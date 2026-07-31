@@ -94,6 +94,15 @@
                 </a>
             </li>
             @endif
+            @if(auth()->user()->can('admin.menus.view') || auth()->user()->can('admin.menus.add') || auth()->user()->can('admin.menus.edit') || auth()->user()->can('admin.menus.delete') || auth()->user()->can('admin.menus.status') || auth()->user()->can('admin.menus.sort'))
+            <li class="nav-item {{ $active_menu == 'menus' ? 'active' : '' }}">
+                <a href="{{ route('menus.view') }}" class="nav-link nav-toggle">
+                    <i class="icon-list"></i>
+                    <span class="title">قوائم الموقع</span>
+                    <span class="arrow"></span>
+                </a>
+            </li>
+            @endif
             @if(auth()->user()->can('admin.pages.view') ||  auth()->user()->can('admin.pages.edit'))
             <li class="nav-item {{ $active_menu == 'pages' ? 'active' : '' }}">
                 <a href="{{ route('pages.view') }}" class="nav-link nav-toggle">

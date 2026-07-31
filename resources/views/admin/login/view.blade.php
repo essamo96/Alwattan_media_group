@@ -21,7 +21,7 @@
             <div class="form-box" style="margin-top: 15%;">
                 <div class='button-box' style="margin-left: auto;width: auto;">
                     <a href='{{ url('/')}}'>
-                        <img src="{{ asset('assets/admin/layouts/layout2/logo.png') }}" alt="alhadath" style="display: block;margin: auto;" />
+                        <img src="{{ asset('assets/front/images/wattan3.png') }}" alt="جريدة الوطن" style="display: block;margin: auto;width: 180px;" />
                     </a>
                 </div>
                 <form action="" id='login' class=" input-group-login login-form" method="post">

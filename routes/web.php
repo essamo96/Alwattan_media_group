@@ -84,6 +84,17 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web
     Route::post('pages/edit/{id}', ['as' => 'pages.edit', 'uses' => 'PagesController@postEdit']);
     Route::post('pages/delete', ['as' => 'pages.delete', 'uses' => 'PagesController@postDelete']);
     Route::post('pages/status', ['as' => 'pages.status', 'uses' => 'PagesController@postStatus']);
+    //Menus Route (قوائم الناف بار في الموقع الخارجي)
+    Route::get('menus', ['as' => 'menus.view', 'middleware' => ['permission:admin.menus.view|admin.menus.add|admin.menus.edit|admin.menus.delete|admin.menus.status|admin.menus.sort'], 'uses' => 'MenusController@getIndex']);
+    Route::get('menus/list', ['as' => 'menus.list', 'middleware' => ['permission:admin.menus.view|admin.menus.add|admin.menus.edit|admin.menus.delete|admin.menus.status|admin.menus.sort'], 'uses' => 'MenusController@getList']);
+    Route::get('menus/add', ['as' => 'menus.add', 'middleware' => ['permission:admin.menus.add'], 'uses' => 'MenusController@getAdd']);
+    Route::post('menus/add', ['as' => 'menus.add', 'middleware' => ['permission:admin.menus.add'], 'uses' => 'MenusController@postAdd']);
+    Route::get('menus/edit/{id}', ['as' => 'menus.edit', 'middleware' => ['permission:admin.menus.edit'], 'uses' => 'MenusController@getEdit']);
+    Route::post('menus/edit/{id}', ['as' => 'menus.edit', 'middleware' => ['permission:admin.menus.edit'], 'uses' => 'MenusController@postEdit']);
+    Route::post('menus/delete', ['as' => 'menus.delete', 'middleware' => ['permission:admin.menus.delete'], 'uses' => 'MenusController@postDelete']);
+    Route::post('menus/status', ['as' => 'menus.status', 'middleware' => ['permission:admin.menus.status'], 'uses' => 'MenusController@postStatus']);
+    Route::post('menus/sort', ['as' => 'menus.sort', 'middleware' => ['permission:admin.menus.sort'], 'uses' => 'MenusController@postSort']);
+
     //services Route
     Route::get('services', ['as' => 'services.view', 'uses' => 'ServicesController@getIndex']);
     Route::get('services/list', ['as' => 'services.list', 'uses' => 'ServicesController@getList']);
