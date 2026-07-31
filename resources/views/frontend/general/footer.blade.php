@@ -204,7 +204,7 @@
     <div class="container">
         <div class="row align-items-middle">
             <div class="col-md-3">
-                <img src="{{ asset('assets/front/images/wattan3.png') }}" class="logo-small" alt=""><br>
+                <img src="{{ asset('assets/front/images/mediagrope.png') }}" class="logo-small" alt="Media Group"><br>
             </div>
 
             <div class="col-md-6 text-white copyright">

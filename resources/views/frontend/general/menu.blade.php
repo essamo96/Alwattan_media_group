@@ -6,7 +6,7 @@
                 <!-- logo begin -->
                 <div id="logo">
                     <a href="{{ url('/')}}">
-                        <img class="logo" src="{{ asset('assets/front/images/wattan3.png') }}" alt="">
+                        <img class="logo" src="{{ asset('assets/front/images/mediagrope.png') }}" alt="Media Group">
                     </a>
                 </div>
                 <!-- logo close -->
