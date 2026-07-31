@@ -260,3 +260,50 @@ git fetch origin main && git reset --hard origin/main
 6. التحقق من أن الموقع يرد بـ 200/301/302، وإلا فشلت الورشة بوضوح.
 
 لتشغيل نشر بلا ترحيلات: `Actions ← نشر الموقع ← Run workflow` وألغِ خيار الترحيلات.
+
+### تحويل مجلد السيرفر إلى مستودع git (مرة واحدة)
+
+مجلد النشر على السيرفر **لم يكن مستودع git** (`fatal: not a git repository`)،
+خلافاً لما افترضته الخطوة ٢ في أعلى هذا الملف. الورشة الجديدة تعتمد عليه، فحوّله:
+
+```bash
+ssh -p 65002 u617249374@147.93.54.90
+cd ~/domains/alwattanmediagroup.com/public_html
+
+# ١) نسخة احتياطية للملفات التي لا يعرفها git
+cp .env ~/env_backup_$(date +%Y%m%d)
+tar -czf ~/uploads_backup_$(date +%Y%m%d).tar.gz public/uploads
+
+# ٢) الربط بالمستودع
+git init
+git remote add origin https://github.com/essamo96/Alwattan_media_group.git
+git fetch origin main
+
+# ٣) المطابقة مع main
+git reset --hard origin/main
+```
+
+`git reset --hard` يستبدل الملفات المتعقَّبة فقط. أما `.env` و `public/uploads`
+و `vendor/` فهي مستثناة في `.gitignore` — لا يعرفها git ولا يمسّها. تحقّق بعدها:
+
+```bash
+ls -la .env && ls public/uploads | head
+```
+
+**إن كان المستودع خاصاً (private)** فلن ينجح `git fetch` بلا مصادقة. أنشئ
+Personal Access Token من GitHub (`Settings ← Developer settings ← Tokens`)
+بصلاحية `repo` فقط، ثم:
+
+```bash
+git remote set-url origin https://<TOKEN>@github.com/essamo96/Alwattan_media_group.git
+```
+
+> **أمان:** بعد `git init` يصبح مجلد `.git` داخل جذر الويب. أُضيفت قاعدتا
+> `RedirectMatch 404` في `.htaccess` بالجذر لمنع الوصول إليه وإلى `.env`
+> عبر المتصفح. تحقّق بفتح `https://www.alwattanmediagroup.com/.git/config`
+> — يجب أن يعطي 404.
+
+### بعد التحويل
+
+أضف أسرار GitHub الخمسة (الجدول أعلاه) ثم شغّل الورشة من
+`Actions ← نشر الموقع على السيرفر ← Run workflow`.

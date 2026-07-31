@@ -1,3 +1,9 @@
+# مجلد النشر على السيرفر هو نفسه جذر الويب، وسيحتوي مجلد .git بعد ربطه
+# بالمستودع. تسريب .git يعني كشف الكود الكامل وتاريخه، لذا نمنعه صراحة
+# ولا نكتفي باعادة التوجيه ادناه.
+RedirectMatch 404 /\.git
+RedirectMatch 404 /\.env
+
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteRule ^(.*)$ public/$1 [L]
