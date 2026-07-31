@@ -25,6 +25,8 @@ jobs:
     name: 🎉 تنفيذ النشر
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
 
     steps:
       - name: 🚀 سحب الكود وتجهيز التطبيق على السيرفر
@@ -41,17 +43,31 @@ jobs:
             cd "${{ secrets.DEPLOY_PATH }}"
 
             echo "::group::سحب الكود"
-            # قد يحمل السيرفر تعديلات محلية تعيق git pull، لذا نطابقه مع main مطابقة تامة.
-            # ملف .env ومجلد public/uploads مستثنيان في gitignore فلا يمسهما reset.
-            BEFORE=$(git rev-parse HEAD)
-            git fetch origin main
-            git reset --hard origin/main
+            # التهيئة الاولى: مجلد النشر لم يكن مستودع git، فننشئه فوق الملفات
+            # الموجودة. git init لا يمس اي ملف، و reset لاحقا يستبدل المتعقَّب فقط.
+            if [ ! -d .git ]; then
+              echo "المجلد ليس مستودع git — تهيئة اولى"
+              git init
+            fi
+
+            # بصمة composer.lock قبل السحب، لتقرير الحاجة الى composer install.
+            # نعتمد البصمة لا تاريخ git كي تعمل حتى في التهيئة الاولى.
+            LOCK_BEFORE=$(md5sum composer.lock 2>/dev/null | cut -d' ' -f1 || echo none)
+
+            # التوكن قصير العمر يصدره GitHub لهذا التشغيل فقط، ولا يُخزَّن على
+            # السيرفر: لا نضعه في remote بل نمرره لعملية fetch وحدها. يعمل مع
+            # المستودعات الخاصة والعامة على السواء.
+            git fetch "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" main
+            git reset --hard FETCH_HEAD
+            git branch -f main FETCH_HEAD 2>/dev/null || true
+            git symbolic-ref HEAD refs/heads/main 2>/dev/null || true
             git log -1 --oneline
             echo "::endgroup::"
 
             echo "::group::المكتبات"
-            # composer install بطيء، فيُشغَّل فقط عند تغير الاعتماديات فعلا
-            if ! git diff --quiet "$BEFORE" HEAD -- composer.json composer.lock; then
+            # composer install بطيء، فيُشغَّل فقط عند تغير الاعتماديات او غياب vendor
+            LOCK_AFTER=$(md5sum composer.lock | cut -d' ' -f1)
+            if [ "$LOCK_BEFORE" != "$LOCK_AFTER" ] || [ ! -d vendor ]; then
               composer install --no-dev --optimize-autoloader --no-interaction
             else
               echo "لا تغيير في composer — تخطي"
