@@ -2,9 +2,18 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreatePermissionTables extends Migration
 {
+    /** ينشئ الجدول فقط اذا لم يكن موجودا: قواعد البيانات القائمة تحوي هذه الجداول اصلا */
+    private function createIfMissing(string $table, callable $definition): void
+    {
+        if (! Schema::hasTable($table)) {
+            Schema::create($table, $definition);
+        }
+    }
+
     /**
      * Run the migrations.
      *
@@ -15,21 +24,21 @@ class CreatePermissionTables extends Migration
         $tableNames = config('permission.table_names');
         $foreignKeys = config('permission.foreign_keys');
 
-        Schema::create($tableNames['permissions'], function (Blueprint $table) {
+        $this->createIfMissing($tableNames['permissions'], function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('guard_name');
             $table->timestamps();
         });
 
-        Schema::create($tableNames['roles'], function (Blueprint $table) {
+        $this->createIfMissing($tableNames['roles'], function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('guard_name');
             $table->timestamps();
         });
 
-        Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $foreignKeys) {
+        $this->createIfMissing($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $foreignKeys) {
             $table->integer('permission_id')->unsigned();
             $table->morphs('model');
 
@@ -41,7 +50,7 @@ class CreatePermissionTables extends Migration
             $table->primary(['permission_id', 'model_id', 'model_type']);
         });
 
-        Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $foreignKeys) {
+        $this->createIfMissing($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $foreignKeys) {
             $table->integer('role_id')->unsigned();
             $table->morphs('model');
 
@@ -53,7 +62,7 @@ class CreatePermissionTables extends Migration
             $table->primary(['role_id', 'model_id', 'model_type']);
         });
 
-        Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
+        $this->createIfMissing($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
             $table->integer('permission_id')->unsigned();
             $table->integer('role_id')->unsigned();
 
@@ -80,10 +89,10 @@ class CreatePermissionTables extends Migration
     {
         $tableNames = config('permission.table_names');
 
-        Schema::drop($tableNames['role_has_permissions']);
-        Schema::drop($tableNames['model_has_roles']);
-        Schema::drop($tableNames['model_has_permissions']);
-        Schema::drop($tableNames['roles']);
-        Schema::drop($tableNames['permissions']);
+        Schema::dropIfExists($tableNames['role_has_permissions']);
+        Schema::dropIfExists($tableNames['model_has_roles']);
+        Schema::dropIfExists($tableNames['model_has_permissions']);
+        Schema::dropIfExists($tableNames['roles']);
+        Schema::dropIfExists($tableNames['permissions']);
     }
 }

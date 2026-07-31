@@ -117,3 +117,92 @@ mv public_html_backup_YYYYMMDD public_html
 ```
 
 ثم أعد نسخة PHP في hPanel إلى ما كانت عليه.
+
+---
+---
+
+# تحديث 2026-07-31 — إصلاح الأصول وقاعدة البيانات وتنظيف public
+
+هذا القسم يكمّل ما سبق ويغطي تغييرات جديدة. **اقرأه قبل النشر.**
+
+## ما تغيّر في هذه الجولة
+
+| التغيير | يُنشر عبر git؟ |
+|---|---|
+| 5 ملفات ترحيل جديدة (`settings`، الجداول المفقودة، أعمدة `users`، المفاتيح الأساسية، `permissions_group`) | ✅ |
+| 4 seeders جديدة (`AdminUserSeeder`، `MissingCategorySeeder`، `MissingTranslationsSeeder`، `SyncPermissionsSeeder`) | ✅ |
+| إصلاح namespace حزمة الكوكيز: `cookieConsent::` ← `cookie-consent::` | ✅ |
+| `2017_09_07_090729_create_permission_tables` صار idempotent (كان سيُفشل `migrate` على أي قاعدة قائمة) | ✅ |
+| `bootstrap/cache/*.php` أُزيلت من تتبع git | ✅ |
+| حذف 4724 ملف أصول غير مستعملة (196 ميغا) + الـPDF (99 ميغا) | ❌ **يدوياً** |
+| استعادة 6506 ملف في `public/` | ❌ **يدوياً** |
+
+## ١. مسألة `public/` — الأهم
+
+`/public` مُستثنى في `.gitignore`، فلا يصل السيرفر عبر `git pull` ولا عبر GitHub Actions
+(عدا 8 ملفات أُضيفت بالقوة: `hero-slider.css/js`، `mediagrope.png`، `wide4-6.jpg`، `login.css`، `wattan-newspaper.png`).
+
+**لذلك:**
+- أصول السيرفر لم تتأثر بما جرى محلياً — المسح كان محلياً فقط.
+- **تنظيف الـ196 ميغا لن ينتقل تلقائياً.** لتطبيقه على السيرفر: احذف المجلدات التالية عبر SSH أو مدير الملفات:
+
+```bash
+cd ~/domains/alwattanmediagroup.com/public_html/public
+rm -rf assets/admin/global/plugins/{amcharts,socicon,cubeportfolio,ckeditor,mapplic,codemirror,echarts,highmaps,highstock,wysihtml,jcrop,highcharts,fullcalendar,bootstrap-editable,plupload,angularjs,bootstrap-table,select2,jstree,bootstrap-summernote,jqvmap,owl-carousel,flot,morris,bootstrap-wysihtml5,fancybox,jquery-validation,jquery-file-upload,jquery-minicolors,bootstrap-datetimepicker,jquery-inputmask,countdown,ion.rangeslider,bootstrap-markdown,bootstrap-daterangepicker,gmaps,flowchart,typeahead,bootstrap-multiselect,animate,bootstrap-timepicker,jquery-gantt,nouislider,bootstrap-sweetalert}
+rm -rf media assets/admin/pages/scripts assets/front/revolution assets/front/images/logo
+rm -f assets/marketing_profile.pdf assets/media.pdf
+find . -name ".DS_Store" -delete
+```
+
+> **لا تحذف `public/uploads`** — محتوى الموقع المرفوع.
+
+**توصية دائمة:** أضف `public/uploads/**` إلى قائمة `exclude` في
+`.github/workflows/main.yml`، حتى لا يمسّ أي نشر مستقبلي مرفوعات المستخدمين.
+
+## ٢. قاعدة البيانات
+
+```bash
+php artisan migrate --force
+```
+
+كل الترحيلات محمية بـ `hasTable` / `hasColumn`، فهي بلا أثر على الجداول الموجودة على السيرفر.
+
+**⚠️ لا تشغّل `php artisan db:seed --force` مباشرة على السيرفر.**
+`DatabaseSeeder` صار يستدعي `AdminUserSeeder`، وهو **يعيد تعيين كلمة مرور المستخدم `admin`**
+إلى القيمة الافتراضية. إن احتجت مزامنة الصلاحيات فقط:
+
+```bash
+php artisan db:seed --class=SyncPermissionsSeeder --force
+```
+
+ولإنشاء حساب مدير على السيرفر، ضع في `.env` أولاً:
+
+```
+ADMIN_USERNAME=...
+ADMIN_PASSWORD=...
+ADMIN_EMAIL=...
+```
+
+ثم `php artisan db:seed --class=AdminUserSeeder --force`.
+
+## ٣. الكاش
+
+`bootstrap/cache/*.php` لم تعد في git — وهي كانت سبب خطأ
+`Class "Fideloper\Proxy\TrustedProxyServiceProvider" not found`.
+بعد النشر:
+
+```bash
+rm -f bootstrap/cache/*.php
+php artisan cache:clear && php artisan view:clear && php artisan config:clear
+php artisan package:discover
+```
+
+`cache:clear` ضروري تحديداً لأن `HomepageController` يستخدم `Cache::rememberForever`.
+
+## ٤. التحقق
+
+```bash
+php artisan migrate:status | grep -i pending    # يجب أن يكون فارغاً
+```
+
+ثم افتح `/` و `/ar` و `/admin/login` وتأكد من ظهور التنسيق (CSS) لا HTML خام.
