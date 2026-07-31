@@ -20,5 +20,6 @@
 ================================================== -->
 <script src="{{ asset('assets/front/js/plugins.js?v=3') }}"></script>
 <script src="{{ asset('assets/front/js/default.js?v=4') }}"></script>
+<script src="{{ asset('assets/front/js/hero-slider.js?v=1') }}"></script>
 <script src="{{ asset('assets/front/js/validation.js?v=3') }}"></script>
 <script src="{{ asset('assets/front/js/countdown-custom.js?v=3') }}"></script>

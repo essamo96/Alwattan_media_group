@@ -18,6 +18,9 @@
 <!-- color scheme -->
 <link rel="stylesheet" href="{{ asset('assets/front/css/colors/magenta.css?v=3') }}" type="text/css" id="colors">
 
+<!-- سلايدر القسم الرئيسي -->
+<link href="{{ asset('assets/front/css/hero-slider.css?v=1') }}" rel="stylesheet" type="text/css">
+
 <!-- custom font -->
 <link rel="stylesheet" href="{{ asset('assets/front/css/font-style.css?v=4') }}" type="text/css">
 <meta name="csrf-token" content="{{ csrf_token() }}"/>

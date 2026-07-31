@@ -2,7 +2,8 @@
 @section('title', $mysettings->{'title_'. trans('site.lang')})
 @section('content')
 <!-- parallax section -->
-<section id="section-hero" class="full-height v-center jarallax text-light">
+<section id="section-hero" class="full-height v-center jarallax text-light has-hero-slideshow">
+    @include('frontend.general.hero-slider')
     @foreach($slides as $item)
     <img src="{{ url('uploads/sliders/'.$item->image) }}" class="jarallax-img">
     <div class="text-center">
