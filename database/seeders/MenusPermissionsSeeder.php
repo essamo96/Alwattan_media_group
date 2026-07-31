@@ -1,11 +1,12 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Permissions;
-use App\Models\PermissionsGroup;
 
 /**
  * مجموعة صلاحيات "ادارة قوائم الموقع" التي تتحكم في قوائم الناف بار في الموقع الخارجي.

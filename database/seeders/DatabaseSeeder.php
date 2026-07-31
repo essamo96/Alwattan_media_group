@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,10 +14,6 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // $this->call(UsersTableSeeder::class);
-        // require صريح حتى يعمل السيدر دون الحاجة الى composer dump-autoload
-        require_once __DIR__ . '/MenusPermissionsSeeder.php';
-        require_once __DIR__ . '/MenusTableSeeder.php';
-
         $this->call(MenusPermissionsSeeder::class);
         $this->call(MenusTableSeeder::class);
     }
