@@ -20,3 +20,5 @@ yarn-error.log
 /public.zip
 public/public.zip
 *.zip
+
+!composer.lock

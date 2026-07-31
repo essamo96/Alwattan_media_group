@@ -90,7 +90,7 @@ class Comments extends Model
         return $this->where('status','=',1)->where('id','=',$id)->first();
     }
     //////////////////////////////////////////////
-    function getSearchComments($status = null,$start,$length)
+    function getSearchComments($status, $start, $length)
     {
         return $this->where(function($query) use ($status) {
             if($status != "")
