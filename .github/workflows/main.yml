@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+concurrency:
+  group: ftp-deploy
+  cancel-in-progress: false
 
 jobs:
   web-deploy:
@@ -15,7 +20,9 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v3
 
-      - name: 📂 Sync files to Server
+      - name: 📂 Sync files to Server (attempt 1)
+        id: deploy1
+        continue-on-error: true
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: 147.93.54.90
@@ -24,6 +31,41 @@ jobs:
           port: 21
           protocol: ftp
           server-dir: ./
+          # السيرفر بطيء في الاستجابة أثناء مسح الملفات، المهلة الافتراضية 30 ثانية غير كافية
+          timeout: 600000
+          log-level: minimal
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/vendor/**
+            **/tests/**
+            **/storage/*.key
+            .env
+            .env.example
+            phpunit.xml
+            README.md
+            docker-compose.yml
+            docker-compose.override.yml
+            .editorconfig
+            .styleci.yml
+
+      - name: ⏳ Wait before retry
+        if: steps.deploy1.outcome == 'failure'
+        run: sleep 60
+
+      - name: 📂 Sync files to Server (retry)
+        if: steps.deploy1.outcome == 'failure'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: 147.93.54.90
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftp
+          server-dir: ./
+          timeout: 600000
+          log-level: minimal
           exclude: |
             **/.git*
             **/.git*/**
