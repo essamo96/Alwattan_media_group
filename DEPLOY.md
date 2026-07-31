@@ -307,3 +307,44 @@ git remote set-url origin https://<TOKEN>@github.com/essamo96/Alwattan_media_gro
 
 أضف أسرار GitHub الخمسة (الجدول أعلاه) ثم شغّل الورشة من
 `Actions ← نشر الموقع على السيرفر ← Run workflow`.
+
+### المصادقة بمفتاح SSH (مُوصى به)
+
+فشلت المصادقة بكلمة المرور بالخطأ:
+`ssh: handshake failed: unable to authenticate, attempted methods [none password]`
+أي أن الاتصال بالمضيف والمنفذ نجح، لكن السيرفر رفض كلمة المرور.
+
+الورشة تقبل الاثنين: تستخدم `SSH_KEY` إن وُجد، وإلا `SSH_PASSWORD`.
+المفتاح أفضل — لا يتأثر بتغيير كلمة المرور، ولا برفض بعض السيرفرات
+للمصادقة بكلمة مرور من عناوين خارجية.
+
+**من جلسة SSH على السيرفر:**
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/github_deploy -N "" -C "github-actions"
+cat ~/.ssh/github_deploy.pub >> ~/.ssh/authorized_keys
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+
+# اطبع المفتاح الخاص وانسخه كاملاً
+cat ~/.ssh/github_deploy
+```
+
+انسخ الناتج **كاملاً** بما فيه سطرا البداية والنهاية:
+
+```
+-----BEGIN OPENSSH PRIVATE KEY-----
+...
+-----END OPENSSH PRIVATE KEY-----
+```
+
+ضعه في سر جديد اسمه `SSH_KEY`، ثم احذف الخاص من السيرفر:
+
+```bash
+rm ~/.ssh/github_deploy
+```
+
+بعدها يمكن حذف سر `SSH_PASSWORD` نهائياً.
+
+**إن استمر الفشل**، تحقق من `SSH_USERNAME` (يجب أن يكون `u617249374` بلا
+مسافات أو أسطر زائدة عند اللصق) ومن أن SSH مفعّل في hPanel.
