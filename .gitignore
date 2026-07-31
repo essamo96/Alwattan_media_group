@@ -1,7 +1,8 @@
 /node_modules
 /public/hot
 /public/storage
-/public
+# ملفات المستخدمين المرفوعة من لوحة التحكم: مكانها السيرفر لا المستودع
+/public/uploads
 /storage/*.key
 /storage/logs/*.log
 /storage/framework/cache/data/*
@@ -20,3 +21,6 @@ yarn-error.log
 /public.zip
 public/public.zip
 *.zip
+
+!composer.lock
+.DS_Store

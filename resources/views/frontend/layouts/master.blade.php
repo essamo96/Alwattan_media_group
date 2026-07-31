@@ -12,6 +12,6 @@
         </div>
         @include('frontend.general.subfooter')
         @yield('js')
-        @include('cookieConsent::index')
+        @include('cookie-consent::index')
     </body>
 </html>

@@ -115,7 +115,7 @@
                 color: #760bd8;
             }
         </style>
-        <link rel="shortcut icon" href="{{ url('assets/front/images/favicon.ico')}}" /> 
+        <link rel="shortcut icon" type="image/png" href="{{ asset('assets/front/images/mediagrope.png')}}" />
     </head>
     <!-- END HEAD -->
 

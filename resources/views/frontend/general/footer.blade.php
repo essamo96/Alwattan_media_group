@@ -150,7 +150,7 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8 col-md-7">
-                <h3 class="size-2 no-margin">{{ $call->title }}</h3>
+                <h3 class="size-2 no-margin">{{ $call->title ?? '' }}</h3>
             </div>
 
             <div class="col-lg-4 col-md-5 d-flex justify-content-end">
@@ -204,7 +204,7 @@
     <div class="container">
         <div class="row align-items-middle">
             <div class="col-md-3">
-                <img src="{{ asset('assets/front/images/wattan3.png') }}" class="logo-small" alt=""><br>
+                <img src="{{ asset('assets/front/images/mediagrope.png') }}" class="logo-small" alt="Media Group"><br>
             </div>
 
             <div class="col-md-6 text-white copyright">

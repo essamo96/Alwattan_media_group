@@ -1,41 +1,98 @@
-name: 🚀 Deploy Website to YMC
+name: 🚀 نشر الموقع على السيرفر
+
+# النشر عبر SSH لا FTP: السيرفر يسحب نفس الـ commit من GitHub، فيصبح
+# الكود المحلي والمستودع والسيرفر متطابقة بحكم التصميم لا بالمزامنة.
+# النسخة السابقة كانت تعتمد SamKirkland/FTP-Deploy-Action وتنهار عند اول
+# عملية حذف لا تطابق ملف الحالة (خطأ 550 على database/seeds).
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      run_migrations:
+        description: تشغيل ترحيلات قاعدة البيانات
+        type: boolean
+        default: true
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
 
 jobs:
-  web-deploy:
-    name: 🎉 Running Deployment Process
+  deploy:
+    name: 🎉 تنفيذ النشر
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 30
 
     steps:
-      - name: 🚚 Get latest code
-        uses: actions/checkout@v3
-
-      - name: 📂 Sync files to Server
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: 🚀 سحب الكود وتجهيز التطبيق على السيرفر
+        uses: appleboy/ssh-action@v1.2.0
         with:
-          server: 147.93.54.90
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          protocol: ftp
-          server-dir: ./
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/vendor/**
-            **/tests/**
-            **/storage/*.key
-            .env
-            .env.example
-            phpunit.xml
-            README.md
-            docker-compose.yml
-            docker-compose.override.yml
-            .editorconfig
-            .styleci.yml
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          command_timeout: 20m
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+
+            echo "::group::سحب الكود"
+            # قد يحمل السيرفر تعديلات محلية تعيق git pull، لذا نطابقه مع main مطابقة تامة.
+            # ملف .env ومجلد public/uploads مستثنيان في gitignore فلا يمسهما reset.
+            BEFORE=$(git rev-parse HEAD)
+            git fetch origin main
+            git reset --hard origin/main
+            git log -1 --oneline
+            echo "::endgroup::"
+
+            echo "::group::المكتبات"
+            # composer install بطيء، فيُشغَّل فقط عند تغير الاعتماديات فعلا
+            if ! git diff --quiet "$BEFORE" HEAD -- composer.json composer.lock; then
+              composer install --no-dev --optimize-autoloader --no-interaction
+            else
+              echo "لا تغيير في composer — تخطي"
+            fi
+            echo "::endgroup::"
+
+            echo "::group::مسح الكاش"
+            # كاش الحزم المُجمَّع اولا: نسخة قديمة منه تعطل الاقلاع بالكامل
+            # (خطأ Fideloper\Proxy\TrustedProxyServiceProvider not found)
+            rm -f bootstrap/cache/*.php
+            php artisan cache:clear
+            php artisan view:clear
+            php artisan config:clear
+            php artisan route:clear
+            php artisan package:discover
+            echo "::endgroup::"
+
+            echo "::group::قاعدة البيانات"
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.run_migrations }}" != "true" ]; then
+              echo "تم تخطي الترحيلات بناء على الطلب"
+            else
+              # كل الترحيلات محمية بـ hasTable / hasColumn فلا اثر لها على الجداول القائمة.
+              # لا نشغّل db:seed هنا اطلاقا: AdminUserSeeder يعيد تعيين كلمة مرور المدير.
+              php artisan migrate --force
+            fi
+            echo "::endgroup::"
+
+            echo "::group::الصلاحيات"
+            chmod -R 775 storage bootstrap/cache
+            if [ -d public/uploads ]; then chmod -R 775 public/uploads; fi
+            echo "::endgroup::"
+
+      - name: ✅ التحقق من استجابة الموقع
+        run: |
+          for i in 1 2 3; do
+            code=$(curl -sk -o /dev/null -w "%{http_code}" --max-time 30 https://www.alwattanmediagroup.com/ || echo 000)
+            echo "المحاولة $i: HTTP $code"
+            case "$code" in
+              200|301|302) echo "✅ الموقع يستجيب"; exit 0 ;;
+            esac
+            sleep 15
+          done
+          echo "❌ الموقع لا يستجيب — راجع storage/logs/laravel.log على السيرفر"
+          exit 1

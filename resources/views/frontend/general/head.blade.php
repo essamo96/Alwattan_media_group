@@ -1,5 +1,6 @@
 <meta charset="utf-8">
-<link rel="icon" href="{{ asset('assets/front/images/favicon.ico') }}" type="image/gif" sizes="16x16">
+<link rel="icon" href="{{ asset('assets/front/images/mediagrope.png') }}" type="image/png">
+<link rel="apple-touch-icon" href="{{ asset('assets/front/images/mediagrope.png') }}">
 <title>@yield('title')</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="{{$mysettings->{'description_'. trans('site.lang')} }}">
