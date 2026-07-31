@@ -17,3 +17,6 @@ yarn-error.log
 .env
 *.lock
 /nbproject/private/
+/public.zip
+public/public.zip
+*.zip
