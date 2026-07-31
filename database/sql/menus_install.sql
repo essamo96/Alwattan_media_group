@@ -49,25 +49,30 @@ WHERE NOT EXISTS (SELECT 1 FROM `menus` mm WHERE mm.`name_ar` = src.a);
 -- ---------------------------------------------------------------------------
 -- 3) مجموعة الصلاحيات
 -- ---------------------------------------------------------------------------
-INSERT INTO `permissions_group` (`name`)
-SELECT 'ادارة قوائم الموقع'
+-- تنبيه: جدولا permissions_group و permissions لا يملكان AUTO_INCREMENT
+-- في هذا المشروع، لذلك يتم توليد المعرّف يدوياً.
+INSERT INTO `permissions_group` (`id`, `name`, `created_at`, `updated_at`, `deleted_at`)
+SELECT (SELECT IFNULL(MAX(x.id), 0) + 1 FROM `permissions_group` x),
+       'ادارة قوائم الموقع', NOW(), NOW(), '1000-01-01 00:00:00'
+FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `permissions_group` pg WHERE pg.`name` = 'ادارة قوائم الموقع');
 
 -- ---------------------------------------------------------------------------
 -- 4) الصلاحيات الست
 -- ---------------------------------------------------------------------------
-INSERT INTO `permissions` (`name`, `group_id`, `guard_name`, `created_at`, `updated_at`)
-SELECT src.n,
+INSERT INTO `permissions` (`id`, `name`, `group_id`, `guard_name`, `created_at`, `updated_at`)
+SELECT (SELECT IFNULL(MAX(x.id), 0) FROM `permissions` x) + src.rn,
+       src.n,
        (SELECT pg.id FROM `permissions_group` pg WHERE pg.`name` = 'ادارة قوائم الموقع' LIMIT 1),
        IFNULL((SELECT p2.guard_name FROM `permissions` p2 LIMIT 1), 'admin'),
        NOW(), NOW()
 FROM (
-  SELECT 'admin.menus.view' AS n
-  UNION ALL SELECT 'admin.menus.add'
-  UNION ALL SELECT 'admin.menus.edit'
-  UNION ALL SELECT 'admin.menus.delete'
-  UNION ALL SELECT 'admin.menus.status'
-  UNION ALL SELECT 'admin.menus.sort'
+  SELECT 'admin.menus.view'   AS n, 1 AS rn
+  UNION ALL SELECT 'admin.menus.add',    2
+  UNION ALL SELECT 'admin.menus.edit',   3
+  UNION ALL SELECT 'admin.menus.delete', 4
+  UNION ALL SELECT 'admin.menus.status', 5
+  UNION ALL SELECT 'admin.menus.sort',   6
 ) AS src
 WHERE NOT EXISTS (SELECT 1 FROM `permissions` p WHERE p.`name` = src.n);
 

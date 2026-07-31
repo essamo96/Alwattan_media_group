@@ -18,15 +18,25 @@ class MenusPermissionsSeeder extends Seeder {
             $guard_name = 'admin';
         }
 
-        // بعض الجداول في المشروع منشأة يدوياً بدون اعمدة التواريخ
-        $group_model = new PermissionsGroup();
-        $group_model->timestamps = Schema::hasColumn('permissions_group', 'created_at');
+        // جداول permissions و permissions_group منشأة يدوياً بدون AUTO_INCREMENT
+        // لذلك نولّد المعرّف بانفسنا بدل الاعتماد على قاعدة البيانات
+        $now = date('Y-m-d H:i:s');
 
-        $group = PermissionsGroup::where('name', 'ادارة قوائم الموقع')->first();
+        $group = DB::table('permissions_group')->where('name', 'ادارة قوائم الموقع')->first();
         if (!$group) {
-            $group_model->name = 'ادارة قوائم الموقع';
-            $group_model->save();
-            $group = $group_model;
+            $group_id = (int) DB::table('permissions_group')->max('id') + 1;
+            $group_row = ['id' => $group_id, 'name' => 'ادارة قوائم الموقع'];
+            if (Schema::hasColumn('permissions_group', 'created_at')) {
+                $group_row['created_at'] = $now;
+                $group_row['updated_at'] = $now;
+            }
+            // العمود deleted_at معرّف NOT NULL بدون قيمة افتراضية في هذا المشروع
+            if (Schema::hasColumn('permissions_group', 'deleted_at')) {
+                $group_row['deleted_at'] = '1000-01-01 00:00:00';
+            }
+            DB::table('permissions_group')->insert($group_row);
+        } else {
+            $group_id = $group->id;
         }
 
         $permissions = [
@@ -39,19 +49,24 @@ class MenusPermissionsSeeder extends Seeder {
         ];
 
         $permission_ids = [];
+        $next_id = (int) DB::table('permissions')->max('id');
         foreach ($permissions as $name) {
-            $permission = Permissions::where('name', $name)->first();
+            $permission = DB::table('permissions')->where('name', $name)->first();
             if (!$permission) {
-                $permission = Permissions::create([
-                            'name' => $name,
-                            'group_id' => $group->id,
-                            'guard_name' => $guard_name,
+                $next_id++;
+                DB::table('permissions')->insert([
+                    'id' => $next_id,
+                    'name' => $name,
+                    'group_id' => $group_id,
+                    'guard_name' => $guard_name,
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ]);
+                $permission_ids[] = $next_id;
             } else {
-                $permission->group_id = $group->id;
-                $permission->save();
+                DB::table('permissions')->where('id', $permission->id)->update(['group_id' => $group_id]);
+                $permission_ids[] = $permission->id;
             }
-            $permission_ids[] = $permission->id;
         }
 
         // منح الصلاحيات الجديدة لادوار المدراء
