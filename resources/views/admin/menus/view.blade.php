@@ -71,6 +71,7 @@
                             <th> # </th>
                             <th> الاسم بالعربي </th>
                             <th> الاسم بالانجليزي </th>
+                            <th> القائمة الاب </th>
                             <th> المسار </th>
                             <th> الايقونة </th>
                             <th> الترتيب </th>
@@ -128,7 +129,7 @@
                     d.name = $('input[name="name"]').val();
                 }
             },
-            "order": [[5, 'asc']],
+            "order": [[6, 'asc']],
             "columnDefs": [{
                     "targets": "_all",
                     "defaultContent": ""
@@ -137,6 +138,7 @@
                 {"data": "", "title": "#", "orderable": false, "searchable": false},
                 {"data": "name_ar", "title": "Name AR", "orderable": true, "searchable": false},
                 {"data": "name_en", "title": "Name EN", "orderable": true, "searchable": false},
+                {"data": "parent", "title": "Parent", "orderable": false, "searchable": false},
                 {"data": "url", "title": "Url", "orderable": false, "searchable": false},
                 {"data": "icon", "title": "Icon", "orderable": false, "searchable": false},
                 {"data": "sort", "title": "Sort", "orderable": true, "searchable": false},

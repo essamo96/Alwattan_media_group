@@ -12,11 +12,23 @@ class Menus extends Model {
     //////////////////////////////////////////////
     protected $table = 'menus';
     protected $fillable = [
-        'name_ar', 'name_en', 'url', 'icon', 'image', 'target', 'type', 'sort', 'status',
+        'parent_id', 'name_ar', 'name_en', 'url', 'icon', 'image', 'target', 'type', 'sort', 'status',
     ];
 
     //////////////////////////////////////////////
-    function addMenu($name_ar, $name_en, $url, $icon, $image, $target, $sort, $status) {
+    // القوائم الفرعية التابعة لهذه القائمة (0 = قائمة رئيسية بلا اب)
+    public function children() {
+        return $this->hasMany(Menus::class, 'parent_id', 'id')->orderBy('sort', 'asc')->orderBy('id', 'asc');
+    }
+
+    //////////////////////////////////////////////
+    public function parentMenu() {
+        return $this->belongsTo(Menus::class, 'parent_id', 'id');
+    }
+
+    //////////////////////////////////////////////
+    function addMenu($parent_id, $name_ar, $name_en, $url, $icon, $image, $target, $sort, $status) {
+        $this->parent_id = $parent_id;
         $this->name_ar = $name_ar;
         $this->name_en = $name_en;
         $this->url = $url;
@@ -31,7 +43,8 @@ class Menus extends Model {
     }
 
     //////////////////////////////////////////////
-    function updateMenu($obj, $name_ar, $name_en, $url, $icon, $image, $target, $sort, $status) {
+    function updateMenu($obj, $parent_id, $name_ar, $name_en, $url, $icon, $image, $target, $sort, $status) {
+        $obj->parent_id = $parent_id;
         $obj->name_ar = $name_ar;
         $obj->name_en = $name_en;
         $obj->url = $url;
@@ -72,6 +85,7 @@ class Menus extends Model {
                                 $query->orWhere('name_en', 'LIKE', '%' . $name . '%');
                             }
                         })
+                        ->orderBy('parent_id', 'asc')
                         ->orderBy('sort', 'asc')
                         ->get();
     }
@@ -82,16 +96,28 @@ class Menus extends Model {
     }
 
     //////////////////////////////////////////////
+    // القوائم الرئيسية فقط (parent_id = 0)، تصلح كخيارات "قائمة الاب" في نموذج الاضافة/التعديل
+    function getTopLevelMenus() {
+        return $this->where('parent_id', 0)->orderBy('sort', 'asc')->get();
+    }
+
+    //////////////////////////////////////////////
+    // القوائم الرئيسية المفعلة مع قوائمها الفرعية المفعلة، لعرض الناف بار في الموقع الخارجي
     function getAllActiveMenus() {
         return $this->where('status', '=', 1)
+                        ->where('parent_id', 0)
                         ->orderBy('sort', 'asc')
                         ->orderBy('id', 'asc')
+                        ->with(['children' => function ($query) {
+                            $query->where('status', 1);
+                        }])
                         ->get();
     }
 
     //////////////////////////////////////////////
-    function getNextSort() {
-        return (int) $this->max('sort') + 1;
+    // الترتيب التالي داخل نطاق قائمة الاب نفسها (0 = القوائم الرئيسية)
+    function getNextSort($parent_id = 0) {
+        return (int) $this->where('parent_id', $parent_id)->max('sort') + 1;
     }
 
     //////////////////////////////////////////////

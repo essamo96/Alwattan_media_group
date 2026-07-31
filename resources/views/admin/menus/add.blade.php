@@ -54,10 +54,22 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="control-label col-md-3">القائمة الاب</label>
+                        <div class="col-md-6">
+                            <select name="parent_id" id="parent_id" class="form-control">
+                                <option value="0" data-next-sort="{{ $next_sort }}" {{ old('parent_id', 0) == 0 ? 'selected' : '' }}>لا يوجد - قائمة رئيسية</option>
+                                @foreach($parent_menus as $item)
+                                <option value="{{ $item->id }}" data-next-sort="{{ (new \App\Models\Menus())->getNextSort($item->id) }}" {{ old('parent_id') == $item->id ? 'selected' : '' }}> {{ $item->name_ar }} </option>
+                                @endforeach
+                            </select>
+                            <span class="help-block">اختر قائمة رئيسية لتظهر هذه القائمة كعنصر منسدل تحتها</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="control-label col-md-3">المسار</label>
                         <div class="col-md-6">
-                            <input type="text" value="{{ old('url') }}" name="url" class="form-control" placeholder="#section-hero او https://example.com">
-                            <span class="help-block">المسارات التي تبدأ بـ # تعتبر أقسام داخل الصفحة الرئيسية</span>
+                            <input type="text" value="{{ old('url', '#') }}" name="url" class="form-control" placeholder="#section-hero او https://example.com">
+                            <span class="help-block">المسارات التي تبدأ بـ # تعتبر أقسام داخل الصفحة الرئيسية. للقوائم التي تُستخدم فقط لفتح قائمة فرعية اترك # كما هي</span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -86,7 +98,8 @@
                     <div class="form-group">
                         <label class="control-label col-md-3">الترتيب</label>
                         <div class="col-md-6">
-                            <input type="number" value="{{ old('sort', $next_sort) }}" name="sort" class="form-control" placeholder="الترتيب">
+                            <input type="number" id="sort" value="{{ old('sort', $next_sort) }}" name="sort" class="form-control" placeholder="الترتيب">
+                            <span class="help-block">الترتيب مستقل لكل قائمة اب: يتحدد تلقائياً حسب القائمة الاب المختارة اعلاه</span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -110,4 +123,16 @@
 @stop
 
 @section('js')
+<script type="text/javascript">
+    $(document).ready(function () {
+        // الترتيب مستقل داخل كل قائمة اب، فيُحدَّث تلقائياً عند تغيير الاب
+        $('#parent_id').on('change', function () {
+            var nextSort = $(this).find(':selected').data('next-sort');
+            if (typeof nextSort === 'undefined') {
+                nextSort = 1;
+            }
+            $('#sort').val(nextSort);
+        });
+    });
+</script>
 @stop

@@ -58,10 +58,28 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="control-label col-md-3">القائمة الاب</label>
+                        <div class="col-md-6">
+                            @if($has_children)
+                            <input type="hidden" name="parent_id" value="0">
+                            <input type="text" class="form-control" value="لا يوجد - قائمة رئيسية" disabled>
+                            <span class="help-block text-warning">هذه القائمة لها قوائم فرعية، لذا تبقى قائمة رئيسية</span>
+                            @else
+                            <select name="parent_id" id="parent_id" class="form-control">
+                                <option value="0" {{ old('parent_id', $info->parent_id) == 0 ? 'selected' : '' }}>لا يوجد - قائمة رئيسية</option>
+                                @foreach($parent_menus as $item)
+                                <option value="{{ $item->id }}" {{ old('parent_id', $info->parent_id) == $item->id ? 'selected' : '' }}> {{ $item->name_ar }} </option>
+                                @endforeach
+                            </select>
+                            <span class="help-block">اختر قائمة رئيسية لتظهر هذه القائمة كعنصر منسدل تحتها</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="control-label col-md-3">المسار</label>
                         <div class="col-md-6">
                             <input type="text" value="{{ old('url', $info->url) }}" name="url" class="form-control" placeholder="#section-hero او https://example.com">
-                            <span class="help-block">المسارات التي تبدأ بـ # تعتبر أقسام داخل الصفحة الرئيسية</span>
+                            <span class="help-block">المسارات التي تبدأ بـ # تعتبر أقسام داخل الصفحة الرئيسية. للقوائم التي تُستخدم فقط لفتح قائمة فرعية اترك # كما هي</span>
                         </div>
                     </div>
                     <div class="form-group">

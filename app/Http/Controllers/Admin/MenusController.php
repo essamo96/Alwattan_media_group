@@ -20,6 +20,7 @@ class MenusController extends AdminController {
     const ACTIVATION_SUCCESS = "نجاح، تم التفعيل بنجاح";
     const DISABLE_SUCCESS = "نجاح، تم التعطيل بنجاح";
     const IMAGE_ERROR = "عذراً، حدث خطأ أثناء رفع الصورة";
+    const HAS_CHILDREN_ERROR = "عذراً، هذه القائمة تحتوي على قوائم فرعية. احذف أو انقل القوائم الفرعية اولاً";
 
     //////////////////////////////////////////
     public function __construct() {
@@ -37,11 +38,18 @@ class MenusController extends AdminController {
         $menu = new Menus();
         $name = $request->get('name');
         $info = $menu->getMenus($name);
+        // خريطة القوائم الرئيسية لعرض اسم الاب دون استعلام لكل صف
+        $parentNames = $menu->getTopLevelMenus()->pluck('name_ar', 'id');
 
         $datatable = Datatables::of($info);
 
-        $datatable->editColumn('name_ar', function ($row) {
-            return (!empty($row->name_ar) ? $row->name_ar : 'N/A');
+        $datatable->editColumn('name_ar', function ($row) use ($parentNames) {
+            $name = !empty($row->name_ar) ? $row->name_ar : 'N/A';
+            return $row->parent_id != 0 ? '↳ ' . $name : $name;
+        });
+
+        $datatable->addColumn('parent', function ($row) use ($parentNames) {
+            return $row->parent_id != 0 ? ($parentNames[$row->parent_id] ?? 'N/A') : '—';
         });
 
         $datatable->editColumn('name_en', function ($row) {
@@ -86,12 +94,15 @@ class MenusController extends AdminController {
     //////////////////////////////////////////
     public function getAdd() {
         $menu = new Menus();
-        parent::$data['next_sort'] = $menu->getNextSort();
+        parent::$data['next_sort'] = $menu->getNextSort(0);
+        parent::$data['parent_menus'] = $menu->getTopLevelMenus();
         return view('admin.menus.add', parent::$data);
     }
 
     //////////////////////////////////////////
     public function postAdd(Request $request) {
+        $menu = new Menus();
+        $parent_id = (int) $request->get('parent_id');
         $name_ar = $request->get('name_ar');
         $name_en = $request->get('name_en');
         $url = $request->get('url');
@@ -101,18 +112,28 @@ class MenusController extends AdminController {
         $status = (int) $request->get('status');
 
         $validator = Validator::make([
+                    'parent_id' => $parent_id,
                     'name_ar' => $name_ar,
                     'url' => $url,
                     'sort' => $sort,
                     'status' => $status,
                         ], [
+                    'parent_id' => 'nullable|numeric',
                     'name_ar' => 'required',
                     'url' => 'required',
                     'sort' => 'nullable|numeric',
                     'status' => 'nullable|numeric|in:0,1',
         ]);
         //////////////////////////////////////////
-        if ($validator->fails()) {
+        // fails() ينفذ التحقق ويثبت رسائل الاخطاء، لتبقى محفوظة عند اضافة رسالة يدوية بعده
+        $failed = $validator->fails();
+        // القائمة الاب يجب ان تكون قائمة رئيسية موجودة فعلاً (لا يوجد اكثر من مستويين)
+        if ($parent_id != 0 && !$menu->where('id', $parent_id)->where('parent_id', 0)->exists()) {
+            $validator->errors()->add('parent_id', 'قائمة الاب المختارة غير صالحة');
+            $failed = true;
+        }
+        //////////////////////////////////////////
+        if ($failed) {
             $request->session()->flash('danger', $validator->messages());
             return redirect(route('menus.add'))->withInput();
         }
@@ -123,8 +144,7 @@ class MenusController extends AdminController {
             return redirect(route('menus.add'))->withInput();
         }
         //////////////////////////////////////////
-        $menu = new Menus();
-        $add = $menu->addMenu($name_ar, $name_en, $url, $icon, $image_name, $target, $sort, $status);
+        $add = $menu->addMenu($parent_id, $name_ar, $name_en, $url, $icon, $image_name, $target, $sort, $status);
         if ($add) {
             $this->clearCache();
             $request->session()->flash('success', self::INSERT_SUCCESS_MESSAGE);
@@ -148,6 +168,9 @@ class MenusController extends AdminController {
         $info = $menu->getMenu($id);
         if ($info) {
             parent::$data['info'] = $info;
+            // القائمة نفسها لا تظهر كخيار لقائمتها الاب، ولا اي قائمة فرعية اخرى (تفادياً لاكثر من مستويين)
+            parent::$data['parent_menus'] = $menu->getTopLevelMenus()->where('id', '!=', $info->id);
+            parent::$data['has_children'] = $info->children()->count() > 0;
             return view('admin.menus.edit', parent::$data);
         } else {
             $request->session()->flash('danger', self::NOT_FOUND);
@@ -172,6 +195,7 @@ class MenusController extends AdminController {
             return redirect(route('menus.view'));
         }
 
+        $parent_id = (int) $request->get('parent_id');
         $name_ar = $request->get('name_ar');
         $name_en = $request->get('name_en');
         $url = $request->get('url');
@@ -181,18 +205,35 @@ class MenusController extends AdminController {
         $status = (int) $request->get('status');
 
         $validator = Validator::make([
+                    'parent_id' => $parent_id,
                     'name_ar' => $name_ar,
                     'url' => $url,
                     'sort' => $sort,
                     'status' => $status,
                         ], [
+                    'parent_id' => 'nullable|numeric',
                     'name_ar' => 'required',
                     'url' => 'required',
                     'sort' => 'nullable|numeric',
                     'status' => 'nullable|numeric|in:0,1',
         ]);
         //////////////////////////////////////////
-        if ($validator->fails()) {
+        $failed = $validator->fails();
+        if ($parent_id != 0) {
+            if ($parent_id == $info->id) {
+                $validator->errors()->add('parent_id', 'لا يمكن ان تكون القائمة اباً لنفسها');
+                $failed = true;
+            } elseif (!$menu->where('id', $parent_id)->where('parent_id', 0)->exists()) {
+                $validator->errors()->add('parent_id', 'قائمة الاب المختارة غير صالحة');
+                $failed = true;
+            } elseif ($info->children()->count() > 0) {
+                // منع اكثر من مستويين: قائمة لها قوائم فرعية لا يمكن ان تصبح فرعية بدورها
+                $validator->errors()->add('parent_id', self::HAS_CHILDREN_ERROR);
+                $failed = true;
+            }
+        }
+        //////////////////////////////////////////
+        if ($failed) {
             $request->session()->flash('danger', $validator->messages());
             return redirect(route('menus.edit', ['id' => $encrypted_id]))->withInput();
         }
@@ -208,7 +249,7 @@ class MenusController extends AdminController {
             @unlink('uploads/menus/' . $info->image);
         }
         //////////////////////////////////////////
-        $update = $menu->updateMenu($info, $name_ar, $name_en, $url, $icon, $image_name, $target, $sort, $status);
+        $update = $menu->updateMenu($info, $parent_id, $name_ar, $name_en, $url, $icon, $image_name, $target, $sort, $status);
         if ($update) {
             $this->clearCache();
             $request->session()->flash('success', self::UPDATE_SUCCESS);
@@ -231,6 +272,9 @@ class MenusController extends AdminController {
         $menu = new Menus();
         $info = $menu->getMenu($id);
         if ($info) {
+            if ($info->children()->count() > 0) {
+                return response()->json(['status' => 'error', 'message' => self::HAS_CHILDREN_ERROR]);
+            }
             $delete = $menu->deleteMenu($info);
             if ($delete) {
                 $this->clearCache();
