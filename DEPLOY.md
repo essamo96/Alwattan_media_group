@@ -206,3 +206,57 @@ php artisan migrate:status | grep -i pending    # يجب أن يكون فارغ�
 ```
 
 ثم افتح `/` و `/ar` و `/admin/login` وتأكد من ظهور التنسيق (CSS) لا HTML خام.
+
+---
+
+## النشر الآلي عبر SSH (بديل FTP)
+
+استُبدلت ورشة FTP بورشة SSH في [.github/workflows/main.yml](.github/workflows/main.yml).
+
+**لماذا:** أداة FTP تزامن الملفات مقابل ملف حالة على السيرفر
+(`.ftp-deploy-sync-state.json`)، وتنهار كلياً عند أول عملية حذف لا تطابق الواقع —
+وهو ما حدث مع `database/seeds` بعد ترقية Laravel 8 التي أعادت تسميته إلى `seeders`.
+ولأن ملف الحالة لا يُكتب إلا عند النجاح الكامل، دخل النشر في حلقة فشل دائمة.
+
+النشر عبر SSH يجعل السيرفر يسحب **نفس الـ commit** من GitHub، فتتطابق الثلاثة
+(المحلي / GitHub / السيرفر) بحكم التصميم لا بالمزامنة.
+
+### الأسرار المطلوبة في GitHub
+
+`Settings ← Secrets and variables ← Actions ← New repository secret`
+
+| الاسم | القيمة |
+|---|---|
+| `SSH_HOST` | `147.93.54.90` |
+| `SSH_PORT` | `65002` |
+| `SSH_USERNAME` | اسم مستخدم SSH |
+| `SSH_PASSWORD` | كلمة مرور SSH |
+| `DEPLOY_PATH` | `~/domains/alwattanmediagroup.com/public_html` |
+
+يمكن حذف `FTP_USERNAME` و `FTP_PASSWORD` بعد التأكد من نجاح النشر الجديد.
+
+### تجهيز السيرفر مرة واحدة
+
+تأكد أن مجلد النشر مستودع git مربوط بـ origin وعلى الفرع main:
+
+```bash
+cd ~/domains/alwattanmediagroup.com/public_html
+git remote -v          # يجب أن يظهر origin
+git rev-parse --abbrev-ref HEAD
+git fetch origin main && git reset --hard origin/main
+```
+
+إن لم يكن مستودع git، انسخ `.env` جانباً ثم استنسخ المشروع في المجلد وأعده.
+
+### ماذا تفعل الورشة
+
+1. `git fetch` + `git reset --hard origin/main` — مطابقة تامة.
+   `.env` و `public/uploads` مستثنيان في gitignore فلا يمسّهما.
+2. `composer install` — **فقط** إن تغيّر `composer.json/lock`.
+3. حذف `bootstrap/cache/*.php` ثم مسح كل أنواع الكاش و `package:discover`.
+4. `php artisan migrate --force` — كل الترحيلات محمية بـ `hasTable`/`hasColumn`.
+   **لا تشغّل `db:seed`** (يعيد تعيين كلمة مرور المدير) — لذا هي غير مضمّنة.
+5. ضبط صلاحيات `storage` و `bootstrap/cache` و `public/uploads`.
+6. التحقق من أن الموقع يرد بـ 200/301/302، وإلا فشلت الورشة بوضوح.
+
+لتشغيل نشر بلا ترحيلات: `Actions ← نشر الموقع ← Run workflow` وألغِ خيار الترحيلات.
