@@ -42,6 +42,10 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web
     Route::post('login', ['as' => 'app.login', 'uses' => 'LoginController@postIndex']);
 });
 
+Route::group(['prefix' => 'admin/file_manager', 'middleware' => ['web', 'auth:admin']], function () {
+    \UniSharp\LaravelFilemanager\Lfm::routes();
+});
+
 Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web', 'auth:admin']], function () {
     // Route
     Route::get('dashboard', ['as' => 'dashboard.view', 'uses' => 'DashboardController@getIndex']);

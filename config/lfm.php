@@ -8,7 +8,10 @@ return [
     */
 
     // Include to pre-defined routes from package or not. Middlewares
-    'use_package_routes' => true,
+    // Disabled: the package hardcodes prefix "filemanager" and middleware
+    // ['web','auth'] regardless of the settings below, which doesn't match
+    // this app's admin guard. Routes are registered manually in routes/web.php instead.
+    'use_package_routes' => false,
 
     // Middlewares which should be applied to all package routes.
     // For laravel 5.1 and before, remove 'web' from the array.
