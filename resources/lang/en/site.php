@@ -25,7 +25,7 @@ return [
     'back_welcome' => ' welcome',
     'services' => ' Services',
     'creative_solutions' => 'Services',
-    'news' => ' news',
+    'news' => 'Our Achievements',
     'latest_new_blogs' => 'Latest News & Blogs',
     'read_more' => 'Read More',
     'partners' => 'partners',
