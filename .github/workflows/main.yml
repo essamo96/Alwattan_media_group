@@ -24,13 +24,18 @@ jobs:
           port: 21
           protocol: ftp
           server-dir: ./
+          # storage/ و public/uploads/ غير متعقَّبين في git (مستثنيان في gitignore)، فلا
+          # يصلان اطلاقا في الكود المسحوب لهذه الورشة. بدون استثنائهما تحذفهما الاداة من
+          # السيرفر عند اول مزامنة ناجحة: فقدان صور الشركاء والاخبار المرفوعة فعليا،
+          # وتعطل الموقع (storage يحوي السجلات والجلسات وكاش الواجهات).
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
             **/vendor/**
             **/tests/**
-            **/storage/*.key
+            public/uploads/**
+            storage/**
             .env
             .env.example
             phpunit.xml
