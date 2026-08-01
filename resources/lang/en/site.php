@@ -25,6 +25,8 @@ return [
     'back_welcome' => ' welcome',
     'services' => ' Services',
     'creative_solutions' => 'Services',
+    'services_intro' => 'Alwattan Media Group offers a complete range of media and digital services aimed at producing trustworthy, professional content and strengthening the media presence of institutions and individuals, including:',
+    'services_tagline' => 'Alwattan Media Group... Professional media that builds knowledge, delivers the truth, and bridges communication',
     'news' => 'Our Achievements',
     'latest_new_blogs' => 'Latest News & Blogs',
     'read_more' => 'Read More',

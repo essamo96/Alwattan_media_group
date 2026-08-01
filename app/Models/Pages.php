@@ -13,7 +13,7 @@ class Pages extends Model {
         Translatable;
 
     protected $table = 'pages';
-    protected $fillable = ['status', 'image', 'tags', 'slug'];
+    protected $fillable = ['status', 'image', 'image2', 'image3', 'tags', 'slug'];
     public $translatedAttributes = ['title', 'details'];
 
     //////////////////////////////////

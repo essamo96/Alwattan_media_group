@@ -66,6 +66,15 @@
         });
         window.addEventListener('load', adjust);
         adjust();
+
+        // custom web fonts (Almarai) swap in after the initial paint and can
+        // widen the menu text enough to cause a wrap that the checks above,
+        // running before the font is ready, never saw
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(adjust);
+        }
+        setTimeout(adjust, 500);
+        setTimeout(adjust, 1500);
     }
 
     if (document.readyState === 'loading') {

@@ -67,17 +67,51 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-md-3">الصورة</label>
+                                    <label class="control-label col-md-3">الصورة الأولى</label>
                                     <div class="col-md-6">
                                         <div class="fileinput fileinput-new" data-provides="fileinput">
                                             <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
-                                                <img src="uploads/image/{{ $info->image }}" alt="" /> </div>
+                                                <img src="{{ asset('uploads/image/'.$info->image) }}" alt="" /> </div>
                                             <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"> </div>
                                             <div>
                                                 <span class="btn default btn-file">
                                                     <span class="fileinput-new"> إختيار صورة </span>
                                                     <span class="fileinput-exists"> تغيير </span>
                                                     <input type="file" name="image"> </span>
+                                                <a href="javascript:;" class="btn red fileinput-exists" data-dismiss="fileinput"> إزالة </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">الصورة الثانية</label>
+                                    <div class="col-md-6">
+                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                            <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                                <img src="{{ $info->image2 ? asset('uploads/image/'.$info->image2) : '' }}" alt="" /> </div>
+                                            <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"> </div>
+                                            <div>
+                                                <span class="btn default btn-file">
+                                                    <span class="fileinput-new"> إختيار صورة </span>
+                                                    <span class="fileinput-exists"> تغيير </span>
+                                                    <input type="file" name="image2"> </span>
+                                                <a href="javascript:;" class="btn red fileinput-exists" data-dismiss="fileinput"> إزالة </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">الصورة الثالثة</label>
+                                    <div class="col-md-6">
+                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                            <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                                <img src="{{ $info->image3 ? asset('uploads/image/'.$info->image3) : '' }}" alt="" /> </div>
+                                            <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"> </div>
+                                            <div>
+                                                <span class="btn default btn-file">
+                                                    <span class="fileinput-new"> إختيار صورة </span>
+                                                    <span class="fileinput-exists"> تغيير </span>
+                                                    <input type="file" name="image3"> </span>
                                                 <a href="javascript:;" class="btn red fileinput-exists" data-dismiss="fileinput"> إزالة </a>
                                             </div>
                                         </div>

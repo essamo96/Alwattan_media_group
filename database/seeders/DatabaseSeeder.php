@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(MissingCategorySeeder::class);
         $this->call(MissingTranslationsSeeder::class);
         $this->call(MediaPlatformsMenuSeeder::class);
+        $this->call(ServicesSeeder::class);
         $this->call(AdminUserSeeder::class);
         $this->call(SyncPermissionsSeeder::class);
     }

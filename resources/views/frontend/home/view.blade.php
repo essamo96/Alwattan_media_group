@@ -35,9 +35,9 @@
 
             <div class="col-lg-6 mb-sm-30 text-center wow fadeInRight">
                 <div class="de-images">
-                    <img class="di-small wow fadeIn" src="{{ asset('assets/front/images/misc/2.jpg') }}" alt="" />
-                    <img class="di-small-2" src="{{ asset('assets/front/images/misc/3.jpg') }}" alt="" />
-                    <img class="img-fluid wow fadeInRight" data-wow-delay=".25s" src="{{ asset('assets/front/images/misc/1.jpg') }}" alt="" />
+                    <img class="di-small wow fadeIn" src="{{ (!empty($about->image) && $about->image !== '-') ? asset('uploads/image/'.$about->image) : asset('assets/front/images/misc/2.jpg') }}" alt="" />
+                    <img class="di-small-2" src="{{ !empty($about->image2) ? asset('uploads/image/'.$about->image2) : asset('assets/front/images/misc/3.jpg') }}" alt="" />
+                    <img class="img-fluid wow fadeInRight" data-wow-delay=".25s" src="{{ !empty($about->image3) ? asset('uploads/image/'.$about->image3) : asset('assets/front/images/misc/1.jpg') }}" alt="" />
                 </div>
             </div>
 
@@ -53,6 +53,7 @@
             <div class="col-md-12 text-center wow fadeInUp">
                 <h2>@lang('site.creative_solutions')</h2>
                 <div class="separator"><span><i class="fa fa-square"></i></span></div>
+                <p class="services-intro">@lang('site.services_intro')</p>
                 <div class="spacer-single"></div>
             </div>
 
@@ -79,6 +80,9 @@
                 </div>
             </div>
             @endforeach
+            <div class="col-md-12 text-center wow fadeInUp mt-4">
+                <p class="services-tagline"><strong>@lang('site.services_tagline')</strong></p>
+            </div>
         </div>
     </div>
 </section>

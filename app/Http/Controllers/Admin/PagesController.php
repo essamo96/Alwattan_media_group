@@ -97,16 +97,17 @@ class PagesController extends AdminController {
                     ]);
                 }
             }
-            $image = $request->file('image');
-            if ($request->hasFile('image') && $image->isValid()) {
-                $destinationPath = 'uploads/image/';
-                $images = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
-                $image->move($destinationPath, $images);
-                @unlink(@'uploads/image/' . $db_img);
-            } else {
-                $images = "-";
+            $destinationPath = 'uploads/image/';
+            foreach (['image', 'image2', 'image3'] as $field) {
+                $file = $request->file($field);
+                if ($request->hasFile($field) && $file->isValid()) {
+                    $filename = 'image_' . strtotime(date("Y-m-d H:i:s")) . '_' . $field . '.' . $file->getClientOriginalExtension();
+                    $file->move($destinationPath, $filename);
+                    $save_data[$field] = $filename;
+                } else {
+                    $save_data[$field] = ($field === 'image') ? '-' : null;
+                }
             }
-            $save_data['image'] = $images;
 
             $add = Pages::create($save_data);
             if ($add) {
@@ -165,17 +166,21 @@ class PagesController extends AdminController {
                         ]);
                     }
                 }
-                $db_img = $info->image;
-                $image = $request->file('image');
-                if ($request->hasFile('image') && $image->isValid()) {
-                    $destinationPath = 'uploads/image/';
-                    $images = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
-                    $image->move($destinationPath, $images);
-                    @unlink(@'uploads/image/' . $db_img);
-                } else {
-                    $images = $db_img;
+                $destinationPath = 'uploads/image/';
+                foreach (['image', 'image2', 'image3'] as $field) {
+                    $db_img = $info->{$field};
+                    $file = $request->file($field);
+                    if ($request->hasFile($field) && $file->isValid()) {
+                        $filename = 'image_' . strtotime(date("Y-m-d H:i:s")) . '_' . $field . '.' . $file->getClientOriginalExtension();
+                        $file->move($destinationPath, $filename);
+                        if (!empty($db_img) && $db_img !== '-') {
+                            @unlink($destinationPath . $db_img);
+                        }
+                        $save_data[$field] = $filename;
+                    } else {
+                        $save_data[$field] = $db_img;
+                    }
                 }
-                $save_data['image'] = $images;
                 $page = Pages::findOrFail($id);
                 $update = $page->update($save_data);
                 if ($update) {
