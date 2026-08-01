@@ -23,3 +23,4 @@
 <script src="{{ asset('assets/front/js/hero-slider.js?v=1') }}"></script>
 <script src="{{ asset('assets/front/js/validation.js?v=3') }}"></script>
 <script src="{{ asset('assets/front/js/countdown-custom.js?v=3') }}"></script>
+<script src="{{ asset('assets/front/js/nav-priority.js?v=1') }}"></script>

@@ -49,7 +49,7 @@
                             $menu_url = $build_url($site_menu);
                             $menu_title = (trans('site.lang') == 'en' && !empty($site_menu->name_en)) ? $site_menu->name_en : $site_menu->name_ar;
                             ?>
-                            <li class="{{ $has_children ? 'has-children' : '' }}">
+                            <li class="mainmenu-item {{ $has_children ? 'has-children' : '' }}">
                                 <a href="{{ $menu_url }}" target="{{ $site_menu->target ?: '_self' }}">
                                     @if(!empty($site_menu->image))
                                         <img src="{{ asset('uploads/menus/'.$site_menu->image) }}" alt="{{ $menu_title }}" class="menu-logo" style="height: 22px;width: auto;vertical-align: middle;margin-inline-end: 6px;">
@@ -81,13 +81,19 @@
                             </li>
                         @endforeach
                     @else
-                        <li><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-hero">@lang('site.home')<span></span></a></li>
-                        <li><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-about">@lang('site.about-us')<span></span></a></li>
-                        <li><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-services">@lang('site.our-services')<span></span></a></li>
-                        <li><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-schedule">@lang('site.blog')<span></span></a></li>
-                        <li><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-partners">@lang('site.partners')<span></span></a></li>
-                        <li><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-contact">@lang('site.contact')<span></span></a></li>
+                        <li class="mainmenu-item"><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-hero">@lang('site.home')<span></span></a></li>
+                        <li class="mainmenu-item"><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-about">@lang('site.about-us')<span></span></a></li>
+                        <li class="mainmenu-item"><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-services">@lang('site.our-services')<span></span></a></li>
+                        <li class="mainmenu-item"><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-schedule">@lang('site.blog')<span></span></a></li>
+                        <li class="mainmenu-item"><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-partners">@lang('site.partners')<span></span></a></li>
+                        <li class="mainmenu-item"><a href="<?= $active_menu != 'home' ? url('/') . '/' : '' ?>#section-contact">@lang('site.contact')<span></span></a></li>
                     @endif
+
+                    <!-- overflow "show more" item, populated by JS when the menu doesn't fit on one line -->
+                    <li id="menu-more-item" class="has-children" style="display:none;">
+                        <a href="javascript:void(0)">{{ trans('site.lang') == 'ar' ? 'المزيد' : 'More' }}<span></span></a>
+                        <ul id="menu-more-list"></ul>
+                    </li>
                     <?php if (trans('site.lang') == 'ar') { ?>
                         <li><a hreflang="en"  title="English" href="{{ LaravelLocalization::getLocalizedURL('en') }}"`>En<span></span></a></li>
                     <?php } else { ?>
