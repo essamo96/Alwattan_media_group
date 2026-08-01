@@ -206,8 +206,8 @@
           }
       });
       },
-      acceptedFiles: "{{ lcfirst(str_singular(request('type') ?: '')) == 'image' ? implode(',', config('lfm.valid_image_mimetypes')) : implode(',', config('lfm.valid_file_mimetypes')) }}",
-      maxFilesize: ({{ lcfirst(str_singular(request('type') ?: '')) == 'image' ? config('lfm.max_image_size') : config('lfm.max_file_size') }} / 1000)
+      acceptedFiles: "{{ implode(',', config('lfm.folder_categories.' . (lcfirst(str_singular(request('type') ?: '')) == 'image' ? 'image' : 'file') . '.valid_mime', [])) }}",
+      maxFilesize: ({{ config('lfm.folder_categories.' . (lcfirst(str_singular(request('type') ?: '')) == 'image' ? 'image' : 'file') . '.max_size', 50000) }} / 1000)
     }
   </script>
 </body>
