@@ -1,131 +1,175 @@
 <?php
 
+/*
+|--------------------------------------------------------------------------
+| Documentation for this config :
+|--------------------------------------------------------------------------
+| online  => http://unisharp.github.io/laravel-filemanager/config
+| offline => vendor/unisharp/laravel-filemanager/docs/config.md
+|
+| اعيد بناء هذا الملف بالكامل من نسخة الحزمة الحالية (vendor/unisharp/laravel-filemanager
+| v2.6+). النسخة القديمة كانت تحمل مفاتيح من اصدار اقدم بكثير للحزمة (images_folder_name,
+| files_folder_name, base_directory, prefix, middlewares, ...) لم تعد مقروءة اطلاقا في
+| الكود المثبت فعليا، وكانت تفتقد المفتاحين الحقيقيين اللذين تعتمد عليهما كل عمليات
+| القراءة والكتابة: disk و folder_categories. غيابهما هو السبب الجذري لفشل انشاء
+| المجلدات ورفع الصور معا (كانت العمليات تسقط على قرص Laravel الافتراضي storage/app
+| بدل public/uploads حيث تعيش كل صور الموقع فعليا).
+ */
+
 return [
     /*
     |--------------------------------------------------------------------------
     | Routing
     |--------------------------------------------------------------------------
-    */
+     */
 
-    // Include to pre-defined routes from package or not. Middlewares
-    // Disabled: the package hardcodes prefix "filemanager" and middleware
-    // ['web','auth'] regardless of the settings below, which doesn't match
-    // this app's admin guard. Routes are registered manually in routes/web.php instead.
-    'use_package_routes' => false,
-
-    // Middlewares which should be applied to all package routes.
-    // For laravel 5.1 and before, remove 'web' from the array.
-    'middlewares' => ['web', 'auth:admin'],
-
-    // The url to this package. Change it if necessary.
-    'prefix' => 'admin/file_manager',
+    // معطّل: نسجّل المسارات يدويا في routes/web.php تحت حارس admin بدل حارس
+    // web الافتراضي للحزمة، ليخضع مدير الملفات لنفس نظام صلاحيات لوحة التحكم.
+    'use_package_routes'       => false,
 
     /*
     |--------------------------------------------------------------------------
-    | Multi-User Mode
+    | Shared folder / Private folder
     |--------------------------------------------------------------------------
-    */
+    |
+    | If both options are set to false, then shared folder will be activated.
+    |
+     */
 
-    // If true, private folders will be created for each signed-in user.
-    'allow_multi_user' => false,
-    // If true, share folder will be created when allow_multi_user is true.
-    'allow_share_folder' => false,
+    // معطّل عمدا: عند تفعيله يُشغِّل middleware MultiUser سطرا يستبدل كل معاملات
+    // الطلب (Request::replace) بمجلد المستخدم الخاص فقط، فيمحو name/type من كل
+    // طلب لا يستهدف مجلده الخاص اصلا - هذا كان السبب الحقيقي لفشل انشاء المجلدات
+    // ورفع الصور معا برسالة "اسم المجلد لا يمكن ان يكون فارغ". المشروع يحتاج
+    // مكتبة وسائط واحدة مشتركة لكل مديري لوحة التحكم، لا مجلدات خاصة لكل مستخدم.
+    'allow_private_folder'     => false,
 
-    // Flexibla way to customize client folders accessibility
+    // Flexible way to customize client folders accessibility
     // If you want to customize client folders, publish tag="lfm_handler"
-    // Then you can rewrite userField function in App\Handler\ConfigHander class
-    // And set 'user_field' to App\Handler\ConfigHander::class
+    // Then you can rewrite userField function in App\Handler\ConfigHandler class
+    // And set 'user_field' to App\Handler\ConfigHandler::class
     // Ex: The private folder of user will be named as the user id.
-    'user_field' => Unisharp\Laravelfilemanager\Handlers\ConfigHandler::class,
+    'private_folder_name'      => UniSharp\LaravelFilemanager\Handlers\ConfigHandler::class,
+
+    'allow_shared_folder'      => true,
+
+    'shared_folder_name'       => 'shares',
 
     /*
     |--------------------------------------------------------------------------
-    | Working Directory
+    | Folder Names
     |--------------------------------------------------------------------------
-    */
+     */
 
-    // Which folder to store files in project, fill in 'public', 'resources', 'storage' and so on.
-    // You should create routes to serve images if it is not set to public.
-    'base_directory' => 'public',
-
-    'images_folder_name' => 'uploads/photos',
-    'files_folder_name'  => 'uploads/files',
-
-    'shared_folder_name' => 'shares',
-    'thumb_folder_name'  => 'thumbs',
+    'folder_categories'        => [
+        'file'  => [
+            'folder_name'  => 'files',
+            'startup_view' => 'list',
+            'max_size'     => 50000, // size in KB
+            'thumb' => true,
+            'thumb_width' => 80,
+            'thumb_height' => 80,
+            'valid_mime'   => [
+                'image/jpeg',
+                'image/pjpeg',
+                'image/png',
+                'image/gif',
+                'application/pdf',
+                'text/plain',
+            ],
+        ],
+        'image' => [
+            'folder_name'  => 'photos',
+            'startup_view' => 'grid',
+            'max_size'     => 50000, // size in KB
+            'thumb' => true,
+            'thumb_width' => 80,
+            'thumb_height' => 80,
+            'valid_mime'   => [
+                'image/jpeg',
+                'image/pjpeg',
+                'image/png',
+                'image/gif',
+            ],
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
-    | Startup Views
+    | Pagination
     |--------------------------------------------------------------------------
-    */
+     */
 
-    // The default display type for items.
-    // Supported: "grid", "list"
-    'images_startup_view' => 'grid',
-    'files_startup_view' => 'list',
+    'paginator' => [
+        'perPage' => 30,
+    ],
 
     /*
     |--------------------------------------------------------------------------
     | Upload / Validation
     |--------------------------------------------------------------------------
-    */
+     */
 
-    // If true, the uploaded file will be renamed to uniqid() + file extension.
-    'rename_file' => true,
+    // قرص مخصص جذره public_path() مباشرة (معرّف في config/filesystems.php)، ليطابق
+    // بنية المشروع الفعلية: كل الصور المرفوعة (menus, partners, services, ...) تُحفظ
+    // مباشرة تحت public/uploads بلا رابط رمزي storage:link. قرص 'public' الافتراضي
+    // للحزمة جذره storage/app/public، وهو مسار مختلف تماما لا يستخدمه هذا المشروع.
+    'disk'                     => 'lfm_public',
 
-    // If rename_file set to false and this set to true, then non-alphanumeric characters in filename will be replaced.
-    'alphanumeric_filename' => true,
+    'rename_file'              => false,
 
-    // If true, non-alphanumeric folder name will be rejected.
-    'alphanumeric_directory' => false,
+    'rename_duplicates'        => false,
 
-    // If true, the uploading file's size will be verified for over than max_image_size/max_file_size.
-    'should_validate_size' => false,
+    'alphanumeric_filename'    => false,
 
-    'max_image_size' => 50000,
-    'max_file_size' => 50000,
+    'alphanumeric_directory'   => false,
 
-    // If true, the uploading file's mime type will be valid in valid_image_mimetypes/valid_file_mimetypes.
-    'should_validate_mime' => true,
+    'should_validate_size'     => false,
 
-    // available since v1.3.0
-    'valid_image_mimetypes' => [
-        'image/jpeg',
-        'image/pjpeg',
-        'image/png',
-        'image/gif',
-        'image/svg+xml',
-    ],
+    'should_validate_mime'     => true,
 
-    // available since v1.3.0
-    // only when '/laravel-filemanager?type=Files'
-    'valid_file_mimetypes' => [
-        'image/jpeg',
-        'image/pjpeg',
-        'image/png',
-        'image/gif',
-        'image/svg+xml',
-        'application/pdf',
-        'text/plain',
-    ],
+    // behavior on files with identical name
+    // setting it to true cause old file replace with new one
+    // setting it to false show `error-file-exist` error and stop upload
+    'over_write_on_duplicate'  => false,
+
+    // mimetypes of executables to prevent from uploading
+    'disallowed_mimetypes' => ['text/x-php', 'text/html', 'text/plain'],
+
+    // extensions of executables to prevent from uploading
+    'disallowed_extensions' => ['php', 'html'],
+
+    // Item Columns
+    'item_columns' => ['name', 'url', 'time', 'icon', 'is_file', 'is_image', 'thumb_url'],
 
     /*
     |--------------------------------------------------------------------------
-    | Image / Folder Setting
+    | Thumbnail
     |--------------------------------------------------------------------------
-    */
+     */
 
-    'thumb_img_width' => 500,
-    'thumb_img_height' => 500,
+    // If true, image thumbnails would be created during upload
+    'should_create_thumbnails' => true,
+
+    'thumb_folder_name'        => 'thumbs',
+
+    // Create thumbnails automatically only for listed types.
+    'raster_mimetypes'         => [
+        'image/jpeg',
+        'image/pjpeg',
+        'image/png',
+    ],
+
+    'thumb_img_width'          => 200, // px
+
+    'thumb_img_height'         => 200, // px
 
     /*
     |--------------------------------------------------------------------------
     | File Extension Information
     |--------------------------------------------------------------------------
-    */
+     */
 
-    'file_type_array' => [
+    'file_type_array'          => [
         'pdf'  => 'Adobe Acrobat',
         'doc'  => 'Microsoft Word',
         'docx' => 'Microsoft Word',
@@ -140,21 +184,6 @@ return [
         'pptx' => 'Microsoft PowerPoint',
     ],
 
-    'file_icon_array' => [
-        'pdf'  => 'fa-file-pdf-o',
-        'doc'  => 'fa-file-word-o',
-        'docx' => 'fa-file-word-o',
-        'xls'  => 'fa-file-excel-o',
-        'xlsx' => 'fa-file-excel-o',
-        'zip'  => 'fa-file-archive-o',
-        'gif'  => 'fa-file-image-o',
-        'jpg'  => 'fa-file-image-o',
-        'jpeg' => 'fa-file-image-o',
-        'png'  => 'fa-file-image-o',
-        'ppt'  => 'fa-file-powerpoint-o',
-        'pptx' => 'fa-file-powerpoint-o',
-    ],
-
     /*
     |--------------------------------------------------------------------------
     | php.ini override
@@ -165,9 +194,8 @@ return [
     |
     | Please note that the 'upload_max_filesize' & 'post_max_size'
     | directives are not supported.
-    */
-    'php_ini_overrides' => [
-        'memory_limit'        => '256M',
+     */
+    'php_ini_overrides'        => [
+        'memory_limit' => '256M',
     ],
-
 ];

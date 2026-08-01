@@ -55,6 +55,17 @@ return [
             'visibility' => 'public',
         ],
 
+        // جذره public/uploads مباشرة، ليطابق بنية المشروع الفعلية: كل الصور
+        // المرفوعة (menus, partners, services, ...) تُحفظ هناك بلا رابط رمزي
+        // storage:link. بهذا يستطيع مدير الملفات تصفح المحتوى الموجود فعليا،
+        // لا شجرة فارغة منفصلة. يُستخدم حصرا من مدير الملفات (config/lfm.php).
+        'lfm_public' => [
+            'driver' => 'local',
+            'root' => public_path('uploads'),
+            'url' => env('APP_URL') . '/uploads',
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_KEY'),
