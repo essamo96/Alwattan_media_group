@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call(MenusTableSeeder::class);
         $this->call(MissingCategorySeeder::class);
         $this->call(MissingTranslationsSeeder::class);
+        $this->call(MediaPlatformsMenuSeeder::class);
         $this->call(AdminUserSeeder::class);
         $this->call(SyncPermissionsSeeder::class);
     }
