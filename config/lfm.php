@@ -27,6 +27,12 @@ return [
     // web الافتراضي للحزمة، ليخضع مدير الملفات لنفس نظام صلاحيات لوحة التحكم.
     'use_package_routes'       => false,
 
+    // يجب ان يطابق البادئة الفعلية المسجّلة في routes/web.php (admin/file_manager).
+    // غياب هذا المفتاح كان يجعل config('lfm.url_prefix') يعيد null، فيتحول
+    // url(null) داخل index.blade.php الى كائن UrlGenerator بدل نص، فيفشل
+    // htmlspecialchars() ب TypeError عند فتح مودال مدير الملفات (خطأ 500).
+    'url_prefix'               => 'admin/file_manager',
+
     /*
     |--------------------------------------------------------------------------
     | Shared folder / Private folder
