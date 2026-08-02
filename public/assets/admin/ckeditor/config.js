@@ -30,6 +30,12 @@ CKEDITOR.editorConfig = function (config) {
     // not needed in the Standard(s) toolbar.
     config.removeButtons = 'Underline,Subscript,Superscript';
 
+    // هذا التوزيع من CKEditor لا يشحن مكوّن bidi الرسمي رغم ان مجموعة
+    // 'bidi' معرّفة اصلا في toolbarGroups اعلاه، فتظهر المجموعة فارغة بلا
+    // ازرار. plugins/bidi/plugin.js اعلاه يوفر بديلا خفيفا لتبديل اتجاه
+    // الفقرة الحالية (LTR/RTL) لدعم النصوص العربية والانجليزية المختلطة.
+    config.extraPlugins = 'bidi';
+
     // Set the most common block elements.
     config.format_tags = 'p;h1;h2;h3;pre';
 
