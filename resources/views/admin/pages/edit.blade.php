@@ -160,6 +160,7 @@
 
 @section('js')
 <script src="{{asset('assets/admin/ckeditor/ckeditor.js')}}" type="text/javascript"></script>
+<script>CKEDITOR.config.customConfig = "{{ asset('assets/admin/ckeditor/config.js') }}?v=2";</script>
 <script type="text/javascript">
 CKEDITOR.replace('ar_details', {
     contentsLangDirection: 'rtl',
