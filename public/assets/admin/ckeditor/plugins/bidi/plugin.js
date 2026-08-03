@@ -13,6 +13,18 @@
             return node.type === CKEDITOR.NODE_ELEMENT && CKEDITOR.dtd.$block[node.getName()];
         }, true) || editor.editable();
 
+        // For list items, direction must be set on the enclosing <ul>/<ol> itself,
+        // otherwise the marker (bullet/number) side never flips and the toggle
+        // looks like it does nothing on the public site.
+        if (block.getName() === 'li') {
+            var list = block.getAscendant(function (node) {
+                return node.type === CKEDITOR.NODE_ELEMENT && (node.getName() === 'ul' || node.getName() === 'ol');
+            }, true);
+            if (list) {
+                block = list;
+            }
+        }
+
         if (block.getAttribute('dir') === dir) {
             block.removeAttribute('dir');
         } else {

@@ -640,6 +640,14 @@ img.logo{
     max-height: 70px !important;
     font-size: 100px !important;
 }
+/* content images (CKEditor uploads, cards, galleries) keep native width/height
+   attributes from the editor, so a responsive container squeezes their width
+   without scaling height along with it -> stretched/cropped-looking images
+   across the whole site. Force proportional auto-height wherever width flexes. */
+img:not(.logo){
+    max-width: 100%;
+    height: auto;
+}
 #mainmenu {
     /* font-family:"Open Sans", Arial, Helvetica, sans-serif; */
     font-family: 'Almarai', sans-serif;

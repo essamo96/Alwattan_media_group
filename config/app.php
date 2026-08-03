@@ -23,6 +23,22 @@ return [
       |
      */
     'env' => env('APP_ENV', 'production'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Deploy Cache-Clear Token
+    |--------------------------------------------------------------------------
+    |
+    | Secret used by routes/deploy/clear-cache/{token} to authorize clearing
+    | compiled views/config/cache after each deploy (storage/ is excluded
+    | from the FTP deploy, so stale compiled views otherwise never expire).
+    |
+    */
+
+    // Fallback value lets the endpoint work immediately on servers where the
+    // .env var hasn't been set yet; override DEPLOY_CACHE_TOKEN in .env for a
+    // private value once deployed.
+    'deploy_cache_token' => env('DEPLOY_CACHE_TOKEN', 'lfm-deploy-clear-2026'),
     /*
       |--------------------------------------------------------------------------
       | Application Debug Mode

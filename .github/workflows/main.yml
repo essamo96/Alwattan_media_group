@@ -44,3 +44,14 @@ jobs:
             docker-compose.override.yml
             .editorconfig
             .styleci.yml
+
+      - name: 🧹 Clear stale compiled cache on server
+        # storage/ is intentionally excluded from the FTP sync above, so compiled
+        # Blade views/config/cache from before this deploy would otherwise linger
+        # forever and keep serving old code (this caused the file manager 500 error).
+        # Falls back to the default token baked into config/app.php when the
+        # DEPLOY_CACHE_TOKEN secret hasn't been set yet.
+        run: |
+          TOKEN="${{ secrets.DEPLOY_CACHE_TOKEN }}"
+          TOKEN="${TOKEN:-lfm-deploy-clear-2026}"
+          curl -fsS "https://alwattanmediagroup.com/deploy/clear-cache/$TOKEN"

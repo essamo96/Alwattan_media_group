@@ -36,6 +36,20 @@ Route::get('/admin', function () {
     return redirect('admin/dashboard');
 });
 
+// deploy-triggered cache clear: storage/ is excluded from FTP deploy (see .github/workflows/main.yml),
+// so stale compiled Blade views survive every deploy unless cleared explicitly via this endpoint.
+Route::get('deploy/clear-cache/{token}', function ($token) {
+    if (!hash_equals((string) config('app.deploy_cache_token'), (string) $token)) {
+        abort(404);
+    }
+
+    Artisan::call('view:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+
+    return 'ok';
+});
+
 // Login Route
 Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web', 'guest:admin']], function () {
     Route::get('login', ['as' => 'app.login', 'uses' => 'LoginController@getIndex']);
