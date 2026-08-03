@@ -88,7 +88,7 @@
 
 @section('js')
 <script src="{{asset('assets/admin/ckeditor/ckeditor.js')}}" type="text/javascript"></script>
-<script>CKEDITOR.config.customConfig = "{{ asset('assets/admin/ckeditor/config.js') }}?v=2";</script>
+<script>CKEDITOR.config.customConfig = "{{ asset('assets/admin/ckeditor/config.js') }}?v={{ filemtime(public_path('assets/admin/ckeditor/config.js')) }}";</script>
 <script type="text/javascript">
 CKEDITOR.replace('name1_ar');
 CKEDITOR.replace('name1_en');

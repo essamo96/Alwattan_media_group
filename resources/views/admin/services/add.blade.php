@@ -95,7 +95,7 @@
 @section('js')
 <script src="vendor/laravel-filemanager/js/lfm.js"></script>
 <script src="{{asset('assets/admin/ckeditor/ckeditor.js')}}" type="text/javascript"></script>
-<script>CKEDITOR.config.customConfig = "{{ asset('assets/admin/ckeditor/config.js') }}?v=2";</script>
+<script>CKEDITOR.config.customConfig = "{{ asset('assets/admin/ckeditor/config.js') }}?v={{ filemtime(public_path('assets/admin/ckeditor/config.js')) }}";</script>
 <script>
 var domain = "{{ asset('/admin').'/file_manager' }}";
 $('#lfm').filemanager('image', {prefix: domain});
