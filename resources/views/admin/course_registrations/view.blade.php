@@ -117,7 +117,7 @@
     <div class="card-body pt-6">
         @include('admin.layout.error')
         <div class="table-responsive">
-            <table class="table align-middle table-row-dashed table-hover fs-6 gy-5" id="registrations_table" style="width:100%">
+            <table class="table align-middle table-row-dashed table-hover fs-6 gy-5 w-100" id="registrations_table" style="width:100%">
                 <thead>
                     <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
                         <th>#</th>
@@ -125,6 +125,7 @@
                         <th>رقم الهوية</th>
                         <th>الجنس</th>
                         <th>الجوال</th>
+                        <th>البريد الإلكتروني</th>
                         <th>الجامعة</th>
                         <th>سنة التخرج</th>
                         <th>الحالة الاجتماعية</th>

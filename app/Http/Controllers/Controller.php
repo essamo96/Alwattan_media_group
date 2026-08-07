@@ -20,7 +20,7 @@ class Controller extends BaseController {
         self::$data['mysettings'] = Cache::rememberForever('mysettings', function () {
                     return Settings::findOrFail(1);
                 });
-        self::$data['social'] = Cache::remember('social', self::$data['minutes'], function () {
+        self::$data['social'] = Cache::rememberForever('social', function () {
                     $social = new Socials();
                     return $social->getAllSocialActive();
                 });

@@ -202,7 +202,7 @@
 <!-- footer begin -->
 <footer class="style-2">
     <div class="container">
-        <div class="row align-items-middle">
+        <div class="row align-items-center">
             <div class="col-md-3">
                 <img src="{{ asset('assets/front/images/mediagrope.png') }}" class="logo-small" alt="Media Group"><br>
             </div>
@@ -211,10 +211,23 @@
                 &copy; {{ trans('site.copyright') }} {{ date('Y') }} - {{ $mysettings->{'title_'. trans('site.lang')} }}
             </div>
 
-            <div class="col-md-3 text-right">
+            <div class="col-md-3 text-end text-right">
                 <div class="social-icons">
                     @foreach($social as $item)
-                    <a href="{{$item->link }}" target="_blank"><i class="fa fa-{{ $item->icon }}"></i></a>
+                        @if(empty($item->link) || empty($item->icon))
+                            @continue
+                        @endif
+                        @php
+                            $icon = trim($item->icon);
+                            $icon = preg_replace('/^(fa\s+)+/', '', $icon);
+                            $icon = ltrim($icon, '-');
+                            if (strpos($icon, 'fa-') !== 0) {
+                                $icon = 'fa-' . $icon;
+                            }
+                        @endphp
+                        <a href="{{ $item->link }}" target="_blank" rel="noopener noreferrer" title="{{ $item->name }}" aria-label="{{ $item->name }}">
+                            <i class="fa {{ $icon }}"></i>
+                        </a>
                     @endforeach
                 </div>
             </div>

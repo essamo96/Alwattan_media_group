@@ -32,24 +32,32 @@ class SocialsController extends AdminController
     //////////////////////////////////////////
     public function postIndex(Request $request)
     {
-        $ids = $request->get('id');
-        $link = $request->get('link');
-        $icon = $request->get('icon');
-        $status = $request->get('status');
-        foreach ($ids as $id)
-        {
-            $social = new Socials();
+        $ids = $request->get('id', []);
+        if (!is_array($ids) || count($ids) === 0) {
+            $request->session()->flash('error', self::NOT_FOUND);
+            return redirect(route('socials.view'));
+        }
+
+        $link = $request->get('link', []);
+        $icon = $request->get('icon', []);
+        $status = $request->get('status', []);
+        $social = new Socials();
+
+        foreach ($ids as $id) {
             $info = $social->getSocial($id);
-            if($info)
-            {
-                $social->updateSocial($info,$link[$id],$icon[$id],$status[$id]);
+            if ($info) {
+                $social->updateSocial(
+                    $info,
+                    $link[$id] ?? $info->link,
+                    $icon[$id] ?? $info->icon,
+                    $status[$id] ?? $info->status
+                );
             }
         }
-        /////////////////////////////////////////////
+
         Cache::forget('social');
-        $info = $social->getAllSocialActive();
-        Cache::forever('social', $info);
-        ////////////////////////////////////////////
+        Cache::forever('social', $social->getAllSocialActive());
+
         $request->session()->flash('success', self::UPDATE_SUCCESS);
         return redirect(route('socials.view'));
     }

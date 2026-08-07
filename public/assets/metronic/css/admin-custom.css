@@ -63,3 +63,17 @@ table.dataTable tbody tr:hover {
     color: #71768c;
     font-size: 0.95rem;
 }
+
+/* Ensure admin content fills the available column after sidebar offset */
+#kt_app_content_container.app-container {
+    width: 100%;
+    max-width: 100%;
+}
+
+.card .table-responsive {
+    width: 100%;
+}
+
+.dataTables_wrapper {
+    width: 100%;
+}

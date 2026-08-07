@@ -29,7 +29,21 @@
         right: calc(var(--bs-app-sidebar-width) + var(--bs-app-sidebar-gap-start, 0px) + var(--bs-app-sidebar-gap-end, 0px)) !important;
     }
 
+    /* Fixed sidebar: Metronic offsets .app-wrapper (not .app-main). Applying
+       margin-right on .app-main while leaving LTR margin-left on .app-wrapper
+       squeezed the content into a narrow left column. */
+    [dir="rtl"] [data-kt-app-sidebar-fixed=true] .app-wrapper {
+        margin-left: 0 !important;
+        margin-right: calc(var(--bs-app-sidebar-width) + var(--bs-app-sidebar-gap-start, 0px) + var(--bs-app-sidebar-gap-end, 0px)) !important;
+    }
+
     [dir="rtl"] .app-main {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* Sticky sidebar variant (unused today, correct if enabled later) */
+    [dir="rtl"] [data-kt-app-sidebar-sticky=true] .app-main {
         margin-left: 0 !important;
         margin-right: calc(var(--bs-app-sidebar-width) + var(--bs-app-sidebar-gap-start, 0px) + var(--bs-app-sidebar-gap-end, 0px)) !important;
     }

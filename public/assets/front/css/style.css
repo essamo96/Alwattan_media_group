@@ -3787,6 +3787,32 @@ footer.light .social-icons i{
 .social-icons .fa-skype{ background:#12c7ef;	}
 .social-icons .fa-dribbble{ background:#f06eaa;	}
 */
+/* ألوان منصات التواصل في الفوتر */
+.social-icons .fa-facebook { background: #305fb3; }
+.social-icons .fa-twitter { background: #1da1f2; }
+.social-icons .fa-instagram { background: #e1306c; }
+.social-icons .fa-youtube { background: #cd201f; }
+.social-icons .fa-linkedin { background: #0077b5; }
+.social-icons .fa-whatsapp { background: #25d366; }
+.social-icons a {
+    display: inline-block;
+    margin-inline-start: 4px;
+}
+.social-icons a i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 4px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.social-icons a:hover i {
+    transform: translateY(-2px);
+    opacity: 0.9;
+    color: #fff;
+}
 
 /* tabs */
 /* ================================================== */

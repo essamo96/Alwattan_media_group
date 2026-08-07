@@ -23,5 +23,6 @@ class DatabaseSeeder extends Seeder
         $this->call(AdminUserSeeder::class);
         $this->call(SyncPermissionsSeeder::class);
         $this->call(HomeSlidesSeeder::class);
+        $this->call(SocialsSeeder::class);
     }
 }
