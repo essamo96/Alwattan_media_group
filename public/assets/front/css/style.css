@@ -239,8 +239,6 @@ html[dir="rtl"] .crumb li{
     z-index: 2;
     width: 100% !important;
     height: 100% !important;
-    transform-origin: 40% 50%;
-    transform: rotate(-9deg) scale(2.03);
     pointer-events: none;
 }
 

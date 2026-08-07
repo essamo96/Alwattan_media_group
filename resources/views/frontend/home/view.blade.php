@@ -4,13 +4,17 @@
 <!-- parallax section -->
 <section id="section-hero" class="full-height v-center jarallax text-light has-hero-slideshow">
     @include('frontend.general.hero-slider')
+    {{-- One shared wave-line canvas for the whole hero (previously duplicated once per
+         slide below, which stacked N rotated/scaled canvases on top of each other and
+         produced the broken diagonal-streak effect). --}}
+    <canvas class="waves" data-speed="-5" data-wave-width="150%" data-animation="SineInOut"></canvas>
     @foreach($slides as $item)
     <img src="{{ url('uploads/sliders/'.$item->image) }}" class="jarallax-img">
-    <div class="text-center">
+    {{-- Only one hero-text-slide is shown at a time (see hero-slider.css / hero-slider.js);
+         previously all slides' text rendered stacked in normal flow simultaneously. --}}
+    <div class="text-center hero-text-slide {{ $loop->first ? 'is-active' : '' }}" data-index="{{ $loop->index }}">
         <div class="container">
             <div class="row">
-                <!-- Waves-->
-                <canvas class="waves" data-speed="5" data-wave-width="150%" data-animation="SineInOut"></canvas>
                 <div class="col-md-12">
                     <h1 class="title-3">
                         {!! $item->name !!}
