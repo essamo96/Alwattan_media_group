@@ -219,7 +219,7 @@
                     <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <h2>تم إرسال طلبك بنجاح</h2>
-                <p>{{ session('success', 'شكراً لتسجيلك، سيتم التواصل معك في حال قبول طلبك ضمن معايير برنامج التدريب التخصصي.') }}</p>
+                <p>شكراً لتسجيلك، سيتم التواصل معك في حال قبول طلبك ضمن معايير برنامج التدريب التخصصي.</p>
 
                 <div class="notes-box">
                     <div class="notes-title">
