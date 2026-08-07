@@ -33,6 +33,7 @@ return [
     'partners' => 'شركاؤنا',
     'send' => 'إرسال',
     'success_partners' => 'شركاء النجاح',
+    'advertisements' => 'الإعلانات',
     'testimonials' => 'قالوا عنا',
     'view_image' => 'عرض الصور',
     'get_in_touch' => 'ابق على تواصل',

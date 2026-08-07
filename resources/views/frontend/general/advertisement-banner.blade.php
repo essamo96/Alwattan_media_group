@@ -1,6 +1,14 @@
 @if(isset($ads_banner) && count($ads_banner) > 0)
-<section id="section-ad-banner" class="ad-banner-section">
+<section id="section-ad-banner" class="ad-banner-section" aria-label="section">
+    <div class="wm wm-border light wow fadeInDown">@lang('site.advertisements')</div>
     <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center wow fadeInUp">
+                <h2>@lang('site.advertisements')</h2>
+                <div class="separator"><span><i class="fa fa-square"></i></span></div>
+                <div class="spacer-single"></div>
+            </div>
+        </div>
         <div class="ad-banner-carousel" data-ad-carousel>
             @foreach($ads_banner as $index => $ad)
             <a href="{{ $ad->url }}" target="_blank" rel="noopener" class="ad-banner-slide {{ $index == 0 ? 'is-active' : '' }}" aria-label="{{ $ad->name }}">
@@ -24,7 +32,6 @@
 </section>
 
 <style>
-    .ad-banner-section{padding:34px 0;}
     .ad-banner-carousel{
         position:relative;
         width:100%;

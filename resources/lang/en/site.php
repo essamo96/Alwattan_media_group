@@ -33,6 +33,7 @@ return [
     'partners' => 'partners',
     'send' => 'Send',
     'success_partners' => 'Success Partners',
+    'advertisements' => 'Advertisements',
     'testimonials' => 'testimonials',
     'view_image' => 'View Image',
     'get_in_touch' => 'Get in touch',
