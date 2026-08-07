@@ -8,6 +8,7 @@ use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Encryption\DecryptException;
+use App\Support\MediaUpload;
 
 class FaqController extends AdminController {
 
@@ -158,10 +159,9 @@ class FaqController extends AdminController {
                 return redirect(route('faq.edit', ['id' => $encrypted_id]))->withInput();
             } else {
                 if ($request->hasFile('image') && $image->isValid()) {
-                    @unlink(@'uploads/faq/' . $db_img);
-                    $destinationPath = 'uploads/faq/';
+                    @unlink(public_path('uploads/faq/' . $db_img));
                     $image_name = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
-                    $image->move($destinationPath, $image_name);
+                    $image->move(MediaUpload::ensureDir('uploads/faq'), $image_name);
                 } else {
                     $image_name = $db_img;
                 }

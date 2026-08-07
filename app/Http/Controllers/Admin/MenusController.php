@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Encryption\DecryptException;
+use App\Support\MediaUpload;
 
 class MenusController extends AdminController {
 
@@ -246,7 +247,7 @@ class MenusController extends AdminController {
         if ($image_name === null) {
             $image_name = $info->image;
         } elseif (!empty($info->image)) {
-            @unlink('uploads/menus/' . $info->image);
+            @unlink(public_path('uploads/menus/' . $info->image));
         }
         //////////////////////////////////////////
         $update = $menu->updateMenu($info, $parent_id, $name_ar, $name_en, $url, $icon, $image_name, $target, $sort, $status);
@@ -350,10 +351,7 @@ class MenusController extends AdminController {
         if (!$image->isValid()) {
             return false;
         }
-        $destinationPath = 'uploads/menus/';
-        if (!file_exists($destinationPath)) {
-            @mkdir($destinationPath, 0755, true);
-        }
+        $destinationPath = MediaUpload::ensureDir('uploads/menus');
         $image_name = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
         $image->move($destinationPath, $image_name);
         return $image_name;

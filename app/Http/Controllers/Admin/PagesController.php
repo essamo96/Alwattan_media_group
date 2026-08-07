@@ -11,6 +11,7 @@ use App\Models\Pages;
 use App\Models\Language;
 use Yajra\DataTables\DataTables;
 use Illuminate\Contracts\Encryption\DecryptException;
+use App\Support\MediaUpload;
 
 class PagesController extends AdminController {
 
@@ -97,7 +98,7 @@ class PagesController extends AdminController {
                     ]);
                 }
             }
-            $destinationPath = 'uploads/image/';
+            $destinationPath = MediaUpload::ensureDir('uploads/image');
             foreach (['image', 'image2', 'image3'] as $field) {
                 $file = $request->file($field);
                 if ($request->hasFile($field) && $file->isValid()) {
@@ -166,7 +167,7 @@ class PagesController extends AdminController {
                         ]);
                     }
                 }
-                $destinationPath = 'uploads/image/';
+                $destinationPath = MediaUpload::ensureDir('uploads/image');
                 foreach (['image', 'image2', 'image3'] as $field) {
                     $db_img = $info->{$field};
                     $file = $request->file($field);
@@ -174,7 +175,7 @@ class PagesController extends AdminController {
                         $filename = 'image_' . strtotime(date("Y-m-d H:i:s")) . '_' . $field . '.' . $file->getClientOriginalExtension();
                         $file->move($destinationPath, $filename);
                         if (!empty($db_img) && $db_img !== '-') {
-                            @unlink($destinationPath . $db_img);
+                            @unlink($destinationPath . DIRECTORY_SEPARATOR . $db_img);
                         }
                         $save_data[$field] = $filename;
                     } else {

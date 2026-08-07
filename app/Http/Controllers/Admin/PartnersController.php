@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Cache;
 use Intervention\Image\Facades\Image;
 ////////////////////////////////////
 use App\Models\Partners;
+use App\Support\MediaUpload;
 
 class PartnersController extends AdminController {
 
@@ -87,7 +88,7 @@ class PartnersController extends AdminController {
         } else {
             $destinationPath = 'uploads/partners/';
             $image_name = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $image_name);
+            $image->move(MediaUpload::ensureDir('uploads/partners'), $image_name);
             $save_data['image'] = $destinationPath . $image_name;
 
             $add = Partners::create($save_data);
@@ -154,8 +155,8 @@ class PartnersController extends AdminController {
                 if ($request->hasFile('image') && $image->isValid()) {
                     $destinationPath = 'uploads/partners/';
                     $image_name = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
-                    $image->move($destinationPath, $image_name);
-                    @unlink($info->image);
+                    $image->move(MediaUpload::ensureDir('uploads/partners'), $image_name);
+                    @unlink(public_path($info->image));
                     $save_data['image'] = $destinationPath . $image_name;
                 }
 

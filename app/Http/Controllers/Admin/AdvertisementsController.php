@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use DataTables;
 /////////////////////////////////////
 use App\Models\Advertisements;
+use App\Support\MediaUpload;
 
 class AdvertisementsController extends AdminController
 {
@@ -108,7 +109,7 @@ class AdvertisementsController extends AdminController
         {
             if ($request->hasFile('image') && $image->isValid())
             {
-                $destinationPath = 'uploads/advertisements/';
+                $destinationPath = MediaUpload::ensureDir('uploads/advertisements');
                 $image_name = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
                 $image->move($destinationPath, $image_name);
             }
@@ -212,10 +213,10 @@ class AdvertisementsController extends AdminController
             {
                 if ($request->hasFile('image') && $image->isValid())
                 {
-                    $destinationPath = 'uploads/advertisements/';
+                    $destinationPath = MediaUpload::ensureDir('uploads/advertisements');
                     $image_name = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
                     $image->move($destinationPath, $image_name);
-                    @unlink(@'uploads/advertisements/'.$db_image);
+                    @unlink($destinationPath . DIRECTORY_SEPARATOR . $db_image);
                 }
                 else
                 {

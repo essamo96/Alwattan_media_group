@@ -77,3 +77,33 @@ table.dataTable tbody tr:hover {
 .dataTables_wrapper {
     width: 100%;
 }
+
+/* Image picker (Metronic image-input + LFM) */
+.admin-image-preview-wrap {
+    background-color: #f5f8fa;
+    background-size: cover;
+    background-position: center;
+    border: 1px dashed #e1e3ea;
+    border-radius: 0.475rem;
+}
+
+.admin-image-picker .image-input-empty .admin-image-preview-wrap {
+    background-image: linear-gradient(45deg, #f5f8fa 25%, #eef3f7 25%, #eef3f7 50%, #f5f8fa 50%, #f5f8fa 75%, #eef3f7 75%, #eef3f7 100%);
+    background-size: 16px 16px;
+}
+
+.admin-dir-btns .btn {
+    min-width: 42px;
+    font-weight: 700;
+}
+
+/* CKEditor editable area */
+.ck.ck-editor__editable {
+    min-height: 220px;
+}
+.ck.ck-editor__editable[dir="rtl"] {
+    text-align: right;
+}
+.ck.ck-editor__editable[dir="ltr"] {
+    text-align: left;
+}

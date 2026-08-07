@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Encryption\DecryptException;
+use App\Support\MediaUpload;
 
 class SlidersController extends AdminController {
 
@@ -98,9 +99,8 @@ class SlidersController extends AdminController {
             return redirect(route('sliders.add'))->withInput();
         } else {
             if ($request->hasFile('image') && $image->isValid()) {
-                $destinationPath = 'uploads/sliders/';
                 $image_name = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
-                $image->move($destinationPath, $image_name);
+                $image->move(MediaUpload::ensureDir('uploads/sliders'), $image_name);
             } else {
                 $request->session()->flash('danger', self::IMAGE_ERROR);
                 return redirect(route('sliders.add'))->withInput();
@@ -181,10 +181,9 @@ class SlidersController extends AdminController {
                 return redirect(route('sliders.edit', ['id' => $encrypted_id]))->withInput();
             } else {
                 if ($request->hasFile('image') && $image->isValid()) {
-                    @unlink(@'uploads/sliders/' . $db_img);
-                    $destinationPath = 'uploads/sliders/';
+                    @unlink(public_path('uploads/sliders/' . $db_img));
                     $image_name = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
-                    $image->move($destinationPath, $image_name);
+                    $image->move(MediaUpload::ensureDir('uploads/sliders'), $image_name);
                 } else {
                     $image_name = $db_img;
                 }
@@ -222,8 +221,8 @@ class SlidersController extends AdminController {
             $delete = $sliders->deleteSlider($info);
             if ($delete) {
                 $this->clearCache($info->language);
-                @unlink(@'uploads/sliders/' . $db_ground);
-                @unlink(@'uploads/sliders/' . $db_img);
+                @unlink(public_path('uploads/sliders/' . $db_ground));
+                @unlink(public_path('uploads/sliders/' . $db_img));
                 return response()->json(['status' => 'success', 'message' => self::DELETE_SUCCESS]);
             } else {
                 return response()->json(['status' => 'error', 'message' => self::EXECUTION_ERROR]);

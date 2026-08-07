@@ -14,6 +14,7 @@ use App\Models\Cities;
 use App\Models\Gallery;
 use App\Models\Language;
 use App\Models\PropertiesCategories;
+use App\Support\MediaUpload;
 
 class PropertiesController extends AdminController {
 
@@ -301,7 +302,7 @@ class PropertiesController extends AdminController {
         foreach ($images as $image) {
             $tableImages[] = $image['file_path'];
         }
-        $storeFolder = public_path('uploads/gallery');
+        $storeFolder = MediaUpload::ensureDir('uploads/gallery');
         $file_path = public_path('uploads/gallery/');
         $files = scandir($storeFolder);
         foreach ($files as $file) {
@@ -323,7 +324,7 @@ class PropertiesController extends AdminController {
         $filename = pathinfo($fileInfo, PATHINFO_FILENAME);
         $extension = pathinfo($fileInfo, PATHINFO_EXTENSION);
         $file_name = $filename . '-' . time() . '.' . $extension;
-        $image->move(public_path('uploads/gallery'), $file_name);
+        $image->move(MediaUpload::ensureDir('uploads/gallery'), $file_name);
 
         $imageUpload = new Gallery;
         $imageUpload->file_path = $file_name;

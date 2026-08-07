@@ -316,18 +316,17 @@ class NewsController extends AdminController {
     }
 
     public function getImage(Request $request) {
-// Allowed extentions.
-        if ($request->hasFile('upload')) {
-            $originName = $request->file('upload')->getClientOriginalName();
-            $fileName = pathinfo($originName, PATHINFO_FILENAME);
-            $extension = $request->file('upload')->getClientOriginalExtension();
-            $fileName = $fileName . '_' . time() . '.' . $extension;
-            $request->file('upload')->move(public_path('images'), $fileName);
-            $url = asset('images/' . $fileName);
+        if (!$request->hasFile('upload')) {
+            return response()->json(['uploaded' => 0, 'error' => ['message' => 'No file uploaded']], 400);
+        }
+
+        try {
+            $stored = \App\Support\MediaUpload::storeCkeditorUpload($request->file('upload'));
+            $url = $stored['url'];
+            $fileName = $stored['fileName'];
 
             $CKEditorFuncNum = $request->input('CKEditorFuncNum');
             if ($CKEditorFuncNum !== null) {
-                // CKEditor 4 callback contract (still used by any not-yet-migrated editor instance).
                 $msg = 'Image uploaded successfully';
                 $response = "<script>window.parent.CKEDITOR.tools.callFunction($CKEditorFuncNum, '$url', '$msg')</script>";
                 @header('Content-type: text/html; charset=utf-8');
@@ -335,8 +334,9 @@ class NewsController extends AdminController {
                 return;
             }
 
-            // CKEditor 5 CKFinderUploadAdapter contract (Metronic's bundled build ships this adapter).
             return response()->json(['uploaded' => 1, 'url' => $url, 'fileName' => $fileName]);
+        } catch (\Throwable $e) {
+            return response()->json(['uploaded' => 0, 'error' => ['message' => $e->getMessage()]], 500);
         }
     }
 

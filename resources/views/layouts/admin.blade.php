@@ -91,6 +91,7 @@
     <script src="{{ asset_v('assets/metronic/plugins/global/plugins.bundle.js') }}"></script>
     <script src="{{ asset_v('assets/metronic/js/scripts.bundle.js') }}"></script>
     <script src="{{ asset_v('assets/admin/global/scripts/datatable-kt-menu-fix.js') }}"></script>
+    @include('admin.partials.media-assets')
 
     @stack('scripts')
 </body>
