@@ -30,3 +30,7 @@ public/public.zip
 /alwattan.ps.zip
 /alwattan.ps
 public/assets/admin/~$تسجيلات_الدورة_2026-08-07_19-13.xlsx
+public/assets/admin/تسجيلات_الدورة_2026-08-07_22-54.xlsx
+
+# ملفات تثبيت/برامج كبيرة لا يجب رفعها للمستودع (تتجاوز حد GitHub 100MB)
+*.exe

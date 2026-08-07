@@ -1,0 +1,82 @@
+/* ==========================================================================
+   إصلاح شريط التنقل: إبقاء الشعار والقوائم في صف واحد على سطح المكتب.
+   عند زيادة عدد العناصر، nav-priority.js ينقلها لقائمة «المزيد» بدل نزول
+   شريط القوائم تحت الشعار.
+   ========================================================================== */
+
+@media (min-width: 993px) {
+    header > .container > .row > .col-md-12 {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        width: 100%;
+    }
+
+    header div#logo {
+        float: none;
+        flex: 0 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+
+    header .header-extra {
+        float: none;
+        flex: 0 0 auto;
+        order: 3;
+        margin-inline-start: 0;
+    }
+
+    #mainmenu {
+        float: none;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        flex: 1 1 auto;
+        justify-content: flex-end;
+        min-width: 0;
+        max-width: 100%;
+        margin: 0;
+        overflow: visible;
+    }
+
+    html[dir="rtl"] #mainmenu {
+        float: none;
+    }
+
+    #mainmenu > li {
+        float: none;
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    html[dir="rtl"] #mainmenu > li {
+        float: none;
+    }
+
+    /* قائمة «المزيد» المنبثقة */
+    #menu-more-item > ul,
+    #menu-more-list {
+        min-width: 180px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    #menu-more-item > ul #menu-more-list,
+    #menu-more-list {
+        float: none;
+        height: auto;
+    }
+
+    /* عناصر منقولة داخل المزيد: أعد ضبط الـ float للعمود */
+    #menu-more-list > li {
+        float: none;
+        display: block;
+        width: 100%;
+    }
+
+    #menu-more-list > li > a {
+        display: block;
+        text-align: start;
+        white-space: normal;
+    }
+}

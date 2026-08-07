@@ -95,9 +95,9 @@
                         <ul id="menu-more-list"></ul>
                     </li>
                     <?php if (trans('site.lang') == 'ar') { ?>
-                        <li><a hreflang="en"  title="English" href="{{ LaravelLocalization::getLocalizedURL('en') }}"`>En<span></span></a></li>
+                        <li><a hreflang="en" title="English" href="{{ LaravelLocalization::getLocalizedURL('en') }}">En<span></span></a></li>
                     <?php } else { ?>
-                        <li><a hreflang="ar"  title="Arabic" href="{{ LaravelLocalization::getLocalizedURL('ar') }}"`>AR<span></span></a></li>
+                        <li><a hreflang="ar" title="Arabic" href="{{ LaravelLocalization::getLocalizedURL('ar') }}">AR<span></span></a></li>
                     <?php } ?>
                 </ul>
                 <!-- mainmenu close -->

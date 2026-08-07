@@ -2,21 +2,14 @@
 @section('title', $mysettings->{'title_'. trans('site.lang')})
 @section('content')
 <!-- parallax section -->
-<section id="section-hero" class="full-height v-center jarallax text-light">
-    {{-- One shared wave-line canvas for the whole hero (previously duplicated once per
-         slide below, which stacked N rotated/scaled canvases on top of each other and
-         produced the broken diagonal-streak effect). --}}
+{{-- النصوص متموضعة مطلقاً فوق الصور/الموجات (hero-slider.css) حتى لا تدخل
+     تدفق التخطيط ولا تتعارض مع الخطوط المتحركة. --}}
+<section id="section-hero" class="full-height jarallax text-light">
+    {{-- canvas واحد مشترك للموجات المتحركة على كامل السلايدر --}}
     <canvas class="waves" data-speed="5" data-wave-width="150%" data-animation="SineInOut"></canvas>
     @foreach($slides as $item)
-    {{-- The jarallax plugin only picks up the FIRST .jarallax-img it finds inside the
-         section (it does a plain querySelector), so with more than one slide the rest
-         used to render as plain, unstyled, full-size <img> tags dumped into the page.
-         hero-slider.js now fades between them itself (crossfade via .is-active, same
-         mechanism as .hero-text-slide below), so every slide's real image is shown. --}}
-    <img src="{{ url('uploads/sliders/'.$item->image) }}" class="jarallax-img{{ $loop->first ? ' is-active' : '' }}" data-index="{{ $loop->index }}">
-    {{-- Only one hero-text-slide is shown at a time (see hero-slider.css / hero-slider.js);
-         previously all slides' text rendered stacked in normal flow simultaneously. --}}
-    <div class="text-center hero-text-slide {{ $loop->first ? 'is-active' : '' }}" data-index="{{ $loop->index }}">
+    <img src="{{ url('uploads/sliders/'.$item->image) }}" class="jarallax-img{{ $loop->first ? ' is-active' : '' }}" alt="" data-index="{{ $loop->index }}">
+    <div class="text-center hero-text-slide{{ $loop->first ? ' is-active' : '' }}" data-index="{{ $loop->index }}">
         <div class="container">
             <div class="row">
                 <div class="col-md-12">

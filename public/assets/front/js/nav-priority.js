@@ -1,7 +1,7 @@
 /*
  * Collapses overflowing #mainmenu items into a "More" dropdown so the
- * navbar never wraps to a second line (English labels are wider than
- * Arabic ones and used to push the menu onto two rows).
+ * navbar never wraps to a second line / drops below the logo (English
+ * labels are wider than Arabic ones and used to push the menu down).
  *
  * Only applies to the desktop horizontal navbar (style.css switches
  * #mainmenu to a full-width vertical drawer below 992px, where every
@@ -38,20 +38,55 @@
             moreItem.style.display = 'none';
         }
 
-        function fits() {
-            // Check every visible top-level <li> (menu items, the "More" button when
-            // shown, and trailing items like the language switcher) against the same
-            // baseline row - not just .mainmenu-item, otherwise once every item has
-            // been collapsed into "More" this used to report "fits" unconditionally
-            // even though "More" (or the language switcher after it) still wrapped.
-            var children = Array.prototype.slice.call(menu.children).filter(function (li) {
-                return li.style.display !== 'none';
+        function visibleChildren() {
+            return Array.prototype.slice.call(menu.children).filter(function (li) {
+                return li.style.display !== 'none' && window.getComputedStyle(li).display !== 'none';
             });
+        }
+
+        function rowFits() {
+            var children = visibleChildren();
             if (children.length === 0) return true;
             var top0 = children[0].offsetTop;
             return children.every(function (li) {
                 return li.offsetTop <= top0 + 2;
             });
+        }
+
+        function menuDroppedBelowLogo() {
+            var logo = document.getElementById('logo');
+            if (!logo) return false;
+            return menu.offsetTop > logo.offsetTop + 4;
+        }
+
+        function exceedsAvailableWidth() {
+            var col = menu.parentElement;
+            if (!col) return false;
+            var logo = document.getElementById('logo');
+            var extra = col.querySelector('.header-extra');
+            var btn = document.getElementById('menu-btn');
+            var used = 0;
+            if (logo) used += logo.offsetWidth;
+            if (extra && window.getComputedStyle(extra).display !== 'none') {
+                used += extra.offsetWidth;
+            }
+            if (btn && window.getComputedStyle(btn).display !== 'none') {
+                used += btn.offsetWidth;
+            }
+            // هامش أمان بسيط بين الشعار والقائمة
+            used += 24;
+            var available = col.clientWidth - used;
+            if (available <= 0) return true;
+
+            var total = 0;
+            visibleChildren().forEach(function (li) {
+                total += li.offsetWidth;
+            });
+            return total > available + 1;
+        }
+
+        function fits() {
+            return rowFits() && !menuDroppedBelowLogo() && !exceedsAvailableWidth();
         }
 
         function adjust() {
