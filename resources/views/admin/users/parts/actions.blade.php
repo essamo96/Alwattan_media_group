@@ -6,14 +6,14 @@
     <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4" data-kt-menu="true">
         @can('admin.users.edit')
         <div class="menu-item px-3">
-            <a href="{{ route('users.edit', ['id' => Crypt::encrypt($id)]) }}" class="menu-link px-3">
+            <a href="{{ route('users.edit', ['id' => rawurlencode(Crypt::encrypt($id))]) }}" class="menu-link px-3">
                 <i class="ki-duotone ki-pencil fs-5 me-1"><span class="path1"></span><span class="path2"></span></i> تعديل
             </a>
         </div>
         @endcan
         @can('admin.users.password')
         <div class="menu-item px-3">
-            <a href="{{ route('users.password', ['id' => Crypt::encrypt($id)]) }}" class="menu-link px-3">
+            <a href="{{ route('users.password', ['id' => rawurlencode(Crypt::encrypt($id))]) }}" class="menu-link px-3">
                 <i class="ki-duotone ki-lock fs-5 me-1"><span class="path1"></span><span class="path2"></span></i> كلمة المرور
             </a>
         </div>

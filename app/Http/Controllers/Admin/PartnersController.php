@@ -70,19 +70,26 @@ class PartnersController extends AdminController {
 
     //////////////////////////////////////////////
     public function postAdd(Request $request) {
-        $save_data = $request->all();
+        $save_data = $request->except('image');
+        $image = $request->file('image');
+
         $validator = Validator::make([
-                    'name' => $save_data['name'],
-                    'image' => $save_data['image'],
+                    'name' => $save_data['name'] ?? null,
+                    'image' => $image,
                         ], [
                     'name' => 'required',
-                    'image' => 'required',
+                    'image' => 'required|image',
         ]);
         //////////////////////////////////////////////////////////
         if ($validator->fails()) {
             $request->session()->flash('danger', $validator->messages());
             return redirect(route('partners.add'))->withInput();
         } else {
+            $destinationPath = 'uploads/partners/';
+            $image_name = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
+            $image->move($destinationPath, $image_name);
+            $save_data['image'] = $destinationPath . $image_name;
+
             $add = Partners::create($save_data);
             if ($add) {
                 $this->clearCache();
@@ -129,20 +136,29 @@ class PartnersController extends AdminController {
         $info = Partners::findOrFail($id);
 
         if ($info) {
-            $save_data = $request->all();
-            //print_r($save_data);die;
+            $save_data = $request->except('image');
+            $image = $request->file('image');
+
             $validator = Validator::make([
-                        'name' => $save_data['name'],
-                        'image' => $save_data['image'],
+                        'name' => $save_data['name'] ?? null,
+                        'image' => $image,
                             ], [
                         'name' => 'required',
-                        'image' => 'required',
+                        'image' => 'nullable|image',
             ]);
             //////////////////////////////////////////////////////////
             if ($validator->fails()) {
                 $request->session()->flash('danger', $validator->messages());
                 return redirect(route('partners.edit', ['id' => $encrypted_id]))->withInput();
             } else {
+                if ($request->hasFile('image') && $image->isValid()) {
+                    $destinationPath = 'uploads/partners/';
+                    $image_name = 'image_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
+                    $image->move($destinationPath, $image_name);
+                    @unlink($info->image);
+                    $save_data['image'] = $destinationPath . $image_name;
+                }
+
                 $update = $info->update($save_data);
                 if ($update) {
                     $this->clearCache();

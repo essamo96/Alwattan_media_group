@@ -6,7 +6,7 @@
     <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4" data-kt-menu="true">
         @can('admin.registrations.view')
         <div class="menu-item px-3">
-            <a href="{{ route('course_registrations.show', ['id' => Crypt::encrypt($id)]) }}" class="menu-link px-3">
+            <a href="{{ route('course_registrations.show', ['id' => rawurlencode(Crypt::encrypt($id))]) }}" class="menu-link px-3">
                 <i class="ki-duotone ki-eye fs-5 me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i> عرض
             </a>
         </div>
