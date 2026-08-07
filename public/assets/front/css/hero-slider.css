@@ -109,6 +109,19 @@
     line-height: 1.25;
     word-break: break-word;
     max-width: 100%;
+    /* فجوة كافية قبل النص الفرعي بدل margin:0 الموروثة عالمياً من h1،
+       والتي تلصق العنوان بالنص عندما يلتف العنوان لسطرين. */
+    margin-bottom: 16px;
+}
+
+/* letter-spacing العالمية على h1 (5px) مصممة للنص اللاتيني فقط: الحروف العربية
+   متصلة السياق (initial/medial/final)، وفرض تباعد موحّد بينها يكسر الاتصال
+   ويجعل الحروف تتراكب أو تبدو متعارضة بصرياً. النسخة الانجليزية لا تتأثر لهذا
+   السبب بالضبط. */
+html[dir="rtl"] #section-hero h1.title-3,
+html[dir="rtl"] #section-hero h1.title-3 strong {
+    letter-spacing: normal;
+    text-transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
