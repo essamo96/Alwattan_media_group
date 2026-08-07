@@ -44,7 +44,7 @@
                 linear-gradient(135deg, rgba(33,52,120,.80) 0%, rgba(21,35,80,.85) 100%),
                 url('{{ asset("assets/admin/damianlopjus-cameras-6839248.jpg") }}');
             background-repeat:no-repeat, no-repeat;
-            background-position:center, center 30%;
+            background-position:center, center 62%;
             background-size:cover, cover;
             background-blend-mode:multiply, normal;
         }
@@ -85,6 +85,8 @@
             overflow:hidden;
         }
         .card-header{padding:26px 32px 6px;}
+        .card-header-branded{text-align:center;padding-top:32px;}
+        .card-logo{height:54px;width:auto;margin:0 auto 14px;display:block;}
         .card-header h2{margin:0 0 4px;font-size:20px;font-weight:800;}
         .card-header p{margin:0;color:var(--muted);font-size:14px;}
         form{padding:10px 32px 32px;}
@@ -207,7 +209,8 @@
             </div>
             @else
 
-            <div class="card-header">
+            <div class="card-header card-header-branded">
+                <img src="{{ asset('assets/front/images/mediagrope.png') }}" alt="{{ $mysettings->name_ar ?? 'الوطن' }}" class="card-logo">
                 <h2>بيانات المتقدم</h2>
                 <p>جميع الحقول أدناه مطلوبة، يرجى تعبئتها بدقة.</p>
             </div>
