@@ -1,86 +1,52 @@
 /* ==========================================================================
    سلايدر الصور في القسم الرئيسي (#section-hero)
-   ظهور واختفاء تدريجي للصور بمقاس الشاشة الكامل 100vw x 100vh
+   الصور الفعلية المُدارة من لوحة التحكم (uploads/sliders)، بتلاشي متبادل
+   (crossfade) بدل الاعتماد على مكتبة jarallax التي تدعم صورة واحدة فقط لكل
+   حاوية (تلتقط أول .jarallax-img عبر querySelector وتتجاهل الباقي).
    ========================================================================== */
 
-#section-hero.has-hero-slideshow {
+#section-hero {
     position: relative;
     overflow: hidden;
 }
 
-.hero-slideshow {
+#section-hero .jarallax-img {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    max-width: 100%;
-    overflow: hidden;
-    z-index: 0;
-    pointer-events: none;
-}
-
-.hero-slideshow__img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     max-width: none;
     object-fit: cover;
     object-position: center center;
     opacity: 0;
-    transform: scale(1.06);
-    transition: opacity 1.6s ease-in-out, transform 7s linear;
-    will-change: opacity, transform;
+    z-index: 0;
+    transition: opacity 1.6s ease-in-out;
+    will-change: opacity;
 }
 
-.hero-slideshow__img.is-active {
+#section-hero .jarallax-img.is-active {
     opacity: 1;
-    transform: scale(1);
 }
 
 /* طبقة تعتيم حتى يبقى النص مقروءاً فوق الصور */
-.hero-slideshow::after {
+#section-hero::after {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
+    z-index: 1;
     background: rgba(0, 0, 0, 0.45);
+    pointer-events: none;
 }
 
-/* ابقاء محتوى القسم (العناوين والنصوص) فوق السلايدر */
-#section-hero.has-hero-slideshow > *:not(.hero-slideshow) {
+/* ابقاء محتوى القسم (الموجات والنصوص) فوق طبقة الصور والتعتيم */
+#section-hero > *:not(.jarallax-img) {
     position: relative;
     z-index: 2;
 }
 
-/* اخفاء صور الـ jarallax حتى لا تتعارض مع السلايدر */
-#section-hero.has-hero-slideshow .jarallax-img,
-#section-hero.has-hero-slideshow > [id^="jarallax-container-"] {
-    display: none !important;
-}
-
-/* على الشاشات الصغيرة نستخدم ارتفاع القسم الفعلي بدل 100vh */
-@media only screen and (max-width: 767px) {
-    .hero-slideshow,
-    .hero-slideshow__img {
-        width: 100%;
-        height: 100%;
-    }
-}
-
-/* احترام تفضيل تقليل الحركة */
 @media (prefers-reduced-motion: reduce) {
-    .hero-slideshow__img {
+    #section-hero .jarallax-img {
         transition: opacity 0.3s linear;
-        transform: none;
-    }
-
-    .hero-slideshow__img.is-active {
-        transform: none;
     }
 }
 

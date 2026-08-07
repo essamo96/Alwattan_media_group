@@ -1,113 +1,41 @@
 /* ==========================================================================
-   سلايدر صور القسم الرئيسي — ظهور واختفاء تدريجي (fade)
-   الصور تُقرأ من العنصر ذو الكلاس .hero-slideshow عبر الخاصية data-images
-   (مصدرها المجلد: public/assets/front/images/slider)
+   سلايدر القسم الرئيسي — يبدّل بين صور uploads/sliders الحقيقية (jarallax-img)
+   ونصوصها (hero-text-slide) معاً بنفس الفهرس، بتلاشي متبادل (fade).
+   مكتبة jarallax تلتقط أول .jarallax-img فقط وتتجاهل الباقي، لذلك التبديل هنا
+   يُدار يدوياً بدل الاعتماد عليها لتعدد الشرائح.
    ========================================================================== */
 (function () {
     'use strict';
 
-    var DEFAULT_INTERVAL = 6000; // مدة بقاء كل صورة بالمللي ثانية
-
-    function initSlideshow(container) {
-        var images;
-        try {
-            images = JSON.parse(container.getAttribute('data-images') || '[]');
-        } catch (e) {
-            images = [];
-        }
-
-        if (!images.length) {
-            return;
-        }
-
-        var interval = parseInt(container.getAttribute('data-interval'), 10) || DEFAULT_INTERVAL;
-        var slides = [];
-
-        // بناء عناصر الصور
-        images.forEach(function (src, index) {
-            var img = document.createElement('img');
-            img.className = 'hero-slideshow__img';
-            img.src = src;
-            img.alt = '';
-            img.setAttribute('aria-hidden', 'true');
-            if (index === 0) {
-                img.classList.add('is-active');
-            } else {
-                img.loading = 'lazy';
-            }
-            container.appendChild(img);
-            slides.push(img);
-        });
-
-        // صورة واحدة فقط: لا حاجة للتبديل
-        if (slides.length < 2) {
-            return;
-        }
-
-        var current = 0;
-        var timer = null;
-
-        function showNext() {
-            var next = (current + 1) % slides.length;
-            slides[current].classList.remove('is-active');
-            slides[next].classList.add('is-active');
-            current = next;
-        }
-
-        function start() {
-            if (timer === null) {
-                timer = window.setInterval(showNext, interval);
-            }
-        }
-
-        function stop() {
-            if (timer !== null) {
-                window.clearInterval(timer);
-                timer = null;
-            }
-        }
-
-        // ايقاف التبديل عندما يكون التبويب غير ظاهر
-        document.addEventListener('visibilitychange', function () {
-            if (document.hidden) {
-                stop();
-            } else {
-                start();
-            }
-        });
-
-        start();
-    }
-
-    function initTextSlides(interval) {
-        var slides = document.querySelectorAll('#section-hero .hero-text-slide');
-        if (slides.length < 2) {
-            return;
-        }
-
-        var current = 0;
-        Array.prototype.forEach.call(slides, function (el, index) {
-            el.classList.toggle('is-active', index === 0);
-        });
-
-        window.setInterval(function () {
-            var next = (current + 1) % slides.length;
-            slides[current].classList.remove('is-active');
-            slides[next].classList.add('is-active');
-            current = next;
-        }, interval);
-    }
+    var DEFAULT_INTERVAL = 6000; // مدة بقاء كل شريحة بالمللي ثانية
 
     function init() {
-        var containers = document.querySelectorAll('.hero-slideshow');
-        for (var i = 0; i < containers.length; i++) {
-            initSlideshow(containers[i]);
+        var imgSlides = document.querySelectorAll('#section-hero .jarallax-img');
+        var textSlides = document.querySelectorAll('#section-hero .hero-text-slide');
+        var count = Math.max(imgSlides.length, textSlides.length);
+
+        if (count < 2) {
+            return;
         }
 
-        var textInterval = containers.length
-            ? (parseInt(containers[0].getAttribute('data-interval'), 10) || DEFAULT_INTERVAL)
-            : DEFAULT_INTERVAL;
-        initTextSlides(textInterval);
+        var current = 0;
+
+        function show(index) {
+            if (imgSlides.length) {
+                imgSlides[current] && imgSlides[current].classList.remove('is-active');
+                imgSlides[index] && imgSlides[index].classList.add('is-active');
+            }
+            if (textSlides.length) {
+                textSlides[current] && textSlides[current].classList.remove('is-active');
+                textSlides[index] && textSlides[index].classList.add('is-active');
+            }
+        }
+
+        window.setInterval(function () {
+            var next = (current + 1) % count;
+            show(next);
+            current = next;
+        }, DEFAULT_INTERVAL);
     }
 
     if (document.readyState === 'loading') {
