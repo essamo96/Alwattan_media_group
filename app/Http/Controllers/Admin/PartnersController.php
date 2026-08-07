@@ -220,10 +220,10 @@ class PartnersController extends AdminController {
 
     /////////////////////////////////////////
     public function clearCache() {
+        // Partners are no longer cached on the public homepage (see
+        // HomepageController) - this just clears out any leftover "forever"
+        // cache entry from before that change so it can't serve stale data.
         Cache::forget('partners');
-        $photo = new Partners();
-        $info = $photo->getAllPartners();
-        Cache::forever('partners', $info);
     }
 
 }

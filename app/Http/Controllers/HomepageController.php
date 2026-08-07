@@ -41,10 +41,10 @@ class HomepageController extends Controller {
                     $items = new Testimonials();
                     return $items->getAllTestimonials();
                 });
-        parent::$data['partners'] = Cache::rememberForever('partners', function () {
-                    $items = new Partners();
-                    return $items->getAllPartners();
-                });
+        // Not cached: partners is a small, cheap query and must always reflect
+        // admin CRUD immediately (a stale "forever" cache previously made newly
+        // added partners invisible on the public site until manually cleared).
+        parent::$data['partners'] = (new Partners())->getAllPartners();
         $page = new Pages();
         parent::$data['about'] = $page->getPage(1);
 
