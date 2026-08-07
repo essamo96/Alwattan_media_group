@@ -46,17 +46,59 @@
                 @endif
 
                 @if(auth()->check() && auth()->user()->can('admin.registrations.view'))
-                {{-- Course registrations live notifications --}}
+                {{-- Course registrations live notifications - stock Metronic notification-menu pattern --}}
                 <div class="app-navbar-item ms-1 ms-md-3">
-                    <a href="{{ route('course_registrations.view') }}" class="btn btn-icon btn-custom btn-icon-muted btn-active-icon-primary w-35px h-35px w-md-40px h-md-40px position-relative">
-                        <i class="ki-duotone ki-profile-user fs-1">
+                    <div class="btn btn-icon btn-custom btn-icon-muted btn-active-icon-primary w-35px h-35px w-md-40px h-md-40px position-relative" data-kt-menu-trigger="{default: 'click', lg: 'click'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+                        <i class="ki-duotone ki-notification-bing fs-1">
                             <span class="path1"></span>
                             <span class="path2"></span>
                             <span class="path3"></span>
-                            <span class="path4"></span>
                         </i>
                         <span id="header_registrations_badge" class="badge badge-circle badge-danger position-absolute top-0 start-0 translate-middle" style="font-size:0.65rem; {{ ($registrations_count ?? 0) > 0 ? '' : 'display:none;' }}">{{ $registrations_count ?? 0 }}</span>
-                    </a>
+                    </div>
+
+                    {{-- Notifications dropdown --}}
+                    <div class="menu menu-sub menu-sub-dropdown menu-column w-350px w-lg-375px" data-kt-menu="true" id="kt_menu_notifications">
+                        <div class="d-flex flex-column rounded-top" style="background-color:#213478;">
+                            <h3 class="text-white fw-bold px-9 mt-10 mb-6">
+                                {{ __('الإشعارات') }}
+                                <span class="fs-8 opacity-75 ps-3">{{ __('آخر تسجيلات الدورة') }}</span>
+                            </h3>
+                        </div>
+
+                        <div class="scroll-y mh-325px my-5 px-8" id="registrations_notifications_list">
+                            @forelse($latest_registrations ?? [] as $reg)
+                            <div class="d-flex flex-stack py-4 notification-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="symbol symbol-35px me-4">
+                                        <span class="symbol-label bg-light-primary">
+                                            <i class="ki-duotone ki-profile-user fs-2 text-primary">
+                                                <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span>
+                                            </i>
+                                        </span>
+                                    </div>
+                                    <div class="mb-0 me-2">
+                                        <a href="{{ route('course_registrations.view') }}" class="fs-6 text-gray-800 text-hover-primary fw-bold">{{ $reg->full_name }}</a>
+                                        <div class="text-muted fs-7">{{ __('طلب تسجيل جديد في الدورة') }}</div>
+                                    </div>
+                                </div>
+                                <span class="badge badge-light fs-8">{{ optional($reg->created_at)->diffForHumans() }}</span>
+                            </div>
+                            @empty
+                            <div class="d-flex flex-column align-items-center py-10 text-muted" id="registrations_notifications_empty">
+                                <i class="ki-duotone ki-information-5 fs-2x mb-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                {{ __('لا توجد إشعارات حالياً') }}
+                            </div>
+                            @endforelse
+                        </div>
+
+                        <div class="py-3 text-center border-top">
+                            <a href="{{ route('course_registrations.view') }}" class="btn btn-color-gray-600 btn-active-color-primary">
+                                {{ __('عرض كل التسجيلات') }}
+                                <i class="ki-duotone ki-arrow-right fs-5"><span class="path1"></span><span class="path2"></span></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 @endif
 
@@ -111,13 +153,7 @@
                 {{-- User menu --}}
                 <div class="app-navbar-item ms-1 ms-md-3" id="kt_header_user_menu_toggle">
                     <div class="cursor-pointer symbol symbol-circle symbol-30px symbol-md-40px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-                        @if(auth()->check() && auth()->user()->avatar ?? false)
-                            <img src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->name }}" />
-                        @else
-                            <span class="symbol-label bg-light-primary text-primary fw-bold fs-6">
-                                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                            </span>
-                        @endif
+                        <img src="{{ (auth()->check() && auth()->user()->avatar) ? auth()->user()->avatar : asset('assets/metronic/media/avatars/blank.svg') }}" alt="{{ auth()->user()->name ?? __('Guest') }}" />
                     </div>
 
                     {{-- User account menu --}}
@@ -125,9 +161,7 @@
                         <div class="menu-item px-3">
                             <div class="menu-content d-flex align-items-center px-3">
                                 <div class="symbol symbol-circle symbol-50px me-5">
-                                    <span class="symbol-label bg-light-primary text-primary fw-bold fs-3">
-                                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                                    </span>
+                                    <img src="{{ (auth()->check() && auth()->user()->avatar) ? auth()->user()->avatar : asset('assets/metronic/media/avatars/blank.svg') }}" alt="{{ auth()->user()->name ?? __('Guest') }}" />
                                 </div>
                                 <div class="d-flex flex-column">
                                     <div class="fw-bold d-flex align-items-center fs-5">

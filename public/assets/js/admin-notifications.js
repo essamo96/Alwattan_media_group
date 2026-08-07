@@ -73,6 +73,35 @@
         }
     }
 
+    function prependNotification(name) {
+        var list = document.getElementById('registrations_notifications_list');
+        if (!list) {
+            return;
+        }
+        var empty = document.getElementById('registrations_notifications_empty');
+        if (empty) {
+            empty.remove();
+        }
+
+        var row = document.createElement('div');
+        row.className = 'd-flex flex-stack py-4 notification-item';
+        row.innerHTML =
+            '<div class="d-flex align-items-center">' +
+                '<div class="symbol symbol-35px me-4">' +
+                    '<span class="symbol-label bg-light-primary">' +
+                        '<i class="ki-duotone ki-profile-user fs-2 text-primary"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>' +
+                    '</span>' +
+                '</div>' +
+                '<div class="mb-0 me-2">' +
+                    '<span class="fs-6 text-gray-800 fw-bold">' + (name || 'مسجل جديد') + '</span>' +
+                    '<div class="text-muted fs-7">طلب تسجيل جديد في الدورة</div>' +
+                '</div>' +
+            '</div>' +
+            '<span class="badge badge-light fs-8">الآن</span>';
+
+        list.insertBefore(row, list.firstChild);
+    }
+
     function bumpBadge(el) {
         if (!el) {
             return;
@@ -106,6 +135,7 @@
             bumpBadge(document.getElementById('header_registrations_badge'));
             bumpBadge(document.getElementById('registrations_badge'));
             showToast('تسجيل جديد في الدورة', (data && data.name) ? data.name : 'تم استلام تسجيل جديد');
+            prependNotification(data && data.name);
             playChime();
         });
 

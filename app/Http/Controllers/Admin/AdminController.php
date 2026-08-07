@@ -36,5 +36,10 @@ class AdminController extends BaseController
         ->count();
 
         self::$data['registrations_count'] = $registrations_today;
+
+        self::$data['latest_registrations'] = CourseRegistration::whereNull('deleted_at')
+            ->orderBy('id', 'desc')
+            ->take(5)
+            ->get();
     }
 }
