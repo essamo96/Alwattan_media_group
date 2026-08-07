@@ -24,6 +24,7 @@
     @endforeach
 </section>
 <!-- section close -->
+@include('frontend.general.advertisement-banner')
 <section id="section-about" data-bgimage="url({{ asset('assets/front/images/bg/1.png') }}) top left no-repeat">
     <div class="wm wm-border light wow fadeInDown">@lang('site.back_welcome')</div>
     <div class="container">

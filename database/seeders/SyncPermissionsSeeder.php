@@ -29,6 +29,7 @@ class SyncPermissionsSeeder extends Seeder
         'services' => 'الخدمات',
         'testimonials' => 'قالوا عنا',
         'partners' => 'الشركاء',
+        'advertisements' => 'الإعلانات',
         'faq' => 'الاسئلة الشائعة',
         'contact' => 'ادارة جهات الاتصال',
         'contacts' => 'ادارة جهات الاتصال',

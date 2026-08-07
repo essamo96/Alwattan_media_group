@@ -6,6 +6,24 @@
 <meta name="description" content="{{$mysettings->{'description_'. trans('site.lang')} }}">
 <meta name="keywords" content="{{$mysettings->{'tags_' . trans('site.lang')} }}">
 
+{{-- Default Open Graph image (site logo) - pages can override by defining their own @section('og') --}}
+<meta property="og:site_name" content="{{ $mysettings->name_ar ?? 'الوطن' }}">
+<meta property="og:image" content="{{ asset('assets/front/images/mediagrope.png') }}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="{{ asset('assets/front/images/mediagrope.png') }}">
+
+{{-- Organization structured data: this is what Google Search uses to show the site's logo
+     next to search results / knowledge panel. --}}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "{{ $mysettings->name_ar ?? 'الوطن' }}",
+    "url": "{{ url('/') }}",
+    "logo": "{{ asset('assets/front/images/mediagrope.png') }}"
+}
+</script>
+
 <!-- CSS Files
 ================================================== -->
 {{-- Cache-busted via filemtime (asset_v helper) instead of manual ?v=N bumps,

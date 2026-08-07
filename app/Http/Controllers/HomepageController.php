@@ -8,6 +8,7 @@ use App\Models\Partners;
 use App\Models\Testimonials;
 use App\Models\News;
 use App\Models\Pages;
+use App\Models\Advertisements;
 //use App\Models\Categories;
 // use App\Models\Videos;
 // use App\Models\Photos;
@@ -46,6 +47,9 @@ class HomepageController extends Controller {
                 });
         $page = new Pages();
         parent::$data['about'] = $page->getPage(1);
+
+        $ads = new Advertisements();
+        parent::$data['ads_banner'] = $ads->getActiveAdvertisementsByType(1);
 
         return view('frontend.home.view', parent::$data);
     }

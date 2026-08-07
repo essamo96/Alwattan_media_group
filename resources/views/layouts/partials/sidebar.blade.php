@@ -184,6 +184,15 @@
                 </div>
                 @endif
 
+                @if(auth()->user()->can('admin.advertisements.view'))
+                <div class="menu-item">
+                    <a class="menu-link {{ $active_menu == 'advertisements' ? 'active' : '' }}" href="{{ route('advertisements.view') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-picture fs-2"><span class="path1"></span><span class="path2"></span></i></span>
+                        <span class="menu-title">{{ __('الإعلانات') }}</span>
+                    </a>
+                </div>
+                @endif
+
                 @can('admin.faq.view')
                 <div class="menu-item">
                     <a class="menu-link {{ $active_menu == 'faq' ? 'active' : '' }}" href="{{ route('faq.view') }}">

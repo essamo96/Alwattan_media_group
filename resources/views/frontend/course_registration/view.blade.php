@@ -177,6 +177,20 @@
         .success-screen h2{font-size:22px;margin:0 0 10px;}
         .success-screen p{color:var(--muted);max-width:480px;margin:0 auto;}
 
+        .notes-box{
+            text-align:start;max-width:560px;margin:28px auto 0;
+            background:#f7f8fc;border:1px solid var(--border);
+            border-inline-start:4px solid var(--primary);
+            border-radius:12px;padding:18px 20px;
+        }
+        .notes-title{
+            display:flex;align-items:center;gap:8px;
+            font-weight:700;font-size:14.5px;color:var(--primary);
+            margin-bottom:10px;
+        }
+        .notes-list{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:8px;}
+        .notes-list li{color:var(--text);font-size:13.5px;line-height:1.75;}
+
         footer{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 40px;}
     </style>
 </head>
@@ -206,6 +220,20 @@
                 </div>
                 <h2>تم إرسال طلبك بنجاح</h2>
                 <p>{{ session('success', 'شكراً لتسجيلك، سيتم التواصل معك في حال قبول طلبك ضمن معايير برنامج التدريب التخصصي.') }}</p>
+
+                <div class="notes-box">
+                    <div class="notes-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 16.5h.01M10.29 3.86l-8.02 13.9A1.5 1.5 0 0 0 3.53 20h16.94a1.5 1.5 0 0 0 1.26-2.24l-8.02-13.9a1.5 1.5 0 0 0-2.42 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        ملاحظات هامة
+                    </div>
+                    <ul class="notes-list">
+                        <li>تعبئة نموذج التسجيل لا تعني القبول النهائي، ويتم اختيار المشاركين وفق معايير البرنامج.</li>
+                        <li>سيتم التواصل مع المقبولين لاستكمال إجراءات المشاركة وإبلاغهم بموعد ومكان انعقاد التدريب.</li>
+                        <li>عدد المقاعد محدود وستُمنح الأولوية للطلبات المستوفية للشروط والمقدمة خلال فترة التسجيل.</li>
+                        <li>سيتم تخصيص 50% من المقاعد للإناث، تعزيزاً لمبدأ تكافؤ الفرص والمساواة.</li>
+                        <li>سيحصل المشاركون الذين يجتازون متطلبات البرنامج بنجاح على شهادة معتمدة من المؤسسة.</li>
+                    </ul>
+                </div>
             </div>
             @else
 

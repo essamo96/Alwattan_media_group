@@ -69,6 +69,7 @@
                 </div>
                 <div class="col-lg-4 col-md-7 col-12">
                     <aside>
+                        @include('frontend.general.advertisement-sidebar')
                         <div class="widget widget-post">
                             <div class="widget-header">
                                 <h5>{{ __('site.last-news') }}</h5>

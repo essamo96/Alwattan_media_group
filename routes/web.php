@@ -247,6 +247,15 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web
     Route::post('partners/edit/{id}', ['as' => 'partners.edit', 'middleware' => ['permission:admin.partners.edit'], 'uses' => 'PartnersController@postEdit']);
     Route::post('partners/delete', ['as' => 'partners.delete', 'middleware' => ['permission:admin.partners.delete'], 'uses' => 'PartnersController@postDelete']);
     Route::post('partners/status', ['as' => 'partners.status', 'middleware' => ['permission:admin.partners.status'], 'uses' => 'PartnersController@postStatus']);
+    //Advertisements Route
+    Route::get('advertisements', ['as' => 'advertisements.view', 'middleware' => ['permission:admin.advertisements.view|admin.advertisements.add|admin.advertisements.edit|admin.advertisements.delete|admin.advertisements.status'], 'uses' => 'AdvertisementsController@getIndex']);
+    Route::get('advertisements/list', ['as' => 'advertisements.list', 'middleware' => ['permission:admin.advertisements.view|admin.advertisements.add|admin.advertisements.edit|admin.advertisements.delete|admin.advertisements.status'], 'uses' => 'AdvertisementsController@getList']);
+    Route::get('advertisements/add', ['as' => 'advertisements.add', 'middleware' => ['permission:admin.advertisements.add'], 'uses' => 'AdvertisementsController@getAdd']);
+    Route::post('advertisements/add', ['as' => 'advertisements.add', 'middleware' => ['permission:admin.advertisements.add'], 'uses' => 'AdvertisementsController@postAdd']);
+    Route::get('advertisements/edit/{id}', ['as' => 'advertisements.edit', 'middleware' => ['permission:admin.advertisements.edit'], 'uses' => 'AdvertisementsController@getEdit']);
+    Route::post('advertisements/edit/{id}', ['as' => 'advertisements.edit', 'middleware' => ['permission:admin.advertisements.edit'], 'uses' => 'AdvertisementsController@postEdit']);
+    Route::post('advertisements/delete', ['as' => 'advertisements.delete', 'middleware' => ['permission:admin.advertisements.delete'], 'uses' => 'AdvertisementsController@postDelete']);
+    Route::post('advertisements/status', ['as' => 'advertisements.status', 'middleware' => ['permission:admin.advertisements.status'], 'uses' => 'AdvertisementsController@postStatus']);
     // faq ROUTE
     Route::get('faq', ['as' => 'faq.view', 'middleware' => ['permission:admin.faq.view|admin.faq.add|admin.faq.edit|admin.faq.delete|admin.faq.status'], 'uses' => 'FaqController@getIndex']);
     Route::get('faq/list', ['as' => 'faq.list', 'middleware' => ['permission:admin.faq.view|admin.faq.add|admin.faq.edit|admin.faq.delete|admin.faq.status'], 'uses' => 'FaqController@getList']);
