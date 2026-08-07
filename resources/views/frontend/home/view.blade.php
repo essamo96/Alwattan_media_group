@@ -7,7 +7,7 @@
     {{-- One shared wave-line canvas for the whole hero (previously duplicated once per
          slide below, which stacked N rotated/scaled canvases on top of each other and
          produced the broken diagonal-streak effect). --}}
-    <canvas class="waves" data-speed="-5" data-wave-width="150%" data-animation="SineInOut"></canvas>
+    <canvas class="waves" data-speed="5" data-wave-width="150%" data-animation="SineInOut"></canvas>
     @foreach($slides as $item)
     <img src="{{ url('uploads/sliders/'.$item->image) }}" class="jarallax-img">
     {{-- Only one hero-text-slide is shown at a time (see hero-slider.css / hero-slider.js);

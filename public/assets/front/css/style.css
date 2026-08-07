@@ -229,7 +229,7 @@ html[dir="rtl"] .crumb li{
         transform: translateY(0) scale(1) rotate(0);
     }
 }
-/* @section Waves */
+/* @section Waves - التصميم الاصلي كما كان منذ اول نسخة من الثيم */
 .waves{
     position: absolute;
     top: 0;
@@ -239,6 +239,8 @@ html[dir="rtl"] .crumb li{
     z-index: 2;
     width: 100% !important;
     height: 100% !important;
+    transform-origin: 40% 50%;
+    transform: rotate(-9deg) scale(2.03);
     pointer-events: none;
 }
 
