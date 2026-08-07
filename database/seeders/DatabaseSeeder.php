@@ -22,5 +22,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ServicesSeeder::class);
         $this->call(AdminUserSeeder::class);
         $this->call(SyncPermissionsSeeder::class);
+        $this->call(HomeSlidesSeeder::class);
     }
 }
