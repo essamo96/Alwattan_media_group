@@ -23,6 +23,8 @@ Route::group(
         Route::get('post/{slug}', ['as' => 'category.view', 'uses' => 'NewsController@getNews']);
         Route::post('contact', ['as' => 'contact.view', 'uses' => 'ContactController@postContact']);
         Route::post('news/info', ['as' => 'news.info', 'uses' => 'NewsController@postNews']);
+        Route::get('course-registration', ['as' => 'course_registration.view', 'uses' => 'CourseRegistrationController@getIndex']);
+        Route::post('course-registration', ['as' => 'course_registration.register', 'uses' => 'CourseRegistrationController@postRegister']);
     }
 );
 Route::get('switchTo={lang}', [
@@ -254,6 +256,13 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web
     Route::post('faq/edit/{id}', ['as' => 'faq.edit', 'middleware' => ['permission:admin.faq.edit'], 'uses' => 'FaqController@postEdit']);
     Route::post('faq/delete', ['as' => 'faq.delete', 'middleware' => ['permission:admin.faq.delete'], 'uses' => 'FaqController@postDelete']);
     Route::post('faq/status', ['as' => 'faq.status', 'middleware' => ['permission:admin.faq.status'], 'uses' => 'FaqController@postStatus']);
+
+    //Course Registrations Route
+    Route::get('course_registrations', ['as' => 'course_registrations.view', 'middleware' => ['permission:admin.registrations.view'], 'uses' => 'CourseRegistrationsController@getIndex']);
+    Route::get('course_registrations/list', ['as' => 'course_registrations.list', 'middleware' => ['permission:admin.registrations.view'], 'uses' => 'CourseRegistrationsController@getList']);
+    Route::get('course_registrations/show/{id}', ['as' => 'course_registrations.show', 'middleware' => ['permission:admin.registrations.view'], 'uses' => 'CourseRegistrationsController@getShow']);
+    Route::post('course_registrations/delete', ['as' => 'course_registrations.delete', 'middleware' => ['permission:admin.registrations.delete'], 'uses' => 'CourseRegistrationsController@postDelete']);
+    Route::get('course_registrations/export', ['as' => 'course_registrations.export', 'middleware' => ['permission:admin.registrations.export'], 'uses' => 'CourseRegistrationsController@getExport']);
 
     // log out
     Route::get('logout', ['as' => 'app.logout', 'uses' => 'LoginController@getLogout']);

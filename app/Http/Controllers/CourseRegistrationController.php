@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Events\NewCourseRegistration;
+use App\Models\CourseRegistration;
+use App\Models\Partners;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class CourseRegistrationController extends Controller {
+
+    const INSERT_SUCCESS_MESSAGE = "نجاح، تم إرسال طلبك بنجاح وسيتم التواصل معك عند الحاجة.";
+    const EXECUTION_ERROR = "عذراً، حدث خطأ أثناء تنفيذ العملية، الرجاء المحاولة مرة اخرى.";
+
+    ///////////////////////////
+    public function getIndex() {
+        $partners = new Partners();
+        parent::$data['partners'] = $partners->getAllPartners();
+        return view('frontend.course_registration.view', parent::$data);
+    }
+
+    //////////////////////////
+    public function postRegister(Request $request) {
+        $data = $request->only([
+            'full_name', 'national_id', 'gender', 'birth_date', 'general_specialization',
+            'specific_specialization', 'graduation_year', 'university', 'gpa', 'nationality',
+            'current_address', 'birth_place', 'employer', 'marital_status', 'mobile', 'email',
+        ]);
+
+        $currentYear = (int) date('Y');
+
+        $validator = Validator::make($data, [
+                    'full_name' => 'required|string|min:6|max:150',
+                    'national_id' => 'required|digits_between:9,10',
+                    'gender' => 'required|in:male,female',
+                    'birth_date' => 'required|date|before:' . date('Y-m-d', strtotime('-16 years')),
+                    'general_specialization' => 'required|string|max:150',
+                    'specific_specialization' => 'required|string|max:150',
+                    'graduation_year' => 'required|integer|min:1970|max:' . $currentYear,
+                    'university' => 'required|string|max:150',
+                    'gpa' => 'required|numeric|min:0|max:100',
+                    'nationality' => 'required|string|max:100',
+                    'current_address' => 'required|string|max:255',
+                    'birth_place' => 'required|string|max:150',
+                    'employer' => 'required|string|max:150',
+                    'marital_status' => 'required|in:single,married,divorced,widowed',
+                    'mobile' => ['required', 'regex:/^05[0-9]{8}$/'],
+                    'email' => 'required|email:filter|max:150',
+                        ], [
+                    'required' => 'هذا الحقل مطلوب',
+                    'national_id.digits_between' => 'رقم الهوية يجب ان يتكون من 9 الى 10 ارقام',
+                    'birth_date.before' => 'تاريخ الميلاد غير منطقي',
+                    'gpa.max' => 'قيمة المعدل غير صحيحة',
+                    'mobile.regex' => 'رقم الجوال يجب ان يكون بصيغة فلسطينية صحيحة (05xxxxxxxx)',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect(route('course_registration.view'))
+                            ->withErrors($validator)
+                            ->withInput();
+        }
+
+        $registration = new CourseRegistration();
+        $saved = $registration->addRegistration($data);
+
+        if ($saved) {
+            try {
+                event(new NewCourseRegistration($saved));
+            } catch (\Throwable $e) {
+                // Broadcasting must never block a successful registration.
+            }
+
+            $request->session()->flash('success', self::INSERT_SUCCESS_MESSAGE);
+            return redirect(route('course_registration.view'))->with('registered', true);
+        }
+
+        $request->session()->flash('danger', self::EXECUTION_ERROR);
+        return redirect(route('course_registration.view'))->withInput();
+    }
+
+}

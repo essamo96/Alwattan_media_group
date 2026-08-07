@@ -1,0 +1,57 @@
+/* Lightweight Metronic color reskin for the UniSharp Laravel-FileManager popup.
+   Only overrides colors/fonts of the SAME classes LFM's own JS already binds to —
+   no DOM/class changes, so vendor/unisharp's script.js keeps working untouched. */
+
+body {
+    font-family: Inter, Helvetica, sans-serif;
+    background-color: #f5f8fa;
+}
+
+.panel-primary > .panel-heading {
+    background-color: #009ef7;
+    border-color: #009ef7;
+}
+
+.btn-primary {
+    background-color: #009ef7;
+    border-color: #009ef7;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #0089d6;
+    border-color: #0089d6;
+}
+
+.navbar-default {
+    background-color: #ffffff;
+    border-color: #eff2f5;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: #3f4254;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+    color: #009ef7;
+}
+
+a.clickable,
+#tree a {
+    color: #3f4254;
+}
+
+a.clickable:hover,
+#tree a:hover {
+    color: #009ef7;
+}
+
+.mfb-component__button--main {
+    background-color: #009ef7 !important;
+}
+
+.item.selected {
+    background-color: #f1faff;
+    border-color: #009ef7;
+}

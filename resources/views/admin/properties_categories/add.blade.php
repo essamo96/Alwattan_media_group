@@ -1,99 +1,89 @@
-@extends('admin.layout.master')
+@extends('layouts.admin')
 
-@section('title')
-اضافة قسم 
-@stop
-@section('page-breadcrumb')
-<ul class="page-breadcrumb">
-    <li>
-        <a href="{{ route('dashboard.view') }}">الرئيسية</a>
-        <i class="fa fa-angle-right"></i>
-    </li>
-    <li>
-        <a href="{{ route('properties_categories.view') }}">ادارة اقسام العقارات</a>
-        <i class="fa fa-angle-right"></i>
-    </li>
-    <li>
-        <a href="{{ route('properties_categories.add') }}">اضافة قسم</a>
-    </li>
-</ul>
-@stop
+@section('title', 'اضافة قسم')
 
 @section('page-title')
-<h1 class="page-title"> ادارة اقسام العقارات
-    <small></small>
-</h1>
-@stop
+اقسام العقارات
+@endsection
 
-@section('page-content')
-<div class="portlet box {{ $form_class }}">
-    <div class="portlet-title">
-        <div class="caption">
-            <i class="icon-drop"></i>اضافة قسم </div>
+@section('breadcrumbs')
+<li class="breadcrumb-item text-muted"><a href="{{ route('dashboard.view') }}" class="text-muted text-hover-primary">الرئيسية</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{{ route('properties_categories.view') }}" class="text-muted text-hover-primary">ادارة اقسام العقارات</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted">اضافة قسم</li>
+@endsection
+
+@section('content')
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">اضافة قسم</div>
     </div>
-    <div class="portlet-body form">
+    <div class="card-body">
         @include('admin.layout.error')
-        <div class="form-body">
-            <form role="form" method="post" action="" class="form-horizontal">
-                <div class="form-body">
-                    <div class="tabbable-line boxless tabbable-reversed">
-                        <ul class="nav nav-tabs">
-                            <li class="active">
-                                <a href="#tab_0" data-toggle="tab"> البيانات الاساسية </a>
-                            </li>
-                            @foreach($languages as $item)
-                            <li>
-                                <a href="#tab_{{ $loop->iteration}}" data-toggle="tab">{{$item->name}}</a>
-                            </li>
-                            @endforeach
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="tab_0">
-                                <div class="row">
-                                    <div class="form-group">
-                                        <label class="control-label col-md-3">الحالة</label>
-                                        <div class="col-md-6">
-                                            <input type="checkbox" value="1" name="status" class="make-switch" data-on-text="&nbsp;تفعيل&nbsp;" data-off-text="&nbsp;تعطيل&nbsp;" {{ old('status') == 1 ? 'checked' : '' }}>
-                                        </div>
-                                    </div>
+        <form role="form" method="post" action="" enctype="multipart/form-data">
+            @csrf
+            <ul class="nav nav-tabs mb-5">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#tab_0">البيانات الاساسية</a>
+                </li>
+                @foreach($languages as $item)
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab_{{ $loop->iteration }}">{{ $item->name }}</a>
+                </li>
+                @endforeach
+            </ul>
 
-                                    <div class="form-group">
-                                        <label class="control-label col-md-3">عنوان الرابط</label>
-                                        <div class="col-md-6">
-                                            <input type="text" value="{{old('slug')}}" name="slug" class="form-control" placeholder="عنوان الرابط">
-                                        </div>
-                                    </div>
-                                </div>
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="tab_0">
+                    <div class="row mb-5">
+                        <label class="col-md-3 col-form-label">الحالة</label>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch form-check-custom form-check-solid">
+                                <input class="form-check-input" type="checkbox" value="1" name="status" {{ old('status') == 1 ? 'checked' : '' }}>
                             </div>
-                            @foreach($languages as $item)
-                            <div class="tab-pane" id="tab_{{ $loop->iteration }}">
-                                <div class="form-group">
-                                    <label class="control-label col-md-3">عنوان القسم</label>
-                                    <div class="col-md-6">
-                                        <input type="text" value="{{old($item->prefix.'_title')}}" name="{{$item->prefix}}_title" class="form-control" placeholder="الاسم">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label col-md-3">الوصف</label>
-                                    <div class="col-md-6">
-                                        <textarea name="{{$item->prefix}}_descs" id="{{$item->prefix}}_descs" class="form-control ckeditor" rows="3">{{old($item->prefix.'_descs')}}</textarea>
-
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <label class="col-md-3 col-form-label">عنوان الرابط</label>
+                        <div class="col-md-6">
+                            <input type="text" value="{{ old('slug') }}" name="slug" class="form-control" placeholder="عنوان الرابط">
                         </div>
                     </div>
                 </div>
-                <div class="form-actions">
-                    <div class="col-md-offset-3 col-md-6">
-                        <button type="submit" class="btn default {{ $btn_class }}">حفظ</button>
-                        <a href="{{ route('properties_categories.view') }}" type="button" class="btn default">إلغاء</a>
-                        {{ csrf_field() }}
+
+                @foreach($languages as $item)
+                <div class="tab-pane fade" id="tab_{{ $loop->iteration }}">
+                    <div class="row mb-5">
+                        <label class="col-md-3 col-form-label">عنوان القسم</label>
+                        <div class="col-md-6">
+                            <input type="text" value="{{ old($item->prefix.'_title') }}" name="{{ $item->prefix }}_title" class="form-control" placeholder="الاسم">
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <label class="col-md-3 col-form-label">الوصف</label>
+                        <div class="col-md-6">
+                            <textarea name="{{ $item->prefix }}_descs" id="{{ $item->prefix }}_descs" class="form-control" rows="3">{{ old($item->prefix.'_descs') }}</textarea>
+                        </div>
                     </div>
                 </div>
-            </form>
-        </div>
+                @endforeach
+            </div>
+
+            <div class="d-flex justify-content-end mt-5">
+                <a href="{{ route('properties_categories.view') }}" class="btn btn-light me-3">إلغاء</a>
+                <button type="submit" class="btn btn-primary">حفظ</button>
+            </div>
+        </form>
     </div>
 </div>
-@stop
+@endsection
+
+@push('scripts')
+<script src="{{ asset_v('assets/metronic/plugins/custom/ckeditor/ckeditor-classic.bundle.js') }}"></script>
+<script type="text/javascript">
+    @foreach($languages as $item)
+    ClassicEditor.create(document.querySelector('#{{ $item->prefix }}_descs'), { language: '{{ $item->prefix }}' }).catch(error => console.error(error));
+    @endforeach
+</script>
+@endpush

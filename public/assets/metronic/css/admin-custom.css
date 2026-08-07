@@ -1,0 +1,65 @@
+/* Site-wide admin panel refinements layered on top of Metronic v8.1.8 (light-sidebar). */
+
+/* Opt out of the browser's automatic content-darkening (Chrome/Edge "force dark" for
+   pages that don't declare their own color-scheme) — it mishandles fixed-position
+   bars and was causing the header/table/footer to render at the wrong width. */
+html {
+    color-scheme: light;
+}
+
+:root[dir="rtl"] body,
+:root[dir="rtl"] .app-sidebar,
+:root[dir="rtl"] .btn,
+:root[dir="rtl"] .form-control,
+:root[dir="rtl"] .form-select,
+:root[dir="rtl"] table {
+    font-family: "Cairo", "Inter", Helvetica, sans-serif;
+}
+
+:root[dir="rtl"] .fw-bold,
+:root[dir="rtl"] .fw-bolder,
+:root[dir="rtl"] h1, :root[dir="rtl"] h2, :root[dir="rtl"] h3,
+:root[dir="rtl"] h4, :root[dir="rtl"] h5, :root[dir="rtl"] .card-title {
+    font-weight: 700 !important;
+}
+
+/* Small, consistent badges/buttons for table cell content (status, row actions) */
+.table .badge {
+    font-size: 0.85rem;
+    padding: 0.45em 0.85em;
+    font-weight: 600;
+}
+
+.table .btn-sm,
+.table .btn.btn-light {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.75rem;
+}
+
+/* DataTable card tables: clearer row separation + header */
+table.dataTable thead th {
+    background-color: #f9f9f9;
+    color: #71768c;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid #eff2f5 !important;
+    vertical-align: middle;
+}
+
+table.dataTable tbody td {
+    vertical-align: middle;
+    border-bottom: 1px dashed #eff2f5;
+}
+
+table.dataTable tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* DataTables wrapper controls (length/filter/info/paginate) match Metronic type scale */
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    color: #71768c;
+    font-size: 0.95rem;
+}

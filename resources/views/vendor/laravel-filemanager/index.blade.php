@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="{{ asset('vendor/laravel-filemanager/css/mfb.css') }}">
   <link rel="stylesheet" href="{{ asset('vendor/laravel-filemanager/css/dropzone.min.css') }}">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.css">
+  <link rel="stylesheet" href="{{ asset('assets/metronic/css/lfm-metronic-theme.css') }}">
 </head>
 <body>
   <div class="container-fluid" id="wrapper">

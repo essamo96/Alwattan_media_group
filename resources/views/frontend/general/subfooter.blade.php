@@ -18,9 +18,9 @@
 <div id="de-overlay"></div>
 <!-- Javascript Files
 ================================================== -->
-<script src="{{ asset('assets/front/js/plugins.js?v=3') }}"></script>
-<script src="{{ asset('assets/front/js/default.js?v=4') }}"></script>
-<script src="{{ asset('assets/front/js/hero-slider.js?v=1') }}"></script>
-<script src="{{ asset('assets/front/js/validation.js?v=3') }}"></script>
-<script src="{{ asset('assets/front/js/countdown-custom.js?v=3') }}"></script>
-<script src="{{ asset('assets/front/js/nav-priority.js?v=1') }}"></script>
+<script src="{{ asset_v('assets/front/js/plugins.js') }}"></script>
+<script src="{{ asset_v('assets/front/js/default.js') }}"></script>
+<script src="{{ asset_v('assets/front/js/hero-slider.js') }}"></script>
+<script src="{{ asset_v('assets/front/js/validation.js') }}"></script>
+<script src="{{ asset_v('assets/front/js/countdown-custom.js') }}"></script>
+<script src="{{ asset_v('assets/front/js/nav-priority.js') }}"></script>

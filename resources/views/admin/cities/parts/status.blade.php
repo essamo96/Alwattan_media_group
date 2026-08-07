@@ -1,9 +1,9 @@
 @if($status == 0)
-    <a data-href="{{ Crypt::encrypt($id) }}" class="btn btn-sm red @can('admin.cities.status') status @endcan">
-        <i class="fa fa-times"></i> Disable
-    </a>
+<a data-href="{{ Crypt::encrypt($id) }}" class="badge badge-light-danger @can('admin.cities.status') status cursor-pointer @endcan">
+    <i class="ki-duotone ki-cross fs-6 me-1"></i> غير فعال
+</a>
 @elseif($status == 1)
-    <a data-href="{{ Crypt::encrypt($id) }}" class="btn btn-sm green-dark @can('admin.cities.status') status @endcan">
-        <i class="fa fa-check"></i>  Enable
-    </a>
+<a data-href="{{ Crypt::encrypt($id) }}" class="badge badge-light-success @can('admin.cities.status') status cursor-pointer @endcan">
+    <i class="ki-duotone ki-check fs-6 me-1"></i> فعال
+</a>
 @endif

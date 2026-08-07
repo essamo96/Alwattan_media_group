@@ -1,77 +1,48 @@
-@extends('admin.layout.master')
+@extends('layouts.admin')
 
-@section('title')
-    إضافة صلاحية
-@stop
-
-@section('css')
-
-@stop
-
-@section('page-breadcrumb')
-    <ul class="page-breadcrumb">
-        <li>
-            <i class="icon-home"></i>
-            <a href="{{ route('dashboard.view') }}">الرئيسية</a>
-            <i class="fa fa-angle-right"></i>
-        </li>
-        <li>
-            <a href="{{ route('roles.view') }}">إدارة الصلاحيات</a>
-            <i class="fa fa-angle-right"></i>
-        </li>
-        <li>
-            <a href="{{ route('roles.add') }}">إضافة صلاحية</a>
-        </li>
-    </ul>
-@stop
+@section('title', 'إضافة صلاحية')
 
 @section('page-title')
-    <h1 class="page-title"> الصلاحيات
-        <small>إدارة الصلاحيات</small>
-    </h1>
-@stop
+الصلاحيات
+@endsection
 
-@section('page-content')
-    <div class="portlet box {{ $form_class }}">
-        <div class="portlet-title">
-            <div class="caption">
-                <i class="icon-direction"></i>إضافة صلاحية  </div>
-        </div>
-        <div class="portlet-body form">
-            @include('admin.layout.error')
-            <form role="form" method="post" action="" class="form-horizontal">
-                <div class="form-body">
-                    <div class="row">
-                        <div class="form-group">
-                            <label class="control-label col-md-3">إسم المجموعة</label>
-                            <div class="col-md-6">
-                                <input type="text" value="{{ old('name') }}" name="name" id="name" class="form-control" placeholder="إسم المجموعة">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-3">الحالة</label>
-                            <div class="col-md-6">
-                                <input type="checkbox" value="1" name="status" class="make-switch" data-on-text="&nbsp;تفعيل&nbsp;" data-off-text="&nbsp;تعطيل&nbsp;">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <div class="col-md-offset-3 col-md-6">
-                        <button type="submit" class="btn default {{ $btn_class }}">حفظ</button>
-                        <a href="{{ route('roles.view') }}" type="button" class="btn default">إلغاء</a>
-                        {{ csrf_field() }}
-                    </div>
-                </div>
-            </form>
-        </div>
+@section('breadcrumbs')
+<li class="breadcrumb-item text-muted"><a href="{{ route('dashboard.view') }}" class="text-muted text-hover-primary">الرئيسية</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{{ route('roles.view') }}" class="text-muted text-hover-primary">إدارة الصلاحيات</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted">إضافة صلاحية</li>
+@endsection
+
+@section('content')
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">إضافة صلاحية</div>
     </div>
-@stop
+    <div class="card-body">
+        @include('admin.layout.error')
+        <form role="form" method="post" action="">
+            @csrf
+            <div class="row mb-5">
+                <label class="col-md-3 col-form-label">إسم المجموعة</label>
+                <div class="col-md-6">
+                    <input type="text" value="{{ old('name') }}" name="name" id="name" class="form-control" placeholder="إسم المجموعة">
+                </div>
+            </div>
+            <div class="row mb-5">
+                <label class="col-md-3 col-form-label">الحالة</label>
+                <div class="col-md-6">
+                    <div class="form-check form-switch form-check-custom form-check-solid">
+                        <input class="form-check-input" type="checkbox" value="1" name="status" {{ old('status') == 1 ? 'checked' : '' }}>
+                    </div>
+                </div>
+            </div>
 
-@section('js')
-
-@stop
-
-@section('modals')
-
-@stop
+            <div class="d-flex justify-content-end mt-5">
+                <a href="{{ route('roles.view') }}" class="btn btn-light me-3">إلغاء</a>
+                <button type="submit" class="btn btn-primary">حفظ</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection

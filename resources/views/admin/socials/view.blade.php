@@ -1,90 +1,54 @@
-@extends('admin.layout.master')
+@extends('layouts.admin')
 
-@section('title')
-    إدارة الشبكات الإجتماعية
-@stop
-
-@section('css')
-
-@stop
-
-@section('page-breadcrumb')
-    <ul class="page-breadcrumb">
-        <li>
-            <i class="icon-home"></i>
-            <a href="{{ route('dashboard.view') }}">الرئيسية</a>
-            <i class="fa fa-angle-right"></i>
-        </li>
-        <li>
-            <a href="{{ route('socials.view') }}">الشبكات الإجتماعية</a>
-            <i class="fa fa-angle-right"></i>
-        </li>
-        <li>
-            <span>إدارة الشبكات الإجتماعية</span>
-        </li>
-    </ul>
-@stop
+@section('title', 'إدارة الشبكات الإجتماعية')
 
 @section('page-title')
-    <h1 class="page-title"> الشبكات الإجتماعية
-        <small>إدارة الشبكات الإجتماعية</small>
-    </h1>
-@stop
+الشبكات الإجتماعية
+@endsection
 
-@section('page-content')
-    <div class="row">
-        <div class="col-md-12">
-            <!-- BEGIN EXAMPLE TABLE PORTLET-->
-            <div class="portlet box {{ $form_class }}">
-                <div class="portlet-title">
-                    <div class="caption">
-                        <i class="icon-social-twitter"></i>إدارة الشبكات الإجتماعية</div>
-                </div>
-                <div class="portlet-body form">
-                    @include('admin.layout.error')
-                    <form role="form" method="post" action="" class="">
-                        <div class="form-body">
-                            <h3 class="form-section">الشبكات الإجتماعية</h3>
-                            @foreach($socials as $row)
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <input type="text" value="{{ $row->name }}" name="name" id="name" class="form-control" placeholder="الفيس بوك" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <input type="text" value="{{ $row->link }}" name="link[{{  $row->id }}]" id="link" class="form-control" placeholder="الرابط">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <input type="text" value="{{ $row->icon }}" name="icon[{{  $row->id }}]" id="icon" class="form-control" placeholder="الايقونة">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <input type="hidden" value="0" name="status[{{  $row->id }}]">
-                                            <input type="checkbox" value="1" name="status[{{  $row->id }}]" class="make-switch" data-on-text="&nbsp;تفعيل&nbsp;" data-off-text="&nbsp;تعطيل&nbsp;" {{ $row->status == 1 ? "checked" : "" }}>
-                                        </div>
-                                    </div>
-                                </div>
-                                <input type="hidden" value="{{ $row->id }}" name="id[]">
-                            @endforeach
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn default {{ $btn_class }}">حفظ</button>
-                            {{ csrf_field() }}
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <!-- END EXAMPLE TABLE PORTLET-->
+@section('breadcrumbs')
+<li class="breadcrumb-item text-muted"><a href="{{ route('dashboard.view') }}" class="text-muted text-hover-primary">الرئيسية</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted">إدارة الشبكات الإجتماعية</li>
+@endsection
+
+@section('content')
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">
+            <i class="ki-duotone ki-share fs-2 me-2"><span class="path1"></span><span class="path2"></span></i>
+            إدارة الشبكات الإجتماعية
         </div>
     </div>
-@stop
+    <div class="card-body">
+        @include('admin.layout.error')
+        <form role="form" method="post" action="" class="">
+            @csrf
+            @foreach($socials as $row)
+            <div class="row mb-5 align-items-center">
+                <div class="col-md-3">
+                    <input type="text" value="{{ $row->name }}" name="name" id="name" class="form-control" placeholder="الفيس بوك" readonly>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" value="{{ $row->link }}" name="link[{{  $row->id }}]" id="link" class="form-control" placeholder="الرابط">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" value="{{ $row->icon }}" name="icon[{{  $row->id }}]" id="icon" class="form-control" placeholder="الايقونة">
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch form-check-custom form-check-solid">
+                        <input type="hidden" value="0" name="status[{{  $row->id }}]">
+                        <input class="form-check-input" type="checkbox" value="1" name="status[{{  $row->id }}]" {{ $row->status == 1 ? "checked" : "" }}>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" value="{{ $row->id }}" name="id[]">
+            @endforeach
 
-@section('js')
-
-@stop
-
+            <div class="d-flex justify-content-end mt-5">
+                <button type="submit" class="btn btn-primary">حفظ</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection

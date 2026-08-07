@@ -1,55 +1,39 @@
-@extends('admin.layout.master')
-@section('title')
-البوم  عقار
-@stop
-@section('page-breadcrumb')
-<ul class="page-breadcrumb">
-    <li>
-        <a href="{{ route('dashboard.view') }}">الرئيسية</a>
-        <i class="fa fa-angle-left"></i>
-    </li>
-    <li>
-        <a href="{{ route('properties.view') }}">إدارة  العقارات</a>
-        <i class="fa fa-angle-left"></i>
-    </li>
-    <li>
-        <strong> {{ $info->title }}</strong>
-        <i class="fa fa-angle-left"></i>
-    </li>
-    <li>
-        <a href="{{ route('properties.gallery',['id' => $info->id]) }}">البوم عقار</a>
-    </li>
-</ul>
-@stop
+@extends('layouts.admin')
+
+@section('title', 'البوم عقار')
 
 @section('page-title')
-<h1 class="page-title"> العقارات
-    <small>البوم عقار</small>
-</h1>
-@stop
+العقارات
+@endsection
 
-@section('page-content')
-<div class="portlet box {{ $form_class }}">
-    <div class="portlet-title">
-        <div class="caption">
-            <i class="icon-grid"></i>البوم عقار </div>
+@section('breadcrumbs')
+<li class="breadcrumb-item text-muted"><a href="{{ route('dashboard.view') }}" class="text-muted text-hover-primary">الرئيسية</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{{ route('properties.view') }}" class="text-muted text-hover-primary">إدارة العقارات</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted">{{ $info->title }}</li>
+@endsection
+
+@section('content')
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">البوم عقار</div>
     </div>
-    <div class="portlet-body form">
-        <div class="form-group">
+    <div class="card-body">
+        <div class="row mb-5">
             <div class="col-md-12">
-                <label for="gallery">معرض الصور</label>
+                <label class="form-label" for="gallery">معرض الصور</label>
                 <div class="dropzone" id="gallery-dropzone"></div>
             </div>
         </div>
-        <div class="form-actions">
-            <div class="col-md-offset-3 col-md-6">
-                <a href="{{ route('properties.view') }}" type="button" class="btn default">عودة</a>
-            </div>
+        <div class="d-flex justify-content-end mt-5">
+            <a href="{{ route('properties.view') }}" class="btn btn-light">عودة</a>
         </div>
     </div>
 </div>
-@stop
-@section('css')
+@endsection
+
+@push('styles')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.css" rel="stylesheet" />
 <style>
     .dz-image img {
@@ -57,8 +41,9 @@
         height: 100%;
     }
 </style>
-@stop
-@section('js')
+@endpush
+
+@push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.js"></script>
 <script>
 Dropzone.options.galleryDropzone =
@@ -127,7 +112,7 @@ Dropzone.options.galleryDropzone =
             success: function (file, response)
             {
                 file.previewElement.id = response.success;
-                //console.log(file); 
+                //console.log(file);
                 // set new images names in dropzone’s preview box.
                 var olddatadzname = file.previewElement.querySelector("[data-dz-name]");
                 file.previewElement.querySelector("img").alt = response.success;
@@ -151,4 +136,4 @@ Dropzone.options.galleryDropzone =
 
         };
 </script>
-@stop
+@endpush

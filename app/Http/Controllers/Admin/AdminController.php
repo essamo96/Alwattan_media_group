@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\Contact;
+use App\Models\CourseRegistration;
 
 class AdminController extends BaseController
 {
@@ -29,5 +30,11 @@ class AdminController extends BaseController
         // dd($notifications);
 
         self::$data['contact_count'] = $notifications;
+
+        $registrations_today = CourseRegistration::whereDate('created_at', $today)
+        ->whereNull('deleted_at')
+        ->count();
+
+        self::$data['registrations_count'] = $registrations_today;
     }
 }

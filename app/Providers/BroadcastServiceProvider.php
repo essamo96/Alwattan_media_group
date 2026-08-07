@@ -14,7 +14,12 @@ class BroadcastServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Broadcast::routes();
+        // The app's default auth guard is "teacher" (config/auth.php), and the
+        // admin panel authenticates on the "admin" guard (auth:admin). Pusher's
+        // private-channel auth POSTs to /broadcasting/auth, so that route must
+        // run under the "admin" guard (session + auth:admin) for
+        // auth('admin')->check() in routes/channels.php to succeed.
+        Broadcast::routes(['middleware' => ['web', 'auth:admin']]);
 
         require base_path('routes/channels.php');
     }

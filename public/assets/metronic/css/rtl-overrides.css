@@ -1,0 +1,69 @@
+/* Minimal RTL mirroring for the light-sidebar layout pieces used by this admin panel.
+   Metronic v8.1.8 Demo1 free HTML build ships LTR-only CSS (no RTL SASS source),
+   so fixed-position offsets are hardcoded to the left. This overrides just those.
+
+   IMPORTANT: Metronic only fixes the sidebar to a column at >=992px; below that it
+   becomes a slide-in drawer (KTDrawer JS, direction "start", which is already
+   RTL-aware on its own). All overrides below are scoped to the same >=992px
+   breakpoint Metronic itself uses for the fixed-sidebar desktop layout — applying
+   them unscoped fights the drawer's own positioning and breaks it on mobile/tablet. */
+
+@media (min-width: 992px) {
+    [dir="rtl"] .app-sidebar {
+        left: auto !important;
+        right: 0 !important;
+    }
+
+    [dir="rtl"] .app-sidebar.app-sidebar-fixed {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* Metronic's compiled CSS pushes the fixed header past the sidebar with
+       `left: calc(sidebar width)` (LTR-only, no logical property) — since the
+       sidebar sits on the right in RTL, the header must be pushed from the
+       right instead, or it stays shifted to the wrong edge and never spans
+       the actual content column. */
+    [dir="rtl"] .app-header {
+        left: 0 !important;
+        right: calc(var(--bs-app-sidebar-width) + var(--bs-app-sidebar-gap-start, 0px) + var(--bs-app-sidebar-gap-end, 0px)) !important;
+    }
+
+    [dir="rtl"] .app-main {
+        margin-left: 0 !important;
+        margin-right: calc(var(--bs-app-sidebar-width) + var(--bs-app-sidebar-gap-start, 0px) + var(--bs-app-sidebar-gap-end, 0px)) !important;
+    }
+
+    [dir="rtl"] .app-footer {
+        left: 0 !important;
+        right: calc(var(--bs-app-sidebar-width) + var(--bs-app-sidebar-gap-start, 0px) + var(--bs-app-sidebar-gap-end, 0px)) !important;
+    }
+
+    /* .app-sidebar-toggle uses Bootstrap's `start-100` utility, compiled as a hardcoded
+       `left:100%!important` (not a logical property) — it must be forced back to the
+       sidebar's inner edge, which is now on the left since the sidebar itself moved right. */
+    [dir="rtl"] .app-sidebar-toggle {
+        left: 0 !important;
+        right: auto !important;
+    }
+}
+
+/* Below 992px the sidebar is a full-width drawer overlay, not a column — it must not
+   reserve any layout space, and the mobile toggle/logo controls stay edge-aligned. */
+@media (max-width: 991.98px) {
+    [dir="rtl"] .app-main {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    [dir="rtl"] .app-footer {
+        left: 0 !important;
+        right: 0 !important;
+    }
+}
+
+/* Bootstrap position utilities (start-*/end-*) used elsewhere in the layout chrome
+   are compiled the same non-logical way in this build — flip the ones actually in use.
+   These are direction-agnostic to viewport width, so no media guard needed. */
+[dir="rtl"] .start-0 { left: auto !important; right: 0 !important; }
+[dir="rtl"] .end-0 { right: auto !important; left: 0 !important; }

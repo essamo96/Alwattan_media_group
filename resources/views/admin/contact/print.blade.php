@@ -1,20 +1,28 @@
-@extends('admin.layout.master')
-@section('title')
-طباعة جهات الاتصال
-@stop
-@section('page-content')
+@extends('layouts.admin')
+
+@section('title', 'طباعة جهات الاتصال')
+
+@section('page-title')
+جهات الاتصال
+@endsection
+
+@section('breadcrumbs')
+<li class="breadcrumb-item text-muted"><a href="{{ route('dashboard.view') }}" class="text-muted text-hover-primary">الرئيسية</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted">طباعة جهات الاتصال</li>
+@endsection
+
+@section('content')
 <div class="row">
     <div class="col-md-12" id="xx">
-        <label class="tx-gray-600">معلومات جهة الاتصال</label>
-        <!-- BEGIN EXAMPLE TABLE PORTLET-->
-        <div class="portlet box {{ $form_class }}"  >
-            <div class="portlet-title" >
-                <div class="caption">
-                    <i class="icon-grid"></i>إدارة جهات الاتصال
-                </div>
+        <label class="text-gray-600">معلومات جهة الاتصال</label>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">إدارة جهات الاتصال</div>
             </div>
-            <div class="portlet-body">
+            <div class="card-body">
                 @include('admin.layout.error')
+        <div class="table-responsive">
                 <table class="table table-striped table-bordered">
                     <tbody>
                         <tr>
@@ -26,9 +34,9 @@
                         </tr>
                     </tbody>
                 </table>
-
+        </div>
             </div>
         </div>
     </div>
 </div>
-@stop
+@endsection

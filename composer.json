@@ -15,8 +15,10 @@
         "laravel/helpers": "^1.5",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.0",
+        "maatwebsite/excel": "^3.1",
         "mcamara/laravel-localization": "^1.7",
         "phpmailer/phpmailer": "^6.8",
+        "pusher/pusher-php-server": "^7.3",
         "spatie/laravel-cookie-consent": "^3.2",
         "spatie/laravel-permission": "^5.5",
         "unisharp/laravel-filemanager": "^2.6",
@@ -47,7 +49,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

@@ -37,6 +37,7 @@ class SyncPermissionsSeeder extends Seeder
         'properties' => 'العقارات',
         'properties_categories' => 'اقسام العقارات',
         'properties_types' => 'انواع العقارات',
+        'registrations' => 'تسجيلات الدورة',
     ];
 
     public function run()

@@ -1,80 +1,64 @@
-@extends('admin.layout.master')
-@section('title')
-تعديل مستخدم
-@stop
-@section('page-breadcrumb')
-<ul class="page-breadcrumb">
-    <li>
-        <a href="{{ route('dashboard.view') }}">الرئيسية</a>
-        <i class="fa fa-angle-right"></i>
-    </li>
-    <li>
-        <a href="{{ route('users.view') }}">إدارة المستخدمين</a>
-        <i class="fa fa-angle-right"></i>
-    </li>
-    <li>
-        <strong> {{$info->name}}</strong>
-        <i class="fa fa-angle-right"></i>
-    </li>
-    <li>
-        <a href="{{ route('users.edit',['id' => Crypt::encrypt($info->id)]) }}">تعديل مستخدم</a>
-    </li>
-</ul>
-@stop
+@extends('layouts.admin')
+
+@section('title', 'تعديل مستخدم')
+
 @section('page-title')
-<h1 class="page-title"> إدارة المستخدمين
-    <small></small>
-</h1>
-@stop
-@section('page-content')
-<div class="portlet box {{ $form_class }}">
-    <div class="portlet-title">
-        <div class="caption">
-            <i class="icon-user"></i>تعديل مستخدم </div>
+المستخدمين
+@endsection
+
+@section('breadcrumbs')
+<li class="breadcrumb-item text-muted"><a href="{{ route('dashboard.view') }}" class="text-muted text-hover-primary">الرئيسية</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted"><a href="{{ route('users.view') }}" class="text-muted text-hover-primary">إدارة المستخدمين</a></li>
+<li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+<li class="breadcrumb-item text-muted">{{ $info->name }}</li>
+@endsection
+
+@section('content')
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">تعديل مستخدم</div>
     </div>
-    <div class="portlet-body form">
+    <div class="card-body">
         @include('admin.layout.error')
-        <form method="post" action="" role="form" class="form-horizontal">
-            <div class="form-body">
-                <div class="row">
-                    <div class="form-group">
-                        <label class="control-label col-md-3">اسم المستخدم (User Name) </label>
-                        <div class="col-md-6">
-                            <input type="text" value="{{ $info->username }}" name="username" id="username" class="form-control" placeholder="اسم المستخدم (User Name)">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-md-3">الإسم الشخصي</label>
-                        <div class="col-md-6">
-                            <input type="text" value="{{ $info->name }}" name="name" id="name" class="form-control" placeholder="الإسم الشخصي">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-md-3">إدارة الصلاحيات</label>
-                        <div class="col-md-6">
-                            <select name="role" id="role" class="form-control">
-                                @foreach($roles as $item)
-                                <option value="{{ $item->id }}" {{ $info->role == $item->id ? 'selected' : '' }}> {{ $item->name }} </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-md-3">الحالة</label>
-                        <div class="col-md-6">
-                            <input type="checkbox" value="1" name="status" class="make-switch" data-on-text="&nbsp;تفعيل&nbsp;" data-off-text="&nbsp;تعطيل&nbsp;" {{ $info->status == 1 ? 'checked' : '' }}>
-                        </div>
+        <form method="post" action="" role="form">
+            @csrf
+            <div class="row mb-5">
+                <label class="col-md-3 col-form-label">اسم المستخدم (User Name)</label>
+                <div class="col-md-6">
+                    <input type="text" value="{{ $info->username }}" name="username" id="username" class="form-control" placeholder="اسم المستخدم (User Name)">
+                </div>
+            </div>
+            <div class="row mb-5">
+                <label class="col-md-3 col-form-label">الإسم الشخصي</label>
+                <div class="col-md-6">
+                    <input type="text" value="{{ $info->name }}" name="name" id="name" class="form-control" placeholder="الإسم الشخصي">
+                </div>
+            </div>
+            <div class="row mb-5">
+                <label class="col-md-3 col-form-label">إدارة الصلاحيات</label>
+                <div class="col-md-6">
+                    <select name="role" id="role" class="form-select">
+                        @foreach($roles as $item)
+                        <option value="{{ $item->id }}" {{ $info->role == $item->id ? 'selected' : '' }}>{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-5">
+                <label class="col-md-3 col-form-label">الحالة</label>
+                <div class="col-md-6">
+                    <div class="form-check form-switch form-check-custom form-check-solid">
+                        <input class="form-check-input" type="checkbox" value="1" name="status" {{ $info->status == 1 ? 'checked' : '' }}>
                     </div>
                 </div>
             </div>
-            <div class="form-actions">
-                <div class="col-md-offset-3 col-md-6">
-                    <button type="submit" class="btn default {{ $btn_class }}">حفظ</button>
-                    <a href="{{ route('users.view') }}" type="button" class="btn default">إلغاء</a>
-                    {{ csrf_field() }}
-                </div>
+
+            <div class="d-flex justify-content-end mt-5">
+                <a href="{{ route('users.view') }}" class="btn btn-light me-3">إلغاء</a>
+                <button type="submit" class="btn btn-primary">حفظ</button>
             </div>
         </form>
     </div>
 </div>
-@stop
+@endsection
