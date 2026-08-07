@@ -240,7 +240,7 @@
                 type: "POST",
                 url: "{{ route('course_registrations.delete') }}",
                 data: {'id': id}
-            }).success(function (data) {
+            }).done(function (data) {
                 toastr[data.status](data.message);
                 oTable.draw();
             });

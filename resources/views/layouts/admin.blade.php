@@ -6,6 +6,11 @@
     <meta charset="utf-8" />
     <title>@yield('title', config('app.name', 'Admin'))</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {{-- Every admin CRUD view's inline script reads this to set the X-CSRF-TOKEN
+         header on its $.ajax() calls (delete, status toggle, filters, ...). Without
+         it, $('meta[name="csrf-token"]').attr('content') is undefined and every
+         such POST is rejected with 419, even though nothing looks wrong client-side. --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     {{-- Tells the browser this page manages its own light/dark styling, so Chrome/Edge's
          automatic content-darkening (triggered by OS/browser dark mode) doesn't try to
          auto-invert colors on its own — that heuristic mishandles fixed-position bars

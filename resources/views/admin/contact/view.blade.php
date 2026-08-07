@@ -177,7 +177,7 @@
                 type: "POST",
                 url: "{{ route('contact.delete') }}",
                 data: {'id': id}
-            }).success(function (data) {
+            }).done(function (data) {
                 toastr[data.status](data.message);
                 oTable.draw();
             });

@@ -154,7 +154,7 @@
                 type: "POST",
                 url: "{{ route('contact.status') }}",
                 data: {'id': id}
-            }).success(function (data) {
+            }).done(function (data) {
                 if (data.type == 'yes') {
                     item.removeClass("badge-light-danger").addClass("badge-light-success");
                     item.html('<i class="ki-duotone ki-check fs-6 me-1"></i> فعال');
@@ -172,7 +172,7 @@
                 type: "POST",
                 url: "{{ route('contact.delete') }}",
                 data: {'id': id}
-            }).success(function (data) {
+            }).done(function (data) {
                 toastr[data.status](data.message);
                 oTable.draw();
             });

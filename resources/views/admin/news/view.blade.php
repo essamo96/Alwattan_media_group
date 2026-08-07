@@ -151,7 +151,7 @@
                 type: "POST",
                 url: "{{ route('news.publish') }}",
                 data: {'id': id}
-            }).success(function (data) {
+            }).done(function (data) {
                 if (data.type == 'yes') {
                     item.removeClass("badge-light-danger").addClass("badge-light-success");
                     item.html('<i class="ki-duotone ki-check fs-6 me-1"></i> منشور');
@@ -169,7 +169,7 @@
                 type: "POST",
                 url: "{{ route('news.delete') }}",
                 data: {'id': id}
-            }).success(function (data) {
+            }).done(function (data) {
                 toastr[data.status](data.message);
                 oTable.draw();
             });

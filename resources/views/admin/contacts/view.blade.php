@@ -166,7 +166,7 @@
                 type: "POST",
                 url: "{{ route('contacts.status') }}",
                 data: {'id' : id}
-            }).success(function (data) {
+            }).done(function (data) {
                 if(data.type == 'yes')
                 {
                     item.removeClass("badge-light-danger");
@@ -189,7 +189,7 @@
                 type: "POST",
                 url: "{{ route('contacts.delete') }}",
                 data: {'id' : id}
-            }).success(function (data) {
+            }).done(function (data) {
                 toastr[data.status](data.message);
                 oTable.draw();
             });
