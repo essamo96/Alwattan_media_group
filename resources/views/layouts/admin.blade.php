@@ -90,6 +90,7 @@
     {{-- Global javascript bundles (mandatory for all pages) --}}
     <script src="{{ asset_v('assets/metronic/plugins/global/plugins.bundle.js') }}"></script>
     <script src="{{ asset_v('assets/metronic/js/scripts.bundle.js') }}"></script>
+    <script src="{{ asset_v('assets/admin/global/scripts/datatable-kt-menu-fix.js') }}"></script>
 
     @stack('scripts')
 </body>
