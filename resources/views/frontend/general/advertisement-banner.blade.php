@@ -9,65 +9,47 @@
                 <div class="spacer-single"></div>
             </div>
         </div>
-        <div class="ad-banner-carousel" data-ad-carousel>
+        <div class="row ad-cards-grid">
             @foreach($ads_banner as $index => $ad)
-            <a href="{{ $ad->url }}" target="_blank" rel="noopener" class="ad-banner-slide {{ $index == 0 ? 'is-active' : '' }}" aria-label="{{ $ad->name }}">
-                <span class="ad-banner-badge">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 11L19 4L17 12L19 20L3 13V11Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-                    إعلان
-                </span>
-                <img src="{{ asset('uploads/advertisements/'.$ad->image) }}" alt="{{ $ad->name }}" loading="lazy">
-            </a>
-            @endforeach
-
-            @if(count($ads_banner) > 1)
-            <div class="ad-banner-dots">
-                @foreach($ads_banner as $index => $ad)
-                <button type="button" class="ad-banner-dot {{ $index == 0 ? 'is-active' : '' }}" data-ad-dot="{{ $index }}" aria-label="إعلان {{ $index + 1 }}"></button>
-                @endforeach
+            <div class="col-lg-4 col-sm-6 wow fadeInUp" data-wow-delay="{{ ($index % 3) * 0.1 }}s">
+                <a href="{{ $ad->url }}" target="_blank" rel="noopener" class="ad-card" aria-label="{{ $ad->name }}">
+                    <span class="ad-card__badge">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 11L19 4L17 12L19 20L3 13V11Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                        إعلان
+                    </span>
+                    <div class="ad-card__media">
+                        <img src="{{ asset('uploads/advertisements/'.$ad->image) }}" alt="{{ $ad->name }}" loading="lazy">
+                        <span class="ad-card__scrim"></span>
+                    </div>
+                    <div class="ad-card__title">
+                        <span>{{ $ad->name }}</span>
+                        <svg class="ad-card__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                </a>
             </div>
-            @endif
+            @endforeach
         </div>
     </div>
 </section>
 
 <style>
-    .ad-banner-carousel{
+    .ad-cards-grid{
+        row-gap:28px;
+    }
+    .ad-card{
+        display:block;
         position:relative;
-        width:100%;
         border-radius:16px;
         overflow:hidden;
-        box-shadow:0 10px 34px rgba(20,30,70,.12);
-        background:#eef0f6;
-        aspect-ratio:16/4.2;
-        max-height:260px;
+        background:#fff;
+        box-shadow:0 8px 24px rgba(20,30,70,.10);
+        transition:transform .3s ease, box-shadow .3s ease;
     }
-    @media (max-width:768px){
-        .ad-banner-carousel{aspect-ratio:16/9;max-height:220px;}
+    .ad-card:hover{
+        transform:translateY(-6px);
+        box-shadow:0 16px 34px rgba(20,30,70,.18);
     }
-    .ad-banner-slide{
-        position:absolute;
-        inset:0;
-        display:block;
-        opacity:0;
-        visibility:hidden;
-        transition:opacity .5s ease;
-        z-index:1;
-    }
-    .ad-banner-slide.is-active{
-        opacity:1;
-        visibility:visible;
-        z-index:2;
-    }
-    .ad-banner-slide img{
-        width:100%;
-        height:100%;
-        object-fit:cover;
-        display:block;
-        transition:transform .35s ease;
-    }
-    .ad-banner-slide:hover img{transform:scale(1.02);}
-    .ad-banner-badge{
+    .ad-card__badge{
         position:absolute;
         top:12px;
         inset-inline-start:12px;
@@ -85,66 +67,61 @@
         letter-spacing:.2px;
         backdrop-filter:blur(2px);
     }
-    .ad-banner-dots{
+    .ad-card__media{
+        position:relative;
+        width:100%;
+        aspect-ratio:4/3;
+        overflow:hidden;
+        background:#eef0f6;
+    }
+    .ad-card__media img{
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        display:block;
+        transition:transform .45s ease;
+    }
+    .ad-card:hover .ad-card__media img{
+        transform:scale(1.06);
+    }
+    /* يمزج أسفل الصورة تدريجياً بلون العنوان الأزرق حتى يبدو الانتقال إلى
+       شريط العنوان متداخلاً بصرياً بدل القطع المفاجئ. */
+    .ad-card__scrim{
         position:absolute;
-        bottom:12px;
-        left:50%;
-        transform:translateX(-50%);
-        z-index:4;
+        inset:auto 0 0 0;
+        height:45%;
+        background:linear-gradient(to top, #213478 0%, rgba(33,52,120,0) 100%);
+        pointer-events:none;
+    }
+    /* شريط العنوان بتدرج لوني متداخل (أزرق داكن → أحمر العلامة) بدل لون واحد مسطح. */
+    .ad-card__title{
         display:flex;
-        gap:7px;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        padding:14px 18px;
+        background:linear-gradient(120deg, #213478 0%, #2c418f 55%, #c0212f 130%);
+        color:#fff;
+        font-family:'Cairo','Tahoma',sans-serif;
+        font-size:15px;
+        font-weight:700;
     }
-    .ad-banner-dot{
-        width:8px;
-        height:8px;
-        border-radius:50%;
-        border:none;
-        background:rgba(255,255,255,.55);
-        cursor:pointer;
-        padding:0;
-        transition:background .25s ease, transform .25s ease;
+    .ad-card__title span{
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
     }
-    .ad-banner-dot.is-active{
-        background:#c0212f;
-        transform:scale(1.2);
+    .ad-card__arrow{
+        flex:none;
+        opacity:.85;
+        transition:transform .3s ease;
+    }
+    .ad-card:hover .ad-card__arrow{
+        transform:translateX(-4px);
+        opacity:1;
+    }
+    html[dir="ltr"] .ad-card:hover .ad-card__arrow{
+        transform:translateX(4px);
     }
 </style>
-
-<script>
-(function(){
-    var carousel = document.querySelector('[data-ad-carousel]');
-    if(!carousel) return;
-    var slides = carousel.querySelectorAll('.ad-banner-slide');
-    var dots = carousel.querySelectorAll('.ad-banner-dot');
-    if(slides.length < 2) return;
-    var current = 0;
-    var timer;
-
-    function goTo(index){
-        slides[current].classList.remove('is-active');
-        dots.length && dots[current].classList.remove('is-active');
-        current = index % slides.length;
-        slides[current].classList.add('is-active');
-        dots.length && dots[current].classList.add('is-active');
-    }
-
-    function next(){ goTo(current + 1); }
-
-    function start(){ timer = setInterval(next, 5000); }
-    function stop(){ clearInterval(timer); }
-
-    dots.forEach(function(dot){
-        dot.addEventListener('click', function(){
-            stop();
-            goTo(parseInt(dot.getAttribute('data-ad-dot'), 10));
-            start();
-        });
-    });
-
-    carousel.addEventListener('mouseenter', stop);
-    carousel.addEventListener('mouseleave', start);
-
-    start();
-})();
-</script>
 @endif

@@ -242,6 +242,9 @@ html[dir="rtl"] .crumb li{
     transform-origin: 40% 50%;
     transform: rotate(-9deg) scale(2.03);
     pointer-events: none;
+    /* Lines run across the full image as originally designed. The hero text stays
+       unaffected not by masking the waves but because .hero-text-slide sits in its
+       own higher stacking layer above .waves (see hero-slider.css). */
 }
 
 /* ================================================== */
