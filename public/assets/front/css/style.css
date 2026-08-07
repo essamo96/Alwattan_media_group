@@ -3799,7 +3799,12 @@ footer.light .social-icons i{
     margin-inline-start: 4px;
 }
 .social-icons a i {
-    display: inline-flex;
+    /* A global "i { display: inline-block !important; }" reset further down this
+       file (for Font Awesome icons elsewhere) beats this rule's display value
+       regardless of selector specificity, so the flex centering below never
+       applied and the glyph sat off-center in its colored box. !important here
+       restores it. */
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     width: 36px;
