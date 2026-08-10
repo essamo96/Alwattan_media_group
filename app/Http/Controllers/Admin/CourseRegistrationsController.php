@@ -26,6 +26,7 @@ class CourseRegistrationsController extends AdminController {
     //////////////////////////////////////////////
     public function getIndex() {
         parent::$data['courses'] = Course::where('status', 1)->orderBy('name')->get();
+        parent::$data['export_columns'] = CourseRegistrationsExport::availableColumns();
         return view('admin.course_registrations.view', parent::$data);
     }
 
@@ -129,9 +130,10 @@ class CourseRegistrationsController extends AdminController {
     //////////////////////////////////////////////
     public function getExport(Request $request) {
         $filters = $this->filtersFromRequest($request);
+        $columns = $request->get('columns'); // مصفوفة مفاتيح الأعمدة بالترتيب المختار من المستخدم، أو null = كل الأعمدة
         $fileName = 'تسجيلات_الدورة_' . date('Y-m-d_H-i') . '.xlsx';
 
-        return Excel::download(new CourseRegistrationsExport($filters), $fileName);
+        return Excel::download(new CourseRegistrationsExport($filters, $columns), $fileName);
     }
 
 }

@@ -68,12 +68,21 @@ class CourseCandidatesController extends AdminController {
     //////////////////////////////////////////////
     public function getIndexList(Request $request) {
         $courseId = $request->get('course_id');
+        $filters = $this->filtersFromRequest($request);
+        $hasFilters = count(array_filter($filters, fn($v) => !empty($v))) > 0;
+
+        $matchingRegistrationIds = $hasFilters
+            ? (new CourseRegistration())->applyFilters($filters)->pluck('id')
+            : null;
 
         $query = CourseCandidate::query()
             ->with(['course', 'registration'])
             ->whereHas('registration')
             ->when($courseId, function ($q) use ($courseId) {
                 $q->where('course_id', $courseId);
+            })
+            ->when($matchingRegistrationIds !== null, function ($q) use ($matchingRegistrationIds) {
+                $q->whereIn('course_registration_id', $matchingRegistrationIds);
             })
             ->orderBy('id', 'desc');
 
@@ -150,7 +159,13 @@ class CourseCandidatesController extends AdminController {
         $candidateRegistrationIds = $course->candidates()->pluck('course_registration_id');
 
         $registration = new CourseRegistration();
-        $query = $registration->applyFilters($filters)->orderBy('id', 'desc');
+        // المرشحون فعلياً لهذه الدورة يُستبعدون من نتائج البحث بالكامل (مو بس checkbox معطّل)
+        // حتى ما يتكرر ظهور نفس الاسم بالفلترة اللاحقة.
+        $query = $registration->applyFilters($filters)
+            ->when($candidateRegistrationIds->isNotEmpty(), function ($q) use ($candidateRegistrationIds) {
+                $q->whereNotIn('id', $candidateRegistrationIds);
+            })
+            ->orderBy('id', 'desc');
         $datatable = Datatables::of($query);
 
         $datatable->addColumn('applicant', function ($row) {
@@ -161,14 +176,9 @@ class CourseCandidatesController extends AdminController {
             return $row->maritalStatusLabel();
         });
 
-        $datatable->addColumn('is_candidate', function ($row) use ($candidateRegistrationIds) {
-            return $candidateRegistrationIds->contains($row->id);
-        });
-
-        $datatable->addColumn('select', function ($row) use ($candidateRegistrationIds) {
-            $checked = $candidateRegistrationIds->contains($row->id) ? 'checked disabled' : '';
+        $datatable->addColumn('select', function ($row) {
             return '<div class="form-check form-check-custom form-check-solid">'
-                . '<input class="form-check-input candidate-checkbox" type="checkbox" value="' . $row->id . '" ' . $checked . '>'
+                . '<input class="form-check-input candidate-checkbox" type="checkbox" value="' . $row->id . '">'
                 . '</div>';
         });
 

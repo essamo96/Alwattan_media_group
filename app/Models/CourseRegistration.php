@@ -72,7 +72,13 @@ class CourseRegistration extends Model {
     public function applyFilters($filters = []) {
         return $this->where(function ($query) use ($filters) {
                     if (!empty($filters['name'])) {
-                        $query->where('full_name', 'LIKE', '%' . $filters['name'] . '%');
+                        // يبحث بكل كلمة من الاسم (الأول/الثاني/الثالث/الرابع) بشكل مستقل بدل
+                        // اشتراط تطابق مقطع واحد متصل بالضبط - "احمد علي" لازم تلاقي
+                        // "احمد محمد علي حسن" حتى لو الكلمتين مش متجاورتين بالاسم الكامل.
+                        $words = array_filter(preg_split('/\s+/', trim($filters['name'])));
+                        foreach ($words as $word) {
+                            $query->where('full_name', 'LIKE', '%' . $word . '%');
+                        }
                     }
                     if (!empty($filters['national_id'])) {
                         $query->where('national_id', 'LIKE', '%' . $filters['national_id'] . '%');
