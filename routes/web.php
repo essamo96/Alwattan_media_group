@@ -272,6 +272,21 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web
     Route::get('course_registrations/show/{id}', ['as' => 'course_registrations.show', 'middleware' => ['permission:admin.registrations.view'], 'uses' => 'CourseRegistrationsController@getShow']);
     Route::post('course_registrations/delete', ['as' => 'course_registrations.delete', 'middleware' => ['permission:admin.registrations.delete'], 'uses' => 'CourseRegistrationsController@postDelete']);
     Route::get('course_registrations/export', ['as' => 'course_registrations.export', 'middleware' => ['permission:admin.registrations.export'], 'uses' => 'CourseRegistrationsController@getExport']);
+    //Courses Route
+    Route::get('courses', ['as' => 'courses.view', 'middleware' => ['permission:admin.courses.view|admin.courses.add|admin.courses.edit|admin.courses.delete|admin.courses.status'], 'uses' => 'CoursesController@getIndex']);
+    Route::get('courses/list', ['as' => 'courses.list', 'middleware' => ['permission:admin.courses.view|admin.courses.add|admin.courses.edit|admin.courses.delete|admin.courses.status'], 'uses' => 'CoursesController@getList']);
+    Route::get('courses/add', ['as' => 'courses.add', 'middleware' => ['permission:admin.courses.add'], 'uses' => 'CoursesController@getAdd']);
+    Route::post('courses/add', ['as' => 'courses.add', 'middleware' => ['permission:admin.courses.add'], 'uses' => 'CoursesController@postAdd']);
+    Route::get('courses/edit/{id}', ['as' => 'courses.edit', 'middleware' => ['permission:admin.courses.edit'], 'uses' => 'CoursesController@getEdit']);
+    Route::post('courses/edit/{id}', ['as' => 'courses.edit', 'middleware' => ['permission:admin.courses.edit'], 'uses' => 'CoursesController@postEdit']);
+    Route::post('courses/delete', ['as' => 'courses.delete', 'middleware' => ['permission:admin.courses.delete'], 'uses' => 'CoursesController@postDelete']);
+    Route::post('courses/status', ['as' => 'courses.status', 'middleware' => ['permission:admin.courses.status'], 'uses' => 'CoursesController@postStatus']);
+    //Course Candidates Route
+    Route::get('courses/{id}/candidates', ['as' => 'course_candidates.manage', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getManage']);
+    Route::get('courses/{id}/candidates/list', ['as' => 'course_candidates.list', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getList']);
+    Route::get('courses/{id}/candidates/current', ['as' => 'course_candidates.current', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getCurrent']);
+    Route::post('courses/{id}/candidates/add', ['as' => 'course_candidates.add', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@postAdd']);
+    Route::post('courses/{id}/candidates/remove', ['as' => 'course_candidates.remove', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@postRemove']);
 
     // log out
     Route::get('logout', ['as' => 'app.logout', 'uses' => 'LoginController@getLogout']);

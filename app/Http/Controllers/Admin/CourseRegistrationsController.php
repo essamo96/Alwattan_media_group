@@ -47,22 +47,21 @@ class CourseRegistrationsController extends AdminController {
             'email' => $request->get('email'),
             'date_from' => $request->get('date_from'),
             'date_to' => $request->get('date_to'),
+            'age_from' => $request->get('age_from'),
+            'age_to' => $request->get('age_to'),
         ];
     }
 
     //////////////////////////////////////////////
     public function getList(Request $request) {
-        $length = $request->get('length');
-        $start = $request->get('start');
         $filters = $this->filtersFromRequest($request);
 
         $registration = new CourseRegistration();
-        $info = $registration->searchRegistrations($filters, $start, $length);
-        $count = $registration->searchRegistrationsCount($filters);
-        $datatable = Datatables::of($info)->setTotalRecords($count);
+        $query = $registration->applyFilters($filters)->orderBy('id', 'desc');
+        $datatable = Datatables::of($query);
 
-        $datatable->editColumn('gender', function ($row) {
-            return $row->genderLabel();
+        $datatable->addColumn('applicant', function ($row) {
+            return view('admin.course_registrations.parts.applicant', ['row' => $row])->render();
         });
 
         $datatable->editColumn('marital_status', function ($row) {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -15,6 +16,15 @@ class CourseRegistration extends Model {
         'specific_specialization', 'graduation_year', 'university', 'gpa', 'nationality',
         'current_address', 'birth_place', 'employer', 'marital_status', 'mobile', 'email',
     ];
+    protected $appends = ['age'];
+    protected $casts = [
+        'birth_date' => 'date',
+    ];
+
+    //////////////////////////////////////////////
+    public function getAgeAttribute() {
+        return $this->birth_date ? Carbon::parse($this->birth_date)->age : null;
+    }
 
     //////////////////////////////////////////////
     public static function genderLabels() {
@@ -57,19 +67,6 @@ class CourseRegistration extends Model {
     }
 
     //////////////////////////////////////////////
-    public function searchRegistrations($filters = [], $start = 0, $length = 25) {
-        return $this->applyFilters($filters)
-                        ->skip($start)
-                        ->orderBy('id', 'desc')
-                        ->take($length);
-    }
-
-    //////////////////////////////////////////////
-    public function searchRegistrationsCount($filters = []) {
-        return $this->applyFilters($filters)->count('id');
-    }
-
-    //////////////////////////////////////////////
     public function applyFilters($filters = []) {
         return $this->where(function ($query) use ($filters) {
                     if (!empty($filters['name'])) {
@@ -107,6 +104,13 @@ class CourseRegistration extends Model {
                     }
                     if (!empty($filters['gpa_to'])) {
                         $query->where('gpa', '<=', $filters['gpa_to']);
+                    }
+                    // عمر من X الى Y => تاريخ ميلاد بين (اليوم - (Y+1) سنة + يوم) و (اليوم - X سنة)
+                    if (!empty($filters['age_to'])) {
+                        $query->where('birth_date', '>=', now()->subYears((int) $filters['age_to'] + 1)->addDay()->toDateString());
+                    }
+                    if (!empty($filters['age_from'])) {
+                        $query->where('birth_date', '<=', now()->subYears((int) $filters['age_from'])->toDateString());
                     }
                     if (!empty($filters['employer'])) {
                         $query->where('employer', 'LIKE', '%' . $filters['employer'] . '%');

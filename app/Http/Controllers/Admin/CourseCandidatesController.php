@@ -1,0 +1,182 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Models\Course;
+use App\Models\CourseCandidate;
+use App\Models\CourseRegistration;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Yajra\DataTables\DataTables;
+
+class CourseCandidatesController extends AdminController {
+
+    const ADD_SUCCESS = "نجاح، تمت إضافة المرشحين المحددين";
+    const REMOVE_SUCCESS = "نجاح، تم حذف المرشح من الدورة";
+    const EXECUTION_ERROR = "عذراً، حدث خطأ أثناء تنفيذ العملية";
+    const NOT_FOUND = "عذراً،لا يمكن العثور على البيانات";
+
+    //////////////////////////////////////////////
+    public function __construct() {
+        parent::__construct();
+        parent::$data['active_menu'] = 'courses';
+    }
+
+    //////////////////////////////////////////////
+    private function resolveCourse($id) {
+        try {
+            $id = Crypt::decrypt($id);
+        } catch (DecryptException $e) {
+            return null;
+        }
+        return (new Course())->getCourse($id);
+    }
+
+    //////////////////////////////////////////////
+    private function filtersFromRequest(Request $request) {
+        return [
+            'name' => $request->get('name'),
+            'national_id' => $request->get('national_id'),
+            'gender' => $request->get('gender'),
+            'marital_status' => $request->get('marital_status'),
+            'nationality' => $request->get('nationality'),
+            'general_specialization' => $request->get('general_specialization'),
+            'specific_specialization' => $request->get('specific_specialization'),
+            'graduation_year_from' => $request->get('graduation_year_from'),
+            'graduation_year_to' => $request->get('graduation_year_to'),
+            'university' => $request->get('university'),
+            'gpa_from' => $request->get('gpa_from'),
+            'gpa_to' => $request->get('gpa_to'),
+            'employer' => $request->get('employer'),
+            'mobile' => $request->get('mobile'),
+            'email' => $request->get('email'),
+            'date_from' => $request->get('date_from'),
+            'date_to' => $request->get('date_to'),
+            'age_from' => $request->get('age_from'),
+            'age_to' => $request->get('age_to'),
+        ];
+    }
+
+    //////////////////////////////////////////////
+    public function getManage(Request $request, $id) {
+        $course = $this->resolveCourse($id);
+        if (!$course) {
+            $request->session()->flash('danger', self::NOT_FOUND);
+            return redirect(route('courses.view'));
+        }
+
+        parent::$data['course'] = $course;
+        parent::$data['encrypted_id'] = $id;
+        return view('admin.course_candidates.manage', parent::$data);
+    }
+
+    //////////////////////////////////////////////
+    public function getList(Request $request, $id) {
+        $course = $this->resolveCourse($id);
+        if (!$course) {
+            return response()->json(['error' => self::NOT_FOUND], 404);
+        }
+
+        $filters = $this->filtersFromRequest($request);
+        $candidateRegistrationIds = $course->candidates()->pluck('course_registration_id');
+
+        $registration = new CourseRegistration();
+        $query = $registration->applyFilters($filters)->orderBy('id', 'desc');
+        $datatable = Datatables::of($query);
+
+        $datatable->addColumn('applicant', function ($row) {
+            return view('admin.course_registrations.parts.applicant', ['row' => $row])->render();
+        });
+
+        $datatable->editColumn('marital_status', function ($row) {
+            return $row->maritalStatusLabel();
+        });
+
+        $datatable->addColumn('is_candidate', function ($row) use ($candidateRegistrationIds) {
+            return $candidateRegistrationIds->contains($row->id);
+        });
+
+        $datatable->addColumn('select', function ($row) use ($candidateRegistrationIds) {
+            $checked = $candidateRegistrationIds->contains($row->id) ? 'checked disabled' : '';
+            return '<div class="form-check form-check-custom form-check-solid">'
+                . '<input class="form-check-input candidate-checkbox" type="checkbox" value="' . $row->id . '" ' . $checked . '>'
+                . '</div>';
+        });
+
+        $datatable->escapeColumns(['*']);
+        return $datatable->make(true);
+    }
+
+    //////////////////////////////////////////////
+    public function getCurrent(Request $request, $id) {
+        $course = $this->resolveCourse($id);
+        if (!$course) {
+            return response()->json(['error' => self::NOT_FOUND], 404);
+        }
+
+        $candidates = $course->candidates()
+            ->with('registration')
+            ->get()
+            ->filter(fn($candidate) => $candidate->registration !== null)
+            ->map(function ($candidate) {
+                $r = $candidate->registration;
+                return [
+                    'candidate_id' => Crypt::encrypt($candidate->id),
+                    'full_name' => $r->full_name,
+                    'age' => $r->age,
+                    'gender' => $r->genderLabel(),
+                    'gpa' => $r->gpa,
+                    'university' => $r->university,
+                ];
+            })
+            ->values();
+
+        return response()->json(['data' => $candidates]);
+    }
+
+    //////////////////////////////////////////////
+    public function postAdd(Request $request, $id) {
+        $course = $this->resolveCourse($id);
+        if (!$course) {
+            return response()->json(['status' => 'error', 'message' => self::NOT_FOUND]);
+        }
+
+        $ids = (array) $request->get('ids', []);
+        $ids = array_filter(array_map('intval', $ids));
+
+        if (empty($ids)) {
+            return response()->json(['status' => 'error', 'message' => self::EXECUTION_ERROR]);
+        }
+
+        $validRegistrationIds = CourseRegistration::whereIn('id', $ids)->pluck('id');
+        foreach ($validRegistrationIds as $registrationId) {
+            CourseCandidate::addCandidate($course->id, $registrationId);
+        }
+
+        return response()->json(['status' => 'success', 'message' => self::ADD_SUCCESS]);
+    }
+
+    //////////////////////////////////////////////
+    public function postRemove(Request $request, $id) {
+        $course = $this->resolveCourse($id);
+        if (!$course) {
+            return response()->json(['status' => 'error', 'message' => self::NOT_FOUND]);
+        }
+
+        try {
+            $candidateId = Crypt::decrypt($request->get('candidate_id'));
+        } catch (DecryptException $e) {
+            return response()->json(['status' => 'error', 'message' => 'Error Decode']);
+        }
+
+        $candidate = CourseCandidate::where('course_id', $course->id)->find($candidateId);
+        if ($candidate) {
+            $candidate->delete();
+            return response()->json(['status' => 'success', 'message' => self::REMOVE_SUCCESS]);
+        }
+
+        return response()->json(['status' => 'error', 'message' => self::NOT_FOUND]);
+    }
+
+}

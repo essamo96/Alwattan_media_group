@@ -175,6 +175,15 @@
                 </div>
                 @endif
 
+                @if(auth()->user()->can('admin.courses.view'))
+                <div class="menu-item">
+                    <a class="menu-link {{ $active_menu == 'courses' ? 'active' : '' }}" href="{{ route('courses.view') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-teacher fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i></span>
+                        <span class="menu-title">{{ __('الدورات') }}</span>
+                    </a>
+                </div>
+                @endif
+
                 @if(auth()->user()->can('admin.partners.view'))
                 <div class="menu-item">
                     <a class="menu-link {{ $active_menu == 'partners' ? 'active' : '' }}" href="{{ route('partners.view') }}">

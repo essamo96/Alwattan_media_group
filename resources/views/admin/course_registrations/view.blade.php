@@ -91,6 +91,14 @@
                 <input type="number" step="0.01" name="gpa_to" class="form-control form-control-solid filter-field" placeholder="إلى">
             </div>
             <div class="col-md-2">
+                <label class="form-label">العمر من</label>
+                <input type="number" min="0" name="age_from" class="form-control form-control-solid filter-field" placeholder="من">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">العمر إلى</label>
+                <input type="number" min="0" name="age_to" class="form-control form-control-solid filter-field" placeholder="إلى">
+            </div>
+            <div class="col-md-2">
                 <label class="form-label">رقم الجوال</label>
                 <input type="text" name="mobile" class="form-control form-control-solid filter-field" placeholder="رقم الجوال">
             </div>
@@ -121,13 +129,13 @@
                 <thead>
                     <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
                         <th>#</th>
-                        <th>الاسم</th>
+                        <th>المتقدم</th>
                         <th>رقم الهوية</th>
-                        <th>الجنس</th>
                         <th>الجوال</th>
                         <th>البريد الإلكتروني</th>
                         <th>الجامعة</th>
                         <th>سنة التخرج</th>
+                        <th>العلامة</th>
                         <th>الحالة الاجتماعية</th>
                         <th>تاريخ التسجيل</th>
                         <th class="text-end">إجراءات</th>
@@ -197,13 +205,13 @@
             "columnDefs": [{"targets": "_all", "defaultContent": ""}],
             "columns": [
                 {"data": "", "title": "#", "orderable": false, "searchable": false},
-                {"data": "full_name", "title": "الاسم", "orderable": false, "searchable": false},
+                {"data": "applicant", "title": "المتقدم", "orderable": false, "searchable": false},
                 {"data": "national_id", "title": "رقم الهوية", "orderable": false, "searchable": false},
-                {"data": "gender", "title": "الجنس", "orderable": false, "searchable": false},
                 {"data": "mobile", "title": "الجوال", "orderable": false, "searchable": false},
                 {"data": "email", "title": "البريد الإلكتروني", "orderable": false, "searchable": false},
                 {"data": "university", "title": "الجامعة", "orderable": false, "searchable": false},
                 {"data": "graduation_year", "title": "سنة التخرج", "orderable": false, "searchable": false},
+                {"data": "gpa", "title": "العلامة", "orderable": false, "searchable": false},
                 {"data": "marital_status", "title": "الحالة الاجتماعية", "orderable": false, "searchable": false},
                 {"data": "created_at", "title": "تاريخ التسجيل", "orderable": false, "searchable": false},
                 {"data": "actions", "title": "إجراءات", "orderable": false, "searchable": false}
