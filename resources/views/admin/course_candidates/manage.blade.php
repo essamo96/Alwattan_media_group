@@ -92,17 +92,27 @@
                     <h3 class="fw-bold">نتائج البحث</h3>
                 </div>
                 <div class="card-toolbar">
+                    <button type="button" id="add_all_matching_btn" class="btn btn-light-primary me-3">
+                        <i class="ki-duotone ki-people fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i> ترشيح كل النتائج المطابقة للفلاتر
+                    </button>
                     <button type="button" id="add_selected_btn" class="btn btn-primary" disabled>
                         <i class="ki-duotone ki-plus fs-2"></i> إضافة المحدد للمرشحين
                     </button>
                 </div>
             </div>
             <div class="card-body pt-0">
+                <div class="text-muted fs-7 mb-3">
+                    التحديد يشتغل على المرشحين المضافين سابقاً لهذه الدورة بشكل تراكمي — تقدر ترشّح لنفس الدورة أكثر من مرة بفلاتر مختلفة كل مرة بدون ما تلغي المرشحين السابقين.
+                </div>
                 <div class="table-responsive">
                     <table class="table align-middle table-row-dashed table-hover fs-6 gy-5 w-100" id="applicants_table" style="width:100%">
                         <thead>
                             <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                                <th></th>
+                                <th>
+                                    <div class="form-check form-check-custom form-check-solid">
+                                        <input class="form-check-input" type="checkbox" id="select_all_checkbox">
+                                    </div>
+                                </th>
                                 <th>المتقدم</th>
                                 <th>الجامعة</th>
                                 <th>العلامة</th>
@@ -148,6 +158,7 @@
         var listUrl = @json(route('course_candidates.list', ['id' => $encrypted_id]));
         var currentUrl = @json(route('course_candidates.current', ['id' => $encrypted_id]));
         var addUrl = @json(route('course_candidates.add', ['id' => $encrypted_id]));
+        var addAllUrl = @json(route('course_candidates.add_all', ['id' => $encrypted_id]));
         var removeUrlBase = @json(route('course_candidates.remove', ['id' => $encrypted_id]));
 
         function collectFilters() {
@@ -188,12 +199,39 @@
             },
             "columnDefs": [{"targets": "_all", "defaultContent": ""}],
             "columns": [
-                {"data": "select", "title": "", "orderable": false, "searchable": false},
+                {"data": "select", "orderable": false, "searchable": false},
                 {"data": "applicant", "title": "المتقدم", "orderable": false, "searchable": false},
                 {"data": "university", "title": "الجامعة", "orderable": false, "searchable": false},
                 {"data": "gpa", "title": "العلامة", "orderable": false, "searchable": false},
                 {"data": "marital_status", "title": "الحالة الاجتماعية", "orderable": false, "searchable": false}
-            ]
+            ],
+            "drawCallback": function () {
+                // كل رسم جديد للجدول (فلترة/صفحة جديدة) يفرغ حالة "تحديد الكل"
+                $('#select_all_checkbox').prop('checked', false);
+                toggleAddButton();
+            }
+        });
+
+        $('#select_all_checkbox').on('change', function () {
+            var checked = $(this).prop('checked');
+            $('.candidate-checkbox:not(:disabled)').prop('checked', checked);
+            toggleAddButton();
+        });
+
+        $('#add_all_matching_btn').on('click', function () {
+            var $btn = $(this);
+            $btn.prop('disabled', true);
+            $.ajax({
+                type: 'POST',
+                url: addAllUrl,
+                data: collectFilters()
+            }).done(function (data) {
+                toastr[data.status](data.message);
+                oTable.draw(false);
+                loadCandidates();
+            }).always(function () {
+                $btn.prop('disabled', false);
+            });
         });
 
         var searchTimer;

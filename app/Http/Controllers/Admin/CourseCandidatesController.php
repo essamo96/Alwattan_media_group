@@ -226,6 +226,35 @@ class CourseCandidatesController extends AdminController {
     }
 
     //////////////////////////////////////////////
+    // يضيف كل المتقدمين المطابقين للفلاتر الحالية دفعة واحدة (بدون التقيد بصفحة الجدول الحالية).
+    public function postAddAll(Request $request, $id) {
+        $course = $this->resolveCourse($id);
+        if (!$course) {
+            return response()->json(['status' => 'error', 'message' => self::NOT_FOUND]);
+        }
+
+        $filters = $this->filtersFromRequest($request);
+        $registration = new CourseRegistration();
+        $matchingIds = $registration->applyFilters($filters)->pluck('id');
+
+        if ($matchingIds->isEmpty()) {
+            return response()->json(['status' => 'error', 'message' => self::EXECUTION_ERROR]);
+        }
+
+        $newCount = 0;
+        foreach ($matchingIds as $registrationId) {
+            if (CourseCandidate::addCandidate($course->id, $registrationId)) {
+                $newCount++;
+            }
+        }
+
+        $message = $newCount > 0
+            ? 'نجاح، تمت إضافة ' . $newCount . ' مرشح جديد (من أصل ' . $matchingIds->count() . ' مطابق للفلاتر)'
+            : 'كل النتائج المطابقة (' . $matchingIds->count() . ') مرشحون لهذه الدورة أصلاً';
+        return response()->json(['status' => 'success', 'message' => $message]);
+    }
+
+    //////////////////////////////////////////////
     public function postRemove(Request $request, $id) {
         $course = $this->resolveCourse($id);
         if (!$course) {

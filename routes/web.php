@@ -289,6 +289,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web
     Route::get('courses/{id}/candidates/list', ['as' => 'course_candidates.list', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getList']);
     Route::get('courses/{id}/candidates/current', ['as' => 'course_candidates.current', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getCurrent']);
     Route::post('courses/{id}/candidates/add', ['as' => 'course_candidates.add', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@postAdd']);
+    Route::post('courses/{id}/candidates/add-all', ['as' => 'course_candidates.add_all', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@postAddAll']);
     Route::post('courses/{id}/candidates/remove', ['as' => 'course_candidates.remove', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@postRemove']);
 
     // log out

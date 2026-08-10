@@ -24,8 +24,13 @@ class CourseCandidate extends Model {
         return $this->belongsTo(CourseRegistration::class, 'course_registration_id');
     }
 
-    //////////////////////////////////////////////
-    public static function addCandidate($course_id, $course_registration_id) {
+    /**
+     * يضيف مرشحاً لدورة، أو يعيد تفعيله ان كان محذوفاً سابقاً منها (soft delete).
+     * آمن يُستدعى عدة مرات لنفس الدورة بفلاتر/دفعات مختلفة بدون تكرار.
+     *
+     * @return bool  true اذا أُضيف/أُعيد تفعيله فعلياً الآن، false اذا كان مرشحاً فعالاً أصلاً
+     */
+    public static function addCandidate($course_id, $course_registration_id): bool {
         // withTrashed حتى لو كان هذا المرشح أُزيل سابقاً من نفس الدورة (soft delete)
         // نعيد تفعيله بدل محاولة إدراج صف جديد يصطدم بالـ unique index.
         $existing = self::withTrashed()
@@ -36,14 +41,16 @@ class CourseCandidate extends Model {
         if ($existing) {
             if ($existing->trashed()) {
                 $existing->restore();
+                return true;
             }
-            return $existing;
+            return false;
         }
 
-        return self::create([
+        self::create([
             'course_id' => $course_id,
             'course_registration_id' => $course_registration_id,
         ]);
+        return true;
     }
 
 }
