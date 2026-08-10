@@ -78,6 +78,8 @@ class CourseRegistrationsController extends AdminController {
         $datatable->addColumn('actions', function ($row) {
             $data['id'] = $row->id;
             $data['btn_class'] = parent::$data['btn_class'];
+            $data['full_name'] = $row->full_name;
+            $data['has_mobile'] = !empty($row->mobile);
 
             return view('admin.course_registrations.parts.actions', $data)->render();
         });

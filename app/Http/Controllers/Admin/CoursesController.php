@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Yajra\DataTables\DataTables;
 ////////////////////////////////////
+use App\Exports\CourseCandidatesExport;
 use App\Models\Course;
 
 class CoursesController extends AdminController {
@@ -28,6 +29,7 @@ class CoursesController extends AdminController {
 
     //////////////////////////////////////////////
     public function getIndex() {
+        parent::$data['export_columns'] = CourseCandidatesExport::availableColumns();
         return view('admin.courses.view', parent::$data);
     }
 
@@ -55,6 +57,13 @@ class CoursesController extends AdminController {
             $data['status'] = $row->status;
 
             return view('admin.courses.parts.status', $data)->render();
+        });
+
+        $datatable->addColumn('candidates_count', function ($row) {
+            $data['id'] = $row->id;
+            $data['count'] = $row->candidates()->count();
+
+            return view('admin.courses.parts.candidates_count', $data)->render();
         });
 
         $datatable->addColumn('actions', function ($row) {

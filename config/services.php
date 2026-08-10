@@ -39,4 +39,11 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'tweetsms' => [
+        'url' => env('TWEETSMS_URL', 'http://www.tweetsms.ps/api.php'),
+        'user' => env('TWEETSMS_USER'),
+        'pass' => env('TWEETSMS_PASS'),
+        'sender' => env('TWEETSMS_SENDER', 'AlWattan'),
+    ],
+
 ];

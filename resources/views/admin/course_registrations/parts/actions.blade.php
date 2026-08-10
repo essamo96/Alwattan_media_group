@@ -11,6 +11,15 @@
             </a>
         </div>
         @endcan
+        @can('admin.sms.send')
+        @if($has_mobile ?? true)
+        <div class="menu-item px-3">
+            <a href="#" class="menu-link px-3 sms-single-btn" data-id="{{ Crypt::encrypt($id) }}" data-name="{{ $full_name ?? '' }}">
+                <i class="ki-duotone ki-message-text-2 fs-5 me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i> إرسال SMS
+            </a>
+        </div>
+        @endif
+        @endcan
         @can('admin.registrations.delete')
         <div class="menu-item px-3">
             <a href="#" data-href="{{ Crypt::encrypt($id) }}" data-bs-toggle="modal" data-bs-target="#confirm" class="menu-link px-3">

@@ -19,6 +19,11 @@
             <h3 class="fw-bold">فلاتر البحث</h3>
         </div>
         <div class="card-toolbar">
+            @can('admin.sms.send')
+            <a href="#" id="sms_bulk_btn" class="btn btn-info me-3">
+                <i class="ki-duotone ki-message-text-2 fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i> إرسال SMS
+            </a>
+            @endcan
             @can('admin.course_candidates.manage')
             <a href="#" id="shortlist_btn" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#shortlist_modal">
                 <i class="ki-duotone ki-people fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i> ترشيح
@@ -155,6 +160,7 @@
 
 @section('modals')
 @include('layouts.partials.confirm-modal')
+@include('admin.partials.sms-compose-modal')
 
 <div class="modal fade" id="shortlist_modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -217,6 +223,7 @@
 @push('scripts')
 <link href="{{ asset('assets/metronic/plugins/custom/datatables/datatables.bundle.css') }}" rel="stylesheet" type="text/css" />
 <script src="{{ asset('assets/metronic/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+<script src="{{ asset_v('assets/admin/global/scripts/sms-compose.js') }}"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         $.ajaxSetup({
@@ -296,6 +303,34 @@
         $('#reset_filters').on('click', function () {
             $('.filter-field').val('');
             oTable.draw();
+        });
+
+        $(document).on('click', '.sms-single-btn', function (e) {
+            e.preventDefault();
+            var registrationId = $(this).data('id');
+            var name = $(this).data('name');
+            SmsCompose.open({
+                title: 'إرسال SMS إلى: ' + name,
+                recipientInfo: 'سيتم إرسال الرسالة لهذا المتقدم فقط',
+                sendUrl: "{{ route('sms.send') }}",
+                payload: function () {
+                    return {target: 'single', registration_id: registrationId};
+                }
+            });
+        });
+
+        $('#sms_bulk_btn').on('click', function (e) {
+            e.preventDefault();
+            SmsCompose.open({
+                title: 'إرسال SMS لكل النتائج المطابقة للفلاتر',
+                recipientInfo: 'سيتم الإرسال لكل متقدم يطابق فلاتر البحث الحالية (عدد الصفوف الظاهرة بالجدول حالياً: ' + oTable.page.info().recordsDisplay + ')',
+                sendUrl: "{{ route('sms.send') }}",
+                payload: function () {
+                    var data = collectFilters();
+                    data.target = 'filtered';
+                    return data;
+                }
+            });
         });
 
         $('#shortlist_course_id').on('change', function () {

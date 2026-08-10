@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\CourseCandidatesExport;
 use App\Models\Course;
 use App\Models\CourseCandidate;
 use App\Models\CourseRegistration;
@@ -9,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Yajra\DataTables\DataTables;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CourseCandidatesController extends AdminController {
 
@@ -62,7 +64,18 @@ class CourseCandidatesController extends AdminController {
     public function getIndex() {
         parent::$data['active_menu'] = 'course_candidates';
         parent::$data['courses'] = Course::orderBy('name')->get();
+        parent::$data['export_columns'] = CourseCandidatesExport::availableColumns();
         return view('admin.course_candidates.index', parent::$data);
+    }
+
+    //////////////////////////////////////////////
+    public function getExport(Request $request) {
+        $filters = $this->filtersFromRequest($request);
+        $courseId = $request->get('course_id');
+        $columns = $request->get('columns'); // مصفوفة مفاتيح الأعمدة بالترتيب المختار من المستخدم، أو null = كل الأعمدة
+        $fileName = 'مرشحين_الدورة_' . date('Y-m-d_H-i') . '.xlsx';
+
+        return Excel::download(new CourseCandidatesExport($filters, $courseId, $columns), $fileName);
     }
 
     //////////////////////////////////////////////
@@ -143,6 +156,7 @@ class CourseCandidatesController extends AdminController {
 
         parent::$data['course'] = $course;
         parent::$data['encrypted_id'] = $id;
+        parent::$data['export_columns'] = CourseCandidatesExport::availableColumns();
         // فلاتر جاءت من زر "ترشيح" بشاشة تسجيلات الدورة (تُعبّأ بالفلاتر تلقائياً عند الوصول)
         parent::$data['initial_filters'] = $this->filtersFromRequest($request);
         return view('admin.course_candidates.manage', parent::$data);

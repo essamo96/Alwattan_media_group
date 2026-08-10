@@ -10,6 +10,11 @@
                 <i class="ki-duotone ki-people fs-5 me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i> إدارة المرشحين
             </a>
         </div>
+        <div class="menu-item px-3">
+            <a href="#" class="menu-link px-3 export-candidates-btn" data-course-id="{{ $id }}" data-bs-toggle="modal" data-bs-target="#export_columns_modal">
+                <i class="ki-duotone ki-file-down fs-5 me-1"><span class="path1"></span><span class="path2"></span></i> تصدير المرشحين Excel
+            </a>
+        </div>
         @endcan
         @can('admin.courses.edit')
         <div class="menu-item px-3">

@@ -284,7 +284,10 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web
     //Course Candidates Route
     Route::get('course_candidates', ['as' => 'course_candidates.view', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getIndex']);
     Route::get('course_candidates/list', ['as' => 'course_candidates.index_list', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getIndexList']);
+    Route::get('course_candidates/export', ['as' => 'course_candidates.export', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getExport']);
     Route::post('course_candidates/remove', ['as' => 'course_candidates.remove_global', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@postRemoveGlobal']);
+    //SMS Route
+    Route::post('sms/send', ['as' => 'sms.send', 'middleware' => ['permission:admin.sms.send'], 'uses' => 'SmsController@postSend']);
     Route::get('courses/{id}/candidates', ['as' => 'course_candidates.manage', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getManage']);
     Route::get('courses/{id}/candidates/list', ['as' => 'course_candidates.list', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getList']);
     Route::get('courses/{id}/candidates/current', ['as' => 'course_candidates.current', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getCurrent']);

@@ -18,6 +18,11 @@
         <div class="card-title">
             <h3 class="fw-bold">فلاتر البحث</h3>
         </div>
+        <div class="card-toolbar">
+            <a href="#" id="export_btn" class="btn btn-light-success" data-bs-toggle="modal" data-bs-target="#export_columns_modal">
+                <i class="ki-duotone ki-file-down fs-2"><span class="path1"></span><span class="path2"></span></i> تصدير Excel
+            </a>
+        </div>
     </div>
     <div class="card-body pt-0">
         <div class="row g-4">
@@ -113,6 +118,40 @@
 </div>
 @endsection
 
+@section('modals')
+<div class="modal fade" id="export_columns_modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">اختيار وترتيب أعمدة التصدير</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-muted fs-7 mb-4">فعّل الأعمدة المطلوبة، واسحب <i class="ki-duotone ki-arrow-mix fs-6"></i> لإعادة ترتيبها كما تريدها بالملف. سيتم تصدير النتائج المطابقة للفلاتر الحالية.</div>
+                <ul id="export_columns_list" class="list-group">
+                    @foreach($export_columns as $key => $col)
+                    <li class="list-group-item d-flex align-items-center px-3 py-2" draggable="true" data-key="{{ $key }}" style="cursor:move;">
+                        <i class="ki-duotone ki-arrow-mix fs-3 text-muted me-3"><span class="path1"></span><span class="path2"></span></i>
+                        <div class="form-check form-check-custom form-check-solid flex-grow-1">
+                            <input class="form-check-input export-col-checkbox" type="checkbox" value="{{ $key }}" id="export_col_{{ $key }}" checked>
+                            <label class="form-check-label w-100" for="export_col_{{ $key }}">{{ $col['label'] }}</label>
+                        </div>
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="export_select_all_btn" class="btn btn-light me-auto">تحديد الكل</button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" id="export_confirm_btn" class="btn btn-success">
+                    <i class="ki-duotone ki-file-down fs-2"><span class="path1"></span><span class="path2"></span></i> تصدير
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
 @push('scripts')
 <link href="{{ asset_v('assets/metronic/plugins/custom/datatables/datatables.bundle.css') }}" rel="stylesheet" type="text/css" />
 <script src="{{ asset_v('assets/metronic/plugins/custom/datatables/datatables.bundle.js') }}"></script>
@@ -178,6 +217,64 @@
         $('#reset_filters').on('click', function () {
             $('.filter-field').val('');
             oTable.draw();
+        });
+
+        function collectFilters() {
+            var filters = {};
+            filters.course_id = $('#course_filter').val();
+            $('.filter-field').each(function () {
+                filters[$(this).attr('name')] = $(this).val();
+            });
+            return filters;
+        }
+
+        // ترتيب أعمدة التصدير بالسحب والافلات (HTML5 drag & drop، بدون مكتبة خارجية)
+        var exportList = document.getElementById('export_columns_list');
+        var dragEl = null;
+        if (exportList) {
+            exportList.querySelectorAll('li').forEach(function (li) {
+                li.addEventListener('dragstart', function () {
+                    dragEl = li;
+                    li.classList.add('opacity-50');
+                });
+                li.addEventListener('dragend', function () {
+                    li.classList.remove('opacity-50');
+                });
+                li.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    if (!dragEl || dragEl === li) {
+                        return;
+                    }
+                    var rect = li.getBoundingClientRect();
+                    var after = (e.clientY - rect.top) > (rect.height / 2);
+                    exportList.insertBefore(dragEl, after ? li.nextSibling : li);
+                });
+            });
+        }
+
+        $('#export_select_all_btn').on('click', function () {
+            var allChecked = $('.export-col-checkbox').length === $('.export-col-checkbox:checked').length;
+            $('.export-col-checkbox').prop('checked', !allChecked);
+        });
+
+        $('#export_confirm_btn').on('click', function () {
+            var columns = [];
+            $('#export_columns_list li').each(function () {
+                var $cb = $(this).find('.export-col-checkbox');
+                if ($cb.prop('checked')) {
+                    columns.push($cb.val());
+                }
+            });
+            if (!columns.length) {
+                toastr.error('يرجى تحديد عمود واحد على الأقل');
+                return;
+            }
+            var params = $.param(collectFilters());
+            columns.forEach(function (col) {
+                params += '&columns[]=' + encodeURIComponent(col);
+            });
+            window.location.href = "{{ route('course_candidates.export') }}?" + params;
+            $('#export_columns_modal').modal('hide');
         });
 
         $(document).on('click', '.remove-candidate-btn', function () {
