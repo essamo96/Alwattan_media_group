@@ -32,7 +32,9 @@ class CourseRegistrationController extends Controller {
 
         $validator = Validator::make($data, [
                     'full_name' => 'required|string|min:6|max:150',
-                    'national_id' => 'required|digits_between:9,10',
+                    // unique:...,NULL,id,deleted_at,NULL يتجاهل التسجيلات المحذوفة (soft delete) عند فحص التكرار،
+                    // بنفس الأسلوب المتّبع بباقي الكونترولرز بهذا المشروع (مثال: AdvertisementsController).
+                    'national_id' => 'required|digits_between:9,10|unique:course_registrations,national_id,NULL,id,deleted_at,NULL',
                     'gender' => 'required|in:male,female',
                     'birth_date' => 'required|date|before:' . date('Y-m-d', strtotime('-16 years')),
                     'general_specialization' => 'required|string|max:150',
@@ -45,14 +47,17 @@ class CourseRegistrationController extends Controller {
                     'birth_place' => 'required|string|max:150',
                     'employer' => 'required|string|max:150',
                     'marital_status' => 'required|in:single,married,divorced,widowed',
-                    'mobile' => ['required', 'regex:/^05[0-9]{8}$/'],
-                    'email' => 'required|email:filter|max:150',
+                    'mobile' => ['required', 'regex:/^05[0-9]{8}$/', 'unique:course_registrations,mobile,NULL,id,deleted_at,NULL'],
+                    'email' => 'required|email:filter|max:150|unique:course_registrations,email,NULL,id,deleted_at,NULL',
                         ], [
                     'required' => 'هذا الحقل مطلوب',
                     'national_id.digits_between' => 'رقم الهوية يجب ان يتكون من 9 الى 10 ارقام',
+                    'national_id.unique' => 'رقم الهوية هذا مسجّل مسبقاً',
                     'birth_date.before' => 'تاريخ الميلاد غير منطقي',
                     'gpa.max' => 'قيمة المعدل غير صحيحة',
                     'mobile.regex' => 'رقم الجوال يجب ان يكون بصيغة فلسطينية صحيحة (05xxxxxxxx)',
+                    'mobile.unique' => 'رقم الجوال هذا مسجّل مسبقاً',
+                    'email.unique' => 'البريد الإلكتروني هذا مسجّل مسبقاً',
         ]);
 
         if ($validator->fails()) {
