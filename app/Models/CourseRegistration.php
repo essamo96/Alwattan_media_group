@@ -15,10 +15,12 @@ class CourseRegistration extends Model {
         'full_name', 'national_id', 'gender', 'birth_date', 'general_specialization',
         'specific_specialization', 'graduation_year', 'university', 'gpa', 'nationality',
         'current_address', 'birth_place', 'employer', 'marital_status', 'mobile', 'email',
+        'has_disability', 'disability_description',
     ];
     protected $appends = ['age'];
     protected $casts = [
         'birth_date' => 'date',
+        'has_disability' => 'boolean',
     ];
 
     //////////////////////////////////////////////

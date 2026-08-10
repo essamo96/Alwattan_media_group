@@ -30,7 +30,8 @@ class CourseRegistrationsExport implements FromCollection, WithHeadings, WithMap
         return [
             '#', 'الاسم رباعي', 'رقم الهوية', 'الجنس', 'تاريخ الميلاد', 'التخصص العام',
             'التخصص الدقيق', 'سنة التخرج', 'الجامعة', 'المعدل', 'الجنسية', 'العنوان الحالي',
-            'مكان الميلاد', 'جهة العمل', 'الحالة الاجتماعية', 'رقم الجوال', 'البريد الإلكتروني', 'تاريخ التسجيل',
+            'مكان الميلاد', 'جهة العمل', 'الحالة الاجتماعية', 'رقم الجوال', 'البريد الإلكتروني',
+            'إعاقة صحية', 'وصف الإعاقة', 'تاريخ التسجيل',
         ];
     }
 
@@ -53,14 +54,16 @@ class CourseRegistrationsExport implements FromCollection, WithHeadings, WithMap
             $row->maritalStatusLabel(),
             $row->mobile,
             $row->email,
+            $row->has_disability ? 'نعم' : 'لا',
+            $row->disability_description,
             optional($row->created_at)->format('Y-m-d H:i'),
         ];
     }
 
     public function styles(Worksheet $sheet) {
-        $sheet->getStyle('A1:R1')->getFont()->setBold(true)->setSize(12);
-        $sheet->getStyle('A1:R1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A1:R1')->getFill()
+        $sheet->getStyle('A1:T1')->getFont()->setBold(true)->setSize(12);
+        $sheet->getStyle('A1:T1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1:T1')->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setRGB('D9E1F2');
 

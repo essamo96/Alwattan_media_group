@@ -115,7 +115,7 @@
         .field{display:flex;flex-direction:column;gap:6px;}
         .field label{font-size:13.5px;font-weight:600;color:var(--text);}
         .field label .req{color:var(--accent);margin-inline-start:2px;}
-        .field input,.field select{
+        .field input,.field select,.field textarea{
             appearance:none;
             border:1.5px solid var(--border);
             border-radius:10px;
@@ -127,14 +127,15 @@
             transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
             min-height:46px;
         }
-        .field input:hover,.field select:hover{border-color:#c7cfe4;}
-        .field input:focus,.field select:focus{
+        .field textarea{resize:vertical;}
+        .field input:hover,.field select:hover,.field textarea:hover{border-color:#c7cfe4;}
+        .field input:focus,.field select:focus,.field textarea:focus{
             outline:none;border-color:var(--primary);
             box-shadow:0 0 0 3px rgba(33,52,120,.14);
             background:#fff;
         }
         .field small.hint{color:var(--muted);font-size:12px;}
-        .field.has-error input,.field.has-error select{
+        .field.has-error input,.field.has-error select,.field.has-error textarea{
             border-color:var(--danger);
             background:#fff6f6;
         }
@@ -351,6 +352,20 @@
                         <small class="hint">في حال عدم العمل، يرجى كتابة "لا يوجد"</small>
                         <span class="error-msg">{{ $errors->first('employer') ?: 'يرجى إدخال جهة العمل أو كتابة لا يوجد' }}</span>
                     </div>
+                    <div class="field {{ $errors->has('has_disability') ? 'has-error' : '' }}">
+                        <label>هل يعاني المتقدم من أي إعاقة صحية؟ <span class="req">*</span></label>
+                        <select name="has_disability" id="has_disability" required>
+                            <option value="" disabled {{ old('has_disability') ? '' : 'selected' }}>اختر</option>
+                            <option value="0" {{ old('has_disability')=='0' ? 'selected':'' }}>لا</option>
+                            <option value="1" {{ old('has_disability')=='1' ? 'selected':'' }}>نعم</option>
+                        </select>
+                        <span class="error-msg">{{ $errors->first('has_disability') ?: 'يرجى الإجابة على هذا السؤال' }}</span>
+                    </div>
+                    <div class="field {{ $errors->has('disability_description') ? 'has-error' : '' }}" id="disability_description_field" style="display:none;">
+                        <label>وصف الإعاقة <span class="req">*</span></label>
+                        <textarea name="disability_description" rows="3" placeholder="يرجى وصف طبيعة الإعاقة">{{ old('disability_description') }}</textarea>
+                        <span class="error-msg">{{ $errors->first('disability_description') ?: 'يرجى وصف الإعاقة الصحية' }}</span>
+                    </div>
                 </div>
 
                 <div class="submit-row">
@@ -373,6 +388,29 @@
 
             var mobilePattern = /^05[0-9]{8}$/;
             var idPattern = /^[0-9]{9,10}$/;
+
+            var disabilitySelect = document.getElementById('has_disability');
+            var disabilityField = document.getElementById('disability_description_field');
+            var disabilityTextarea = disabilityField ? disabilityField.querySelector('textarea') : null;
+
+            function toggleDisabilityField() {
+                if (!disabilitySelect || !disabilityField || !disabilityTextarea) {
+                    return;
+                }
+                if (disabilitySelect.value === '1') {
+                    disabilityField.style.display = '';
+                    disabilityTextarea.setAttribute('required', 'required');
+                } else {
+                    disabilityField.style.display = 'none';
+                    disabilityTextarea.removeAttribute('required');
+                    disabilityField.classList.remove('has-error');
+                }
+            }
+
+            if (disabilitySelect) {
+                disabilitySelect.addEventListener('change', toggleDisabilityField);
+                toggleDisabilityField();
+            }
 
             function setError(field, message) {
                 field.classList.add('has-error');
@@ -408,7 +446,7 @@
                 return valid;
             }
 
-            form.querySelectorAll('input, select').forEach(function (input) {
+            form.querySelectorAll('input, select, textarea').forEach(function (input) {
                 input.addEventListener('blur', function () {
                     validateField(input);
                 });
@@ -416,7 +454,7 @@
 
             form.addEventListener('submit', function (e) {
                 var isValid = true;
-                form.querySelectorAll('input, select').forEach(function (input) {
+                form.querySelectorAll('input, select, textarea').forEach(function (input) {
                     if (!validateField(input)) {
                         isValid = false;
                     }

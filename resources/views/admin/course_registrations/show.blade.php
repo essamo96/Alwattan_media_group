@@ -43,6 +43,17 @@
                     <tr><th class="text-muted">سنة التخرج</th><td class="fw-semibold">{{ $info->graduation_year }}</td></tr>
                     <tr><th class="text-muted">المعدل</th><td class="fw-semibold">{{ $info->gpa }}</td></tr>
                     <tr><th class="text-muted">جهة العمل</th><td class="fw-semibold">{{ $info->employer }}</td></tr>
+                    <tr>
+                        <th class="text-muted">إعاقة صحية</th>
+                        <td>
+                            @if($info->has_disability)
+                            <span class="badge badge-light-warning">نعم</span>
+                            <div class="fw-semibold mt-2">{{ $info->disability_description }}</div>
+                            @else
+                            <span class="badge badge-light-secondary">لا</span>
+                            @endif
+                        </td>
+                    </tr>
                     <tr><th class="text-muted">العنوان الحالي</th><td class="fw-semibold">{{ $info->current_address }}</td></tr>
                     <tr><th class="text-muted">رقم الجوال</th><td class="fw-semibold" dir="ltr">{{ $info->mobile }}</td></tr>
                     <tr><th class="text-muted">البريد الإلكتروني</th><td class="fw-semibold" dir="ltr">{{ $info->email }}</td></tr>

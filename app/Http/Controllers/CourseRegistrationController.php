@@ -26,7 +26,11 @@ class CourseRegistrationController extends Controller {
             'full_name', 'national_id', 'gender', 'birth_date', 'general_specialization',
             'specific_specialization', 'graduation_year', 'university', 'gpa', 'nationality',
             'current_address', 'birth_place', 'employer', 'marital_status', 'mobile', 'email',
+            'disability_description',
         ]);
+        // القيمة الخام من checkbox النموذج ("1" اذا مفعّل) تُستخدم بالتحقق كما هي،
+        // وتتحول لـ boolean حقيقي بعد نجاح التحقق فقط (أسفل الدالة).
+        $data['has_disability'] = $request->input('has_disability', '0');
 
         $currentYear = (int) date('Y');
 
@@ -49,6 +53,8 @@ class CourseRegistrationController extends Controller {
                     'marital_status' => 'required|in:single,married,divorced,widowed',
                     'mobile' => ['required', 'regex:/^05[0-9]{8}$/', 'unique:course_registrations,mobile,NULL,id,deleted_at,NULL'],
                     'email' => 'required|email:filter|max:150|unique:course_registrations,email,NULL,id,deleted_at,NULL',
+                    'has_disability' => 'nullable|in:0,1',
+                    'disability_description' => 'required_if:has_disability,1|nullable|string|max:500',
                         ], [
                     'required' => 'هذا الحقل مطلوب',
                     'national_id.digits_between' => 'رقم الهوية يجب ان يتكون من 9 الى 10 ارقام',
@@ -58,12 +64,19 @@ class CourseRegistrationController extends Controller {
                     'mobile.regex' => 'رقم الجوال يجب ان يكون بصيغة فلسطينية صحيحة (05xxxxxxxx)',
                     'mobile.unique' => 'رقم الجوال هذا مسجّل مسبقاً',
                     'email.unique' => 'البريد الإلكتروني هذا مسجّل مسبقاً',
+                    'disability_description.required_if' => 'يرجى وصف الإعاقة الصحية',
         ]);
 
         if ($validator->fails()) {
             return redirect(route('course_registration.view'))
                             ->withErrors($validator)
                             ->withInput();
+        }
+
+        // تطبيع قيمة الـ checkbox الخام ("1"/"0") الى boolean حقيقي قبل الحفظ.
+        $data['has_disability'] = $data['has_disability'] === '1';
+        if (!$data['has_disability']) {
+            $data['disability_description'] = null;
         }
 
         $registration = new CourseRegistration();
