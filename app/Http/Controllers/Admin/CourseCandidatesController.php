@@ -134,6 +134,8 @@ class CourseCandidatesController extends AdminController {
 
         parent::$data['course'] = $course;
         parent::$data['encrypted_id'] = $id;
+        // فلاتر جاءت من زر "ترشيح" بشاشة تسجيلات الدورة (تُعبّأ بالفلاتر تلقائياً عند الوصول)
+        parent::$data['initial_filters'] = $this->filtersFromRequest($request);
         return view('admin.course_candidates.manage', parent::$data);
     }
 

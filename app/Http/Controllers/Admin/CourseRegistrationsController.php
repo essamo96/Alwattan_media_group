@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Exports\CourseRegistrationsExport;
+use App\Models\Course;
 use App\Models\CourseRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -24,6 +25,7 @@ class CourseRegistrationsController extends AdminController {
 
     //////////////////////////////////////////////
     public function getIndex() {
+        parent::$data['courses'] = Course::where('status', 1)->orderBy('name')->get();
         return view('admin.course_registrations.view', parent::$data);
     }
 

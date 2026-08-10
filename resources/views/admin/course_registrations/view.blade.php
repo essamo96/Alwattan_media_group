@@ -18,13 +18,18 @@
         <div class="card-title">
             <h3 class="fw-bold">فلاتر البحث</h3>
         </div>
-        @can('admin.registrations.export')
         <div class="card-toolbar">
+            @can('admin.course_candidates.manage')
+            <a href="#" id="shortlist_btn" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#shortlist_modal">
+                <i class="ki-duotone ki-people fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i> ترشيح
+            </a>
+            @endcan
+            @can('admin.registrations.export')
             <a href="#" id="export_btn" class="btn btn-light-success">
                 <i class="ki-duotone ki-file-down fs-2"><span class="path1"></span><span class="path2"></span></i> تصدير Excel
             </a>
+            @endcan
         </div>
-        @endcan
     </div>
     <div class="card-body pt-0">
         <div class="row g-4">
@@ -150,6 +155,31 @@
 
 @section('modals')
 @include('layouts.partials.confirm-modal')
+
+<div class="modal fade" id="shortlist_modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">ترشيح المتقدمين المطابقين للفلاتر الحالية</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label">اختر الدورة</label>
+                <select id="shortlist_course_id" class="form-select">
+                    <option value="">-- اختر --</option>
+                    @foreach($courses as $course)
+                    <option value="{{ rawurlencode(Crypt::encrypt($course->id)) }}">{{ $course->name }}</option>
+                    @endforeach
+                </select>
+                <div class="text-muted fs-7 mt-3">سيتم نقل فلاتر البحث الحالية (الاسم، الجنس، العمر، العلامة...) تلقائياً إلى شاشة ترشيح هذه الدورة.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" id="shortlist_continue_btn" class="btn btn-primary" disabled>متابعة</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -234,6 +264,19 @@
         $('#reset_filters').on('click', function () {
             $('.filter-field').val('');
             oTable.draw();
+        });
+
+        $('#shortlist_course_id').on('change', function () {
+            $('#shortlist_continue_btn').prop('disabled', !$(this).val());
+        });
+
+        $('#shortlist_continue_btn').on('click', function () {
+            var courseId = $('#shortlist_course_id').val();
+            if (!courseId) {
+                return;
+            }
+            var params = $.param(collectFilters());
+            window.location.href = "{{ url('admin/courses') }}/" + courseId + "/candidates?" + params;
         });
 
         $('#export_btn').on('click', function (e) {

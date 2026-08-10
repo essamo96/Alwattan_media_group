@@ -158,6 +158,14 @@
             return filters;
         }
 
+        // فلاتر قادمة من زر "ترشيح" بشاشة تسجيلات الدورة (عبر رابط ?name=...&gender=...)
+        var initialFilters = @json($initial_filters ?? []);
+        $.each(initialFilters, function (name, value) {
+            if (value !== null && value !== '') {
+                $('.filter-field[name="' + name + '"]').val(value);
+            }
+        });
+
         var oTable = $('#applicants_table').DataTable({
             "processing": true,
             "serverSide": true,
