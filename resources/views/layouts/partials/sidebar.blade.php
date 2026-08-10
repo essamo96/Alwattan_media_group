@@ -163,24 +163,42 @@
                 </div>
                 @endif
 
-                @if(auth()->user()->can('admin.registrations.view'))
-                <div class="menu-item">
-                    <a class="menu-link {{ $active_menu == 'course_registrations' ? 'active' : '' }}" href="{{ route('course_registrations.view') }}">
-                        <span class="menu-icon"><i class="ki-duotone ki-profile-user fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></span>
-                        <span class="menu-title">{{ __('تسجيلات الدورة') }}</span>
+                @if(auth()->user()->can('admin.courses.view') || auth()->user()->can('admin.registrations.view') || auth()->user()->can('admin.course_candidates.manage'))
+                <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ in_array($active_menu, ['courses', 'course_registrations', 'course_candidates']) ? 'here show' : '' }}">
+                    <span class="menu-link">
+                        <span class="menu-icon"><i class="ki-duotone ki-teacher fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i></span>
+                        <span class="menu-title">{{ __('الدورات') }}</span>
                         @if(($registrations_count ?? 0) > 0)
                         <span class="badge badge-circle badge-danger ms-2" id="registrations_badge" style="font-size:0.65rem;">{{ $registrations_count }}</span>
                         @endif
-                    </a>
-                </div>
-                @endif
-
-                @if(auth()->user()->can('admin.courses.view'))
-                <div class="menu-item">
-                    <a class="menu-link {{ $active_menu == 'courses' ? 'active' : '' }}" href="{{ route('courses.view') }}">
-                        <span class="menu-icon"><i class="ki-duotone ki-teacher fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i></span>
-                        <span class="menu-title">{{ __('الدورات') }}</span>
-                    </a>
+                        <span class="menu-arrow"></span>
+                    </span>
+                    <div class="menu-sub menu-sub-accordion">
+                        @if(auth()->user()->can('admin.courses.view'))
+                        <div class="menu-item">
+                            <a class="menu-link {{ $active_menu == 'courses' ? 'active' : '' }}" href="{{ route('courses.view') }}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">{{ __('الدورات') }}</span>
+                            </a>
+                        </div>
+                        @endif
+                        @if(auth()->user()->can('admin.registrations.view'))
+                        <div class="menu-item">
+                            <a class="menu-link {{ $active_menu == 'course_registrations' ? 'active' : '' }}" href="{{ route('course_registrations.view') }}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">{{ __('تسجيلات الدورة') }}</span>
+                            </a>
+                        </div>
+                        @endif
+                        @if(auth()->user()->can('admin.course_candidates.manage'))
+                        <div class="menu-item">
+                            <a class="menu-link {{ $active_menu == 'course_candidates' ? 'active' : '' }}" href="{{ route('course_candidates.view') }}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">{{ __('قائمة المرشحين') }}</span>
+                            </a>
+                        </div>
+                        @endif
+                    </div>
                 </div>
                 @endif
 

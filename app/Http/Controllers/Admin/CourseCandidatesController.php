@@ -59,6 +59,72 @@ class CourseCandidatesController extends AdminController {
     }
 
     //////////////////////////////////////////////
+    public function getIndex() {
+        parent::$data['active_menu'] = 'course_candidates';
+        parent::$data['courses'] = Course::orderBy('name')->get();
+        return view('admin.course_candidates.index', parent::$data);
+    }
+
+    //////////////////////////////////////////////
+    public function getIndexList(Request $request) {
+        $courseId = $request->get('course_id');
+
+        $query = CourseCandidate::query()
+            ->with(['course', 'registration'])
+            ->whereHas('registration')
+            ->when($courseId, function ($q) use ($courseId) {
+                $q->where('course_id', $courseId);
+            })
+            ->orderBy('id', 'desc');
+
+        $datatable = Datatables::of($query);
+
+        $datatable->addColumn('applicant', function ($row) {
+            return $row->registration
+                ? view('admin.course_registrations.parts.applicant', ['row' => $row->registration])->render()
+                : '-';
+        });
+
+        $datatable->addColumn('course_name', function ($row) {
+            return $row->course->name ?? '-';
+        });
+
+        $datatable->addColumn('university', function ($row) {
+            return $row->registration->university ?? '-';
+        });
+
+        $datatable->addColumn('gpa', function ($row) {
+            return $row->registration->gpa ?? '-';
+        });
+
+        $datatable->addColumn('actions', function ($row) {
+            return '<button type="button" class="btn btn-sm btn-light-danger remove-candidate-btn" data-candidate-id="' . Crypt::encrypt($row->id) . '">'
+                . '<i class="ki-duotone ki-trash fs-5"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i> حذف'
+                . '</button>';
+        });
+
+        $datatable->escapeColumns(['course_name', 'university', 'gpa']);
+        return $datatable->make(true);
+    }
+
+    //////////////////////////////////////////////
+    public function postRemoveGlobal(Request $request) {
+        try {
+            $candidateId = Crypt::decrypt($request->get('candidate_id'));
+        } catch (DecryptException $e) {
+            return response()->json(['status' => 'error', 'message' => 'Error Decode']);
+        }
+
+        $candidate = CourseCandidate::find($candidateId);
+        if ($candidate) {
+            $candidate->delete();
+            return response()->json(['status' => 'success', 'message' => self::REMOVE_SUCCESS]);
+        }
+
+        return response()->json(['status' => 'error', 'message' => self::NOT_FOUND]);
+    }
+
+    //////////////////////////////////////////////
     public function getManage(Request $request, $id) {
         $course = $this->resolveCourse($id);
         if (!$course) {
