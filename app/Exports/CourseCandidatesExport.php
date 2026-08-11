@@ -94,7 +94,7 @@ class CourseCandidatesExport implements FromCollection, WithHeadings, WithMappin
     public function map($row): array {
         $this->rowNumber++;
         $available = self::availableColumns();
-        return array_map(function ($key) use ($row) {
+        return array_map(function ($key) use ($row, $available) {
             // عمود "#" يعرض ترقيماً تسلسلياً 1..N بترتيب التصدير النهائي بدل رقم السجل بقاعدة البيانات.
             if ($key === 'id') {
                 return $this->rowNumber;
