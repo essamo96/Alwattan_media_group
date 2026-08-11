@@ -26,7 +26,7 @@ class CourseRegistrationController extends Controller {
             'full_name', 'national_id', 'gender', 'birth_date', 'general_specialization',
             'specific_specialization', 'graduation_year', 'university', 'gpa', 'nationality',
             'current_address', 'birth_place', 'employer', 'marital_status', 'mobile', 'email',
-            'disability_description',
+            'disability_description', 'citizen_type', 'unrwa_card_number',
         ]);
         // القيمة الخام من checkbox النموذج ("1" اذا مفعّل) تُستخدم بالتحقق كما هي،
         // وتتحول لـ boolean حقيقي بعد نجاح التحقق فقط (أسفل الدالة).
@@ -55,6 +55,8 @@ class CourseRegistrationController extends Controller {
                     'email' => 'required|email:filter|max:150|unique:course_registrations,email,NULL,id,deleted_at,NULL',
                     'has_disability' => 'nullable|in:0,1',
                     'disability_description' => 'required_if:has_disability,1|nullable|string|max:500',
+                    'citizen_type' => 'required|in:citizen,refugee',
+                    'unrwa_card_number' => 'required_if:citizen_type,refugee|nullable|string|max:50',
                         ], [
                     'required' => 'هذا الحقل مطلوب',
                     'national_id.digits_between' => 'رقم الهوية يجب ان يتكون من 9 الى 10 ارقام',
@@ -65,6 +67,8 @@ class CourseRegistrationController extends Controller {
                     'mobile.unique' => 'رقم الجوال هذا مسجّل مسبقاً',
                     'email.unique' => 'البريد الإلكتروني هذا مسجّل مسبقاً',
                     'disability_description.required_if' => 'يرجى وصف الإعاقة الصحية',
+                    'citizen_type.required' => 'يرجى تحديد هل المسجل مواطن أم لاجئ',
+                    'unrwa_card_number.required_if' => 'يرجى إدخال رقم تسجيل بطاقة الوكالة',
         ]);
 
         if ($validator->fails()) {
@@ -77,6 +81,9 @@ class CourseRegistrationController extends Controller {
         $data['has_disability'] = $data['has_disability'] === '1';
         if (!$data['has_disability']) {
             $data['disability_description'] = null;
+        }
+        if ($data['citizen_type'] !== 'refugee') {
+            $data['unrwa_card_number'] = null;
         }
 
         $registration = new CourseRegistration();

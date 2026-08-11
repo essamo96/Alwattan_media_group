@@ -68,6 +68,14 @@
                 <label class="form-label">الجنسية</label>
                 <input type="text" name="nationality" class="form-control form-control-solid filter-field" placeholder="الجنسية">
             </div>
+            <div class="col-md-2">
+                <label class="form-label">نوع المسجل</label>
+                <select name="citizen_type" class="form-select form-select-solid filter-field">
+                    <option value="">الكل</option>
+                    <option value="citizen">مواطن</option>
+                    <option value="refugee">لاجئ</option>
+                </select>
+            </div>
             <div class="col-md-3">
                 <label class="form-label">التخصص العام</label>
                 <input type="text" name="general_specialization" class="form-control form-control-solid filter-field" placeholder="التخصص العام">
@@ -147,6 +155,7 @@
                         <th>سنة التخرج</th>
                         <th>العلامة</th>
                         <th>الحالة الاجتماعية</th>
+                        <th>نوع المسجل</th>
                         <th>تاريخ التسجيل</th>
                         <th class="text-end">إجراءات</th>
                     </tr>
@@ -282,6 +291,7 @@
                 {"data": "graduation_year", "title": "سنة التخرج", "orderable": false, "searchable": false},
                 {"data": "gpa", "title": "العلامة", "orderable": false, "searchable": false},
                 {"data": "marital_status", "title": "الحالة الاجتماعية", "orderable": false, "searchable": false},
+                {"data": "citizen_type", "title": "نوع المسجل", "orderable": false, "searchable": false},
                 {"data": "created_at", "title": "تاريخ التسجيل", "orderable": false, "searchable": false},
                 {"data": "actions", "title": "إجراءات", "orderable": false, "searchable": false}
             ],

@@ -36,6 +36,8 @@ class CourseRegistrationsExport implements FromCollection, WithHeadings, WithMap
             'university' => ['label' => 'الجامعة', 'value' => fn($row) => $row->university],
             'gpa' => ['label' => 'المعدل', 'value' => fn($row) => $row->gpa],
             'nationality' => ['label' => 'الجنسية', 'value' => fn($row) => $row->nationality],
+            'citizen_type' => ['label' => 'نوع المسجل', 'value' => fn($row) => $row->citizenTypeLabel()],
+            'unrwa_card_number' => ['label' => 'رقم تسجيل بطاقة الوكالة', 'value' => fn($row) => $row->unrwa_card_number],
             'current_address' => ['label' => 'العنوان الحالي', 'value' => fn($row) => $row->current_address],
             'birth_place' => ['label' => 'مكان الميلاد', 'value' => fn($row) => $row->birth_place],
             'employer' => ['label' => 'جهة العمل', 'value' => fn($row) => $row->employer],

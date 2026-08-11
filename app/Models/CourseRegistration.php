@@ -15,7 +15,7 @@ class CourseRegistration extends Model {
         'full_name', 'national_id', 'gender', 'birth_date', 'general_specialization',
         'specific_specialization', 'graduation_year', 'university', 'gpa', 'nationality',
         'current_address', 'birth_place', 'employer', 'marital_status', 'mobile', 'email',
-        'has_disability', 'disability_description',
+        'has_disability', 'disability_description', 'citizen_type', 'unrwa_card_number',
     ];
     protected $appends = ['age'];
     protected $casts = [
@@ -46,6 +46,16 @@ class CourseRegistration extends Model {
     //////////////////////////////////////////////
     public function maritalStatusLabel() {
         return self::maritalStatusLabels()[$this->marital_status] ?? $this->marital_status;
+    }
+
+    //////////////////////////////////////////////
+    public static function citizenTypeLabels() {
+        return ['citizen' => 'مواطن', 'refugee' => 'لاجئ'];
+    }
+
+    //////////////////////////////////////////////
+    public function citizenTypeLabel() {
+        return self::citizenTypeLabels()[$this->citizen_type] ?? $this->citizen_type;
     }
 
     //////////////////////////////////////////////
@@ -91,6 +101,9 @@ class CourseRegistration extends Model {
                     }
                     if (!empty($filters['nationality'])) {
                         $query->where('nationality', 'LIKE', '%' . $filters['nationality'] . '%');
+                    }
+                    if (!empty($filters['citizen_type'])) {
+                        $query->where('citizen_type', '=', $filters['citizen_type']);
                     }
                     if (!empty($filters['general_specialization'])) {
                         $query->where('general_specialization', 'LIKE', '%' . $filters['general_specialization'] . '%');

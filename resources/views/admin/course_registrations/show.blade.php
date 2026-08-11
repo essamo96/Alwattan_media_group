@@ -36,6 +36,15 @@
                     <tr><th class="text-muted">تاريخ الميلاد</th><td class="fw-semibold">{{ optional($info->birth_date)->format('Y-m-d') }}</td></tr>
                     <tr><th class="text-muted">مكان الميلاد</th><td class="fw-semibold">{{ $info->birth_place }}</td></tr>
                     <tr><th class="text-muted">الجنسية</th><td class="fw-semibold">{{ $info->nationality }}</td></tr>
+                    <tr>
+                        <th class="text-muted">نوع المسجل</th>
+                        <td>
+                            <span class="badge {{ $info->citizen_type === 'refugee' ? 'badge-light-danger' : 'badge-light-success' }}">{{ $info->citizenTypeLabel() }}</span>
+                            @if($info->citizen_type === 'refugee')
+                            <div class="fw-semibold mt-2">رقم تسجيل بطاقة الوكالة: {{ $info->unrwa_card_number }}</div>
+                            @endif
+                        </td>
+                    </tr>
                     <tr><th class="text-muted">الحالة الاجتماعية</th><td><span class="badge badge-light-primary">{{ $info->maritalStatusLabel() }}</span></td></tr>
                     <tr><th class="text-muted">التخصص العام</th><td class="fw-semibold">{{ $info->general_specialization }}</td></tr>
                     <tr><th class="text-muted">التخصص الدقيق</th><td class="fw-semibold">{{ $info->specific_specialization }}</td></tr>

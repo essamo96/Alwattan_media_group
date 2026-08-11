@@ -43,6 +43,7 @@ class CourseCandidatesController extends AdminController {
             'gender' => $request->get('gender'),
             'marital_status' => $request->get('marital_status'),
             'nationality' => $request->get('nationality'),
+            'citizen_type' => $request->get('citizen_type'),
             'general_specialization' => $request->get('general_specialization'),
             'specific_specialization' => $request->get('specific_specialization'),
             'graduation_year_from' => $request->get('graduation_year_from'),

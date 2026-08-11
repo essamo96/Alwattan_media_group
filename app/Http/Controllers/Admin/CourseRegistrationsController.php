@@ -38,6 +38,7 @@ class CourseRegistrationsController extends AdminController {
             'gender' => $request->get('gender'),
             'marital_status' => $request->get('marital_status'),
             'nationality' => $request->get('nationality'),
+            'citizen_type' => $request->get('citizen_type'),
             'general_specialization' => $request->get('general_specialization'),
             'specific_specialization' => $request->get('specific_specialization'),
             'graduation_year_from' => $request->get('graduation_year_from'),
@@ -69,6 +70,12 @@ class CourseRegistrationsController extends AdminController {
 
         $datatable->editColumn('marital_status', function ($row) {
             return $row->maritalStatusLabel();
+        });
+
+        $datatable->editColumn('citizen_type', function ($row) {
+            return $row->citizen_type === 'refugee'
+                ? $row->citizenTypeLabel() . ' (' . ($row->unrwa_card_number ?: '-') . ')'
+                : $row->citizenTypeLabel();
         });
 
         $datatable->editColumn('created_at', function ($row) {

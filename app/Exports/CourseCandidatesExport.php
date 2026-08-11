@@ -38,6 +38,8 @@ class CourseCandidatesExport implements FromCollection, WithHeadings, WithMappin
             'university' => ['label' => 'الجامعة', 'value' => fn($row) => $row->registration->university ?? ''],
             'gpa' => ['label' => 'المعدل', 'value' => fn($row) => $row->registration->gpa ?? ''],
             'nationality' => ['label' => 'الجنسية', 'value' => fn($row) => $row->registration->nationality ?? ''],
+            'citizen_type' => ['label' => 'نوع المسجل', 'value' => fn($row) => $row->registration ? $row->registration->citizenTypeLabel() : ''],
+            'unrwa_card_number' => ['label' => 'رقم تسجيل بطاقة الوكالة', 'value' => fn($row) => $row->registration->unrwa_card_number ?? ''],
             'employer' => ['label' => 'جهة العمل', 'value' => fn($row) => $row->registration->employer ?? ''],
             'marital_status' => ['label' => 'الحالة الاجتماعية', 'value' => fn($row) => $row->registration ? $row->registration->maritalStatusLabel() : ''],
             'mobile' => ['label' => 'رقم الجوال', 'value' => fn($row) => $row->registration->mobile ?? ''],

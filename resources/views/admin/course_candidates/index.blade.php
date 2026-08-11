@@ -52,6 +52,14 @@
                 <input type="text" name="university" class="form-control form-control-solid filter-field" placeholder="الجامعة">
             </div>
             <div class="col-md-3">
+                <label class="form-label">نوع المسجل</label>
+                <select name="citizen_type" class="form-select form-select-solid filter-field">
+                    <option value="">الكل</option>
+                    <option value="citizen">مواطن</option>
+                    <option value="refugee">لاجئ</option>
+                </select>
+            </div>
+            <div class="col-md-3">
                 <label class="form-label">العمر من</label>
                 <input type="number" min="0" name="age_from" class="form-control form-control-solid filter-field" placeholder="من">
             </div>

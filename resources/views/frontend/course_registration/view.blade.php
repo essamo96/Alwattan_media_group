@@ -142,6 +142,10 @@
         .field .error-msg{color:var(--danger);font-size:12.5px;display:none;align-items:center;gap:4px;}
         .field.has-error .error-msg{display:flex;}
 
+        .radio-group{display:flex;gap:18px;flex-wrap:wrap;min-height:46px;align-items:center;}
+        .radio-option{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:500;cursor:pointer;}
+        .radio-option input[type="radio"]{width:18px;height:18px;accent-color:var(--primary);cursor:pointer;}
+
         .submit-row{margin-top:30px;display:flex;flex-direction:column;align-items:center;gap:10px;}
         .btn-submit{
             width:100%;max-width:340px;
@@ -352,6 +356,23 @@
                         <small class="hint">في حال عدم العمل، يرجى كتابة "لا يوجد"</small>
                         <span class="error-msg">{{ $errors->first('employer') ?: 'يرجى إدخال جهة العمل أو كتابة لا يوجد' }}</span>
                     </div>
+                    <div class="field {{ $errors->has('citizen_type') ? 'has-error' : '' }}">
+                        <label>هل المسجل مواطن أم لاجئ؟ <span class="req">*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="citizen_type" value="citizen" {{ old('citizen_type', 'citizen')=='citizen' ? 'checked':'' }} required> مواطن
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="citizen_type" value="refugee" {{ old('citizen_type')=='refugee' ? 'checked':'' }} required> لاجئ
+                            </label>
+                        </div>
+                        <span class="error-msg">{{ $errors->first('citizen_type') ?: 'يرجى تحديد هل المسجل مواطن أم لاجئ' }}</span>
+                    </div>
+                    <div class="field {{ $errors->has('unrwa_card_number') ? 'has-error' : '' }}" id="unrwa_card_number_field" style="display:none;">
+                        <label>رقم تسجيل بطاقة الوكالة <span class="req">*</span></label>
+                        <input type="text" name="unrwa_card_number" value="{{ old('unrwa_card_number') }}" placeholder="رقم تسجيل بطاقة الوكالة">
+                        <span class="error-msg">{{ $errors->first('unrwa_card_number') ?: 'يرجى إدخال رقم تسجيل بطاقة الوكالة' }}</span>
+                    </div>
                     <div class="field {{ $errors->has('has_disability') ? 'has-error' : '' }}">
                         <label>هل يعاني المتقدم من أي إعاقة صحية؟ <span class="req">*</span></label>
                         <select name="has_disability" id="has_disability" required>
@@ -411,6 +432,30 @@
                 disabilitySelect.addEventListener('change', toggleDisabilityField);
                 toggleDisabilityField();
             }
+
+            var citizenRadios = form.querySelectorAll('input[name="citizen_type"]');
+            var unrwaField = document.getElementById('unrwa_card_number_field');
+            var unrwaInput = unrwaField ? unrwaField.querySelector('input') : null;
+
+            function toggleUnrwaField() {
+                if (!unrwaField || !unrwaInput) {
+                    return;
+                }
+                var checked = form.querySelector('input[name="citizen_type"]:checked');
+                if (checked && checked.value === 'refugee') {
+                    unrwaField.style.display = '';
+                    unrwaInput.setAttribute('required', 'required');
+                } else {
+                    unrwaField.style.display = 'none';
+                    unrwaInput.removeAttribute('required');
+                    unrwaField.classList.remove('has-error');
+                }
+            }
+
+            citizenRadios.forEach(function (radio) {
+                radio.addEventListener('change', toggleUnrwaField);
+            });
+            toggleUnrwaField();
 
             function setError(field, message) {
                 field.classList.add('has-error');
