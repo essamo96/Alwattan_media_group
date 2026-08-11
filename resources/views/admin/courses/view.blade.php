@@ -52,6 +52,7 @@
 
 @section('modals')
 @include('layouts.partials.confirm-modal')
+@include('admin.partials.sms-compose-modal')
 
 <div class="modal fade" id="export_columns_modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -89,6 +90,7 @@
 @push('scripts')
 <link href="{{ asset_v('assets/metronic/plugins/custom/datatables/datatables.bundle.css') }}" rel="stylesheet" type="text/css" />
 <script src="{{ asset_v('assets/metronic/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+<script src="{{ asset_v('assets/admin/global/scripts/sms-compose.js') }}"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         $.ajaxSetup({
@@ -217,6 +219,20 @@
         $(document).on('click', '.export-candidates-btn', function (e) {
             e.preventDefault();
             exportCourseId = $(this).data('course-id');
+        });
+
+        $(document).on('click', '.sms-course-btn', function (e) {
+            e.preventDefault();
+            var courseId = $(this).data('course-id');
+            var courseName = $(this).data('course-name');
+            SmsCompose.open({
+                title: 'إرسال SMS لكل مرشحي: ' + courseName,
+                recipientInfo: 'سيتم الإرسال لكل المرشحين المضافين حالياً لهذه الدورة',
+                sendUrl: "{{ route('sms.send') }}",
+                payload: function () {
+                    return {target: 'course', course_id: courseId};
+                }
+            });
         });
 
         $('#export_confirm_btn').on('click', function () {

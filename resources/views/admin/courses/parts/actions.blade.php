@@ -16,6 +16,13 @@
             </a>
         </div>
         @endcan
+        @can('admin.sms.send')
+        <div class="menu-item px-3">
+            <a href="#" class="menu-link px-3 sms-course-btn" data-course-id="{{ Crypt::encrypt($id) }}" data-course-name="{{ $name ?? '' }}">
+                <i class="ki-duotone ki-message-text-2 fs-5 me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i> إرسال SMS للمرشحين
+            </a>
+        </div>
+        @endcan
         @can('admin.courses.edit')
         <div class="menu-item px-3">
             <a href="{{ route('courses.edit', ['id' => rawurlencode(Crypt::encrypt($id))]) }}" class="menu-link px-3">

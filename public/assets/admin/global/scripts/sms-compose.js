@@ -31,12 +31,23 @@
 
         $('#sms_compose_send_label').text(currentOptions.sendLabel || 'إرسال');
 
+        $('#sms_compose_custom_toggle').prop('checked', false);
+        $('#sms_compose_custom_mobile').val('');
+        $('#sms_compose_custom_field').addClass('d-none');
+
         $('#sms_compose_modal').modal('show');
     };
 
     $(function () {
         $(document).on('input', '#sms_compose_message', function () {
             $('#sms_compose_count').text($(this).val().length);
+        });
+
+        $(document).on('change', '#sms_compose_custom_toggle', function () {
+            $('#sms_compose_custom_field').toggleClass('d-none', !this.checked);
+            if (this.checked) {
+                $('#sms_compose_custom_mobile').trigger('focus');
+            }
         });
 
         $(document).on('click', '.sms-var-btn', function () {
@@ -62,7 +73,19 @@
                 return;
             }
 
-            var payload = typeof currentOptions.payload === 'function' ? currentOptions.payload() : {};
+            var useCustom = $('#sms_compose_custom_toggle').is(':checked');
+            var payload;
+
+            if (useCustom) {
+                var customMobile = $('#sms_compose_custom_mobile').val().trim();
+                if (!/^05[0-9]{8}$/.test(customMobile)) {
+                    toastr.error('رقم الجوال يجب ان يكون بصيغة فلسطينية صحيحة (05xxxxxxxx)');
+                    return;
+                }
+                payload = {target: 'custom', mobile: customMobile};
+            } else {
+                payload = typeof currentOptions.payload === 'function' ? currentOptions.payload() : {};
+            }
             payload.message = message;
 
             var $btn = $(this);

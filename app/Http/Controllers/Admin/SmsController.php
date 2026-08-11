@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Course;
+use App\Models\CourseCandidate;
 use App\Models\CourseRegistration;
 use App\Models\SmsLog;
 use App\Services\TweetSmsService;
@@ -55,12 +56,52 @@ class SmsController extends AdminController {
     public function postSend(Request $request, TweetSmsService $sms) {
         $request->validate([
             'message' => 'required|string|max:900',
-            'target' => 'required|in:single,filtered,course',
+            'target' => 'required|in:single,filtered,course,candidates,custom',
         ]);
 
         $message = $request->get('message');
         $target = $request->get('target');
         $courseId = null;
+
+        // إرسال لرقم مخصص يكتبه المستخدم يدوياً، متاح من أي شاشة تستخدم نافذة الإرسال الموحّدة،
+        // بغض النظر عن الهدف (target) الأصلي المرسل من الشاشة - يتجاوزه بالكامل.
+        if ($target === 'custom') {
+            $mobile = $request->get('mobile');
+
+            $validator = \Illuminate\Support\Facades\Validator::make(['mobile' => $mobile], [
+                'mobile' => ['required', 'regex:/^05[0-9]{8}$/'],
+            ], [
+                'mobile.regex' => 'رقم الجوال يجب ان يكون بصيغة فلسطينية صحيحة (05xxxxxxxx)',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['status' => 'error', 'message' => $validator->errors()->first('mobile')]);
+            }
+
+            $rendered = strtr($message, ['{mobile}' => $mobile, '{name}' => '', '{email}' => '']);
+            $result = $sms->send($mobile, $rendered);
+
+            SmsLog::create([
+                'recipient_name' => null,
+                'recipient_mobile' => $mobile,
+                'recipient_email' => null,
+                'message' => $rendered,
+                'success' => $result['success'],
+                'status_message' => $result['message'],
+                'provider_response' => $result['raw'],
+                'course_id' => null,
+                'course_registration_id' => null,
+                'sent_by' => Auth::guard('admin')->id(),
+            ]);
+
+            return response()->json([
+                'status' => $result['success'] ? 'success' : 'error',
+                'message' => $result['success'] ? 'تم إرسال الرسالة بنجاح' : ('فشل الإرسال: ' . $result['message']),
+                'sent' => $result['success'] ? 1 : 0,
+                'failed' => $result['success'] ? 0 : 1,
+                'failed_names' => [],
+            ]);
+        }
 
         switch ($target) {
             case 'single':
@@ -86,6 +127,29 @@ class SmsController extends AdminController {
                     'id',
                     $course->candidates()->pluck('course_registration_id')
                 )->get();
+                break;
+
+            case 'candidates':
+                // كل المرشحين (بجدول course_candidates) المطابقين للفلاتر الحالية بشاشة "قائمة المرشحين"،
+                // اختيارياً محصورين بدورة معينة عبر course_id (قيمة صريحة غير مشفّرة، فلتر مو route id).
+                $filters = $this->filtersFromRequest($request);
+                $candidatesCourseId = $request->get('course_id');
+                $hasFilters = count(array_filter($filters, fn($v) => !empty($v))) > 0;
+                $matchingRegistrationIds = $hasFilters
+                    ? (new CourseRegistration())->applyFilters($filters)->pluck('id')
+                    : null;
+
+                $registrationIds = CourseCandidate::query()
+                    ->whereHas('registration')
+                    ->when($candidatesCourseId, function ($q) use ($candidatesCourseId) {
+                        $q->where('course_id', $candidatesCourseId);
+                    })
+                    ->when($matchingRegistrationIds !== null, function ($q) use ($matchingRegistrationIds) {
+                        $q->whereIn('course_registration_id', $matchingRegistrationIds);
+                    })
+                    ->pluck('course_registration_id');
+
+                $recipients = CourseRegistration::whereIn('id', $registrationIds)->get();
                 break;
 
             case 'filtered':

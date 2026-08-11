@@ -68,6 +68,7 @@ class CoursesController extends AdminController {
 
         $datatable->addColumn('actions', function ($row) {
             $data['id'] = $row->id;
+            $data['name'] = $row->name;
             $data['btn_class'] = parent::$data['btn_class'];
 
             return view('admin.courses.parts.actions', $data)->render();

@@ -9,6 +9,16 @@
             <div class="modal-body">
                 <div id="sms_compose_recipient_info" class="alert alert-light-primary d-none mb-4"></div>
 
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="sms_compose_custom_toggle">
+                    <label class="form-check-label" for="sms_compose_custom_toggle">إرسال لرقم مخصص بدلاً من ذلك</label>
+                </div>
+                <div id="sms_compose_custom_field" class="mb-4 d-none">
+                    <label class="form-label">رقم الجوال</label>
+                    <input type="tel" dir="ltr" id="sms_compose_custom_mobile" class="form-control" placeholder="05XXXXXXXX">
+                    <div class="text-muted fs-8 mt-1">سيتم إرسال الرسالة لهذا الرقم فقط، بغض النظر عن المستلمين المحددين أعلاه.</div>
+                </div>
+
                 <label class="form-label">نص الرسالة</label>
                 <textarea id="sms_compose_message" class="form-control" rows="5" maxlength="900" placeholder="اكتب نص الرسالة هنا..."></textarea>
                 <div class="d-flex justify-content-between align-items-center mt-2">

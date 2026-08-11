@@ -19,6 +19,11 @@
             <h3 class="fw-bold">فلاتر البحث</h3>
         </div>
         <div class="card-toolbar">
+            @can('admin.sms.send')
+            <a href="#" id="sms_bulk_btn" class="btn btn-info me-3">
+                <i class="ki-duotone ki-message-text-2 fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i> إرسال SMS
+            </a>
+            @endcan
             <a href="#" id="export_btn" class="btn btn-light-success" data-bs-toggle="modal" data-bs-target="#export_columns_modal">
                 <i class="ki-duotone ki-file-down fs-2"><span class="path1"></span><span class="path2"></span></i> تصدير Excel
             </a>
@@ -127,6 +132,8 @@
 @endsection
 
 @section('modals')
+@include('admin.partials.sms-compose-modal')
+
 <div class="modal fade" id="export_columns_modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -163,6 +170,7 @@
 @push('scripts')
 <link href="{{ asset_v('assets/metronic/plugins/custom/datatables/datatables.bundle.css') }}" rel="stylesheet" type="text/css" />
 <script src="{{ asset_v('assets/metronic/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+<script src="{{ asset_v('assets/admin/global/scripts/sms-compose.js') }}"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         $.ajaxSetup({
@@ -283,6 +291,20 @@
             });
             window.location.href = "{{ route('course_candidates.export') }}?" + params;
             $('#export_columns_modal').modal('hide');
+        });
+
+        $('#sms_bulk_btn').on('click', function (e) {
+            e.preventDefault();
+            SmsCompose.open({
+                title: 'إرسال SMS لكل المرشحين المطابقين للفلاتر',
+                recipientInfo: 'سيتم الإرسال لكل مرشح يطابق فلاتر البحث الحالية (عدد الصفوف الظاهرة بالجدول حالياً: ' + oTable.page.info().recordsDisplay + ')',
+                sendUrl: "{{ route('sms.send') }}",
+                payload: function () {
+                    var data = collectFilters();
+                    data.target = 'candidates';
+                    return data;
+                }
+            });
         });
 
         $(document).on('click', '.remove-candidate-btn', function () {
