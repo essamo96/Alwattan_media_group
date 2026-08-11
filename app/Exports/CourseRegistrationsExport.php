@@ -17,6 +17,7 @@ class CourseRegistrationsExport implements FromCollection, WithHeadings, WithMap
 
     protected $filters;
     protected $columns;
+    protected $rowNumber = 0;
 
     /**
      * سجل كل الأعمدة المتاحة للتصدير: مفتاح => [تسمية عربية، دالة تُرجع القيمة لكل صف].
@@ -65,7 +66,11 @@ class CourseRegistrationsExport implements FromCollection, WithHeadings, WithMap
 
     public function collection() {
         $registration = new CourseRegistration();
-        return $registration->applyFilters($this->filters)->orderBy('id', 'desc')->get();
+        // النساء أولاً ثم الرجال (بحسب طلب العمل)، وداخل كل مجموعة الأقدم تسجيلاً أولاً.
+        return $registration->applyFilters($this->filters)
+                ->orderByRaw("gender = 'female' DESC")
+                ->orderBy('id', 'asc')
+                ->get();
     }
 
     public function headings(): array {
@@ -74,8 +79,15 @@ class CourseRegistrationsExport implements FromCollection, WithHeadings, WithMap
     }
 
     public function map($row): array {
+        $this->rowNumber++;
         $available = self::availableColumns();
-        return array_map(fn($key) => $available[$key]['value']($row), $this->columns);
+        return array_map(function ($key) use ($row) {
+            // عمود "#" يعرض ترقيماً تسلسلياً 1..N بترتيب التصدير النهائي بدل رقم السجل بقاعدة البيانات.
+            if ($key === 'id') {
+                return $this->rowNumber;
+            }
+            return $available[$key]['value']($row);
+        }, $this->columns);
     }
 
     public function styles(Worksheet $sheet) {

@@ -19,6 +19,7 @@ class CourseCandidatesExport implements FromCollection, WithHeadings, WithMappin
     protected $filters;
     protected $courseId;
     protected $columns;
+    protected $rowNumber = 0;
 
     /**
      * سجل كل الأعمدة المتاحة للتصدير: مفتاح => [تسمية عربية، دالة تُرجع القيمة لكل صف (CourseCandidate مع registration/course محملين).
@@ -68,6 +69,8 @@ class CourseCandidatesExport implements FromCollection, WithHeadings, WithMappin
             ? (new CourseRegistration())->applyFilters($this->filters)->pluck('id')
             : null;
 
+        // الجنس محفوظ بجدول registration المرتبط، فيصعب فرزه بـ orderBy SQL بسيط هون - نفرز
+        // النتائج بعد جلبها بالذاكرة: النساء أولاً ثم الرجال، وداخل كل مجموعة الأقدم ترشيحاً أولاً.
         return CourseCandidate::query()
             ->with(['course', 'registration'])
             ->whereHas('registration')
@@ -77,8 +80,10 @@ class CourseCandidatesExport implements FromCollection, WithHeadings, WithMappin
             ->when($matchingRegistrationIds !== null, function ($q) use ($matchingRegistrationIds) {
                 $q->whereIn('course_registration_id', $matchingRegistrationIds);
             })
-            ->orderBy('id', 'desc')
-            ->get();
+            ->orderBy('id', 'asc')
+            ->get()
+            ->sortByDesc(fn($row) => $row->registration && $row->registration->gender === 'female')
+            ->values();
     }
 
     public function headings(): array {
@@ -87,8 +92,15 @@ class CourseCandidatesExport implements FromCollection, WithHeadings, WithMappin
     }
 
     public function map($row): array {
+        $this->rowNumber++;
         $available = self::availableColumns();
-        return array_map(fn($key) => $available[$key]['value']($row), $this->columns);
+        return array_map(function ($key) use ($row) {
+            // عمود "#" يعرض ترقيماً تسلسلياً 1..N بترتيب التصدير النهائي بدل رقم السجل بقاعدة البيانات.
+            if ($key === 'id') {
+                return $this->rowNumber;
+            }
+            return $available[$key]['value']($row);
+        }, $this->columns);
     }
 
     public function styles(Worksheet $sheet) {
