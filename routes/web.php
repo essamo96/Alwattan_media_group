@@ -49,6 +49,16 @@ Route::get('deploy/clear-cache/{token}', function ($token) {
     Artisan::call('cache:clear');
     Artisan::call('config:clear');
 
+    // public/uploads/** مستثنى بالكامل من نشر FTP (ليبقى محفوظاً بين عمليات النشر)، فأي
+    // سيرفر جديد/فارغ لا يملك هذا المجلد ولا مجلدات مدير الملفات (photos/files) اطلاقاً.
+    // غيابها يُسقط LfmController@show بخطأ 500 عام (الديسك lfm_public جذره غير موجود).
+    foreach (['photos', 'files', 'ckeditor'] as $lfmDir) {
+        \App\Support\MediaUpload::ensureDir('uploads/' . $lfmDir);
+    }
+    foreach (['partners', 'advertisements', 'gallery', 'achievements'] as $moduleDir) {
+        \App\Support\MediaUpload::ensureDir('uploads/' . $moduleDir);
+    }
+
     return 'ok';
 });
 
