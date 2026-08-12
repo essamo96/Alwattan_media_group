@@ -42,6 +42,8 @@ class SyncPermissionsSeeder extends Seeder
         'courses' => 'الدورات',
         'course_candidates' => 'مرشحين الدورات',
         'sms' => 'الرسائل النصية',
+        'gallery' => 'معرض الصور',
+        'achievements' => 'الانجازات',
     ];
 
     public function run()

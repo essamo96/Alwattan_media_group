@@ -211,6 +211,24 @@
                 </div>
                 @endif
 
+                @if(auth()->user()->can('admin.gallery.view'))
+                <div class="menu-item">
+                    <a class="menu-link {{ $active_menu == 'gallery' ? 'active' : '' }}" href="{{ route('gallery.view') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-picture fs-2"><span class="path1"></span><span class="path2"></span></i></span>
+                        <span class="menu-title">{{ __('معرض الصور') }}</span>
+                    </a>
+                </div>
+                @endif
+
+                @if(auth()->user()->can('admin.achievements.view'))
+                <div class="menu-item">
+                    <a class="menu-link {{ $active_menu == 'achievements' ? 'active' : '' }}" href="{{ route('achievements.view') }}">
+                        <span class="menu-icon"><i class="ki-duotone ki-medal-star fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></span>
+                        <span class="menu-title">{{ __('الانجازات') }}</span>
+                    </a>
+                </div>
+                @endif
+
                 @if(auth()->user()->can('admin.advertisements.view'))
                 <div class="menu-item">
                     <a class="menu-link {{ $active_menu == 'advertisements' ? 'active' : '' }}" href="{{ route('advertisements.view') }}">

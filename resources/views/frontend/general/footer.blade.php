@@ -1,67 +1,38 @@
 <!-- section begin -->
-<section id="section-portfolio" class="no-top no-bottom" aria-label="section">                
+<section id="section-portfolio" class="no-top no-bottom" aria-label="section">
     <div id="gallery" class="gallery zoom-gallery full-gallery de-gallery pf_full_width wow fadeInUp" data-wow-delay=".3s">
-
-        <!-- gallery item -->
-        <div class="item residential">
+        {{-- معرض الصور مُدار بالكامل من لوحة التحكم: admin/gallery (الترتيب والحالة والصور) --}}
+        @forelse($gallery_images ?? [] as $photo)
+        <div class="item">
             <div class="picframe">
-                <a href="{{ asset('assets/front/images/portfolio/1.jpg') }}" title="View Details">
+                <a href="{{ asset('uploads/gallery/' . $photo->image) }}" title="{{ $photo->title ?: __('site.view_image') }}">
+                    <span class="overlay">
+                        <span class="pf_text">
+                            <span class="project-name">{{ $photo->title ?: __('site.view_image') }}</span>
+                        </span>
+                    </span>
+                    <img src="{{ asset('uploads/gallery/' . $photo->image) }}" alt="{{ $photo->title }}" />
+                </a>
+            </div>
+        </div>
+        @empty
+        {{-- صور افتراضية تظهر فقط اذا لم يتم اضافة اي صورة بعد من لوحة التحكم --}}
+        @foreach ([1, 2, 3, 4] as $n)
+        <div class="item">
+            <div class="picframe">
+                <a href="{{ asset('assets/front/images/portfolio/' . $n . '.jpg') }}" title="View Details">
                     <span class="overlay">
                         <span class="pf_text">
                             <span class="project-name">@lang('site.view_image')</span>
                         </span>
                     </span>
-                    <img src="{{ asset('assets/front/images/portfolio/1.jpg') }}" alt="" />
+                    <img src="{{ asset('assets/front/images/portfolio/' . $n . '.jpg') }}" alt="" />
                 </a>
             </div>
         </div>
-        <!-- close gallery item -->
-
-        <!-- gallery item -->
-        <div class="item hospitaly">
-            <div class="picframe">
-                <a href="{{ asset('assets/front/images/portfolio/2.jpg') }}" title="View Details">
-                    <span class="overlay">
-                        <span class="pf_text">
-                            <span class="project-name">@lang('site.view_image')</span>
-                        </span>
-                    </span>
-                    <img src="{{ asset('assets/front/images/portfolio/2.jpg') }}" alt="" />
-                </a>
-            </div>
-        </div>
-        <!-- close gallery item -->
-
-        <!-- gallery item -->
-        <div class="item hospitaly">
-            <div class="picframe">
-                <a href="{{ asset('assets/front/images/portfolio/3.jpg') }}" title="View Details">
-                    <span class="overlay">
-                        <span class="pf_text">
-                            <span class="project-name">@lang('site.view_image')</span>
-                        </span>
-                    </span>
-                    <img src="{{ asset('assets/front/images/portfolio/3.jpg') }}" alt="" />
-                </a>
-            </div>
-        </div>
-        <!-- close gallery item -->
-
-        <!-- gallery item -->
-        <div class="item residential">
-            <div class="picframe">
-                <a href="{{ asset('assets/front/images/portfolio/4.jpg') }}" title="View Details">
-                    <span class="overlay">
-                        <span class="pf_text">
-                            <span class="project-name">@lang('site.view_image')</span>
-                        </span>
-                    </span>
-                    <img src="{{ asset('assets/front/images/portfolio/4.jpg') }}" alt="" />
-                </a>
-            </div>
-        </div>
-        <!-- close gallery item -->
-    </div>             
+        @endforeach
+        @endforelse
+    </div>
 </section>
 <!-- section close -->
 

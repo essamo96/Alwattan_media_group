@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Exports\CourseCandidatesExport;
+use App\Imports\CourseCandidatesImport;
 use App\Models\Course;
 use App\Models\CourseCandidate;
 use App\Models\CourseRegistration;
@@ -277,6 +278,124 @@ class CourseCandidatesController extends AdminController {
             ? 'نجاح، تمت إضافة ' . $newCount . ' مرشح جديد (من أصل ' . $matchingIds->count() . ' مطابق للفلاتر)'
             : 'كل النتائج المطابقة (' . $matchingIds->count() . ') مرشحون لهذه الدورة أصلاً';
         return response()->json(['status' => 'success', 'message' => $message]);
+    }
+
+    //////////////////////////////////////////////
+    private function normalizeMobile(?string $mobile): ?string {
+        $digits = preg_replace('/\D/', '', (string) $mobile);
+        if ($digits === '') {
+            return null;
+        }
+        // نقارن بآخر 9 أرقام فقط حتى تتطابق كل الصيغ الممكنة لنفس الرقم
+        // (05xxxxxxxx محلي، 9725xxxxxxxx دولي، أو 5xxxxxxxx بدون الصفر).
+        return substr($digits, -9);
+    }
+
+    //////////////////////////////////////////////
+    private function normalizeEmail(?string $email): ?string {
+        $email = strtolower(trim((string) $email));
+        return $email === '' ? null : $email;
+    }
+
+    //////////////////////////////////////////////
+    // يقارن ملف اكسل بمرشحي دورة معينة، ويرجع الفروقات (بدون تنفيذ اي تغيير)، أو يطبّقها
+    // فعلياً لو confirm=1 - بحيث تصبح قائمة مرشحي الدورة مطابقة تماماً لمحتوى الملف
+    // (يضيف الموجود بالملف وغير مضاف، ويحذف "soft delete" الموجود عندنا وغير موجود بالملف).
+    public function postImport(Request $request) {
+        $request->validate([
+            'course_id' => 'required|exists:courses,id',
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $course = Course::find($request->get('course_id'));
+        if (!$course) {
+            return response()->json(['status' => 'error', 'message' => self::NOT_FOUND]);
+        }
+
+        $import = new CourseCandidatesImport();
+        try {
+            Excel::import($import, $request->file('file'));
+        } catch (\Throwable $e) {
+            return response()->json(['status' => 'error', 'message' => 'تعذّرت قراءة الملف: ' . $e->getMessage()]);
+        }
+
+        if (empty($import->rows)) {
+            return response()->json(['status' => 'error', 'message' => 'لم يتم العثور على بيانات صالحة بالملف (تأكد من وجود صف عناوين وعمود جوال أو بريد إلكتروني)']);
+        }
+
+        // فهرسة كل التسجيلات حسب الجوال/البريد (آخر 9 أرقام / بريد بأحرف صغيرة) لمطابقة سريعة.
+        $allRegistrations = CourseRegistration::all(['id', 'full_name', 'mobile', 'email']);
+        $byMobile = [];
+        $byEmail = [];
+        foreach ($allRegistrations as $r) {
+            if ($m = $this->normalizeMobile($r->mobile)) {
+                $byMobile[$m] = $r->id;
+            }
+            if ($e = $this->normalizeEmail($r->email)) {
+                $byEmail[$e] = $r->id;
+            }
+        }
+
+        $excelMatchedIds = [];
+        $notFoundRows = [];
+        foreach ($import->rows as $row) {
+            $matchedId = null;
+            if ($m = $this->normalizeMobile($row['mobile'])) {
+                $matchedId = $byMobile[$m] ?? null;
+            }
+            if (!$matchedId && ($e = $this->normalizeEmail($row['email']))) {
+                $matchedId = $byEmail[$e] ?? null;
+            }
+
+            if ($matchedId) {
+                $excelMatchedIds[$matchedId] = true;
+            } else {
+                $notFoundRows[] = $row;
+            }
+        }
+        $excelMatchedIds = array_keys($excelMatchedIds);
+
+        $currentCandidateIds = $course->candidates()->pluck('course_registration_id')->all();
+
+        $toAddIds = array_values(array_diff($excelMatchedIds, $currentCandidateIds));
+        $toRemoveIds = array_values(array_diff($currentCandidateIds, $excelMatchedIds));
+
+        if ($request->boolean('confirm')) {
+            $addedCount = 0;
+            foreach ($toAddIds as $regId) {
+                if (CourseCandidate::addCandidate($course->id, $regId)) {
+                    $addedCount++;
+                }
+            }
+            $removedCount = 0;
+            if (!empty($toRemoveIds)) {
+                $removedCount = CourseCandidate::where('course_id', $course->id)
+                    ->whereIn('course_registration_id', $toRemoveIds)
+                    ->delete();
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "نجاح، تمت المزامنة: أُضيف {$addedCount}، وحُذف {$removedCount}",
+                'added' => $addedCount,
+                'removed' => $removedCount,
+            ]);
+        }
+
+        // معاينة فقط (dry run) - نُرجع الأسماء لعرضها قبل أي تنفيذ فعلي.
+        $toAdd = CourseRegistration::whereIn('id', $toAddIds)->get(['id', 'full_name', 'mobile', 'email'])
+            ->map(fn($r) => ['name' => $r->full_name, 'mobile' => $r->mobile, 'email' => $r->email]);
+        $toRemove = CourseRegistration::whereIn('id', $toRemoveIds)->get(['id', 'full_name', 'mobile', 'email'])
+            ->map(fn($r) => ['name' => $r->full_name, 'mobile' => $r->mobile, 'email' => $r->email]);
+
+        return response()->json([
+            'status' => 'success',
+            'preview' => true,
+            'to_add' => $toAdd->values(),
+            'to_remove' => $toRemove->values(),
+            'not_found' => $notFoundRows,
+            'unchanged_count' => count($excelMatchedIds) - count($toAddIds),
+        ]);
     }
 
     //////////////////////////////////////////////

@@ -24,6 +24,9 @@
                 <i class="ki-duotone ki-message-text-2 fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i> إرسال SMS
             </a>
             @endcan
+            <a href="#" id="import_btn" class="btn btn-warning me-3" data-bs-toggle="modal" data-bs-target="#import_modal">
+                <i class="ki-duotone ki-file-up fs-2"><span class="path1"></span><span class="path2"></span></i> استيراد من Excel
+            </a>
             <a href="#" id="export_btn" class="btn btn-light-success" data-bs-toggle="modal" data-bs-target="#export_columns_modal">
                 <i class="ki-duotone ki-file-down fs-2"><span class="path1"></span><span class="path2"></span></i> تصدير Excel
             </a>
@@ -160,6 +163,77 @@
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
                 <button type="button" id="export_confirm_btn" class="btn btn-success">
                     <i class="ki-duotone ki-file-down fs-2"><span class="path1"></span><span class="path2"></span></i> تصدير
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="import_modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">استيراد مرشحين من ملف Excel</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="import_step_1">
+                    <div class="row g-4 mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label">الدورة <span class="text-danger">*</span></label>
+                            <select id="import_course_id" class="form-select">
+                                <option value="">-- اختر الدورة --</option>
+                                @foreach($courses as $course)
+                                <option value="{{ $course->id }}">{{ $course->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ملف Excel <span class="text-danger">*</span></label>
+                            <input type="file" id="import_file" class="form-control" accept=".xlsx,.xls,.csv">
+                        </div>
+                    </div>
+                    <div class="text-muted fs-7">
+                        الملف لازم يحتوي صف عناوين وعمود واحد على الأقل من: <strong>رقم الجوال</strong> أو <strong>البريد الإلكتروني</strong>
+                        (وممكن عمود <strong>الاسم</strong> اختيارياً). سيتم مطابقة كل صف مع المسجلين بالنظام عبر الجوال أو البريد.
+                    </div>
+                </div>
+
+                <div id="import_step_2" class="d-none">
+                    <div id="import_summary" class="alert alert-light-info mb-4"></div>
+
+                    <div class="mb-4">
+                        <h5 class="text-success">
+                            <i class="ki-duotone ki-plus-circle fs-3"><span class="path1"></span><span class="path2"></span></i>
+                            سيُضاف للمرشحين (<span id="import_add_count">0</span>)
+                        </h5>
+                        <div id="import_add_list" class="border rounded p-3" style="max-height:180px;overflow-y:auto;"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-danger">
+                            <i class="ki-duotone ki-minus-circle fs-3"><span class="path1"></span><span class="path2"></span></i>
+                            سيُحذف من المرشحين (<span id="import_remove_count">0</span>)
+                        </h5>
+                        <div id="import_remove_list" class="border rounded p-3" style="max-height:180px;overflow-y:auto;"></div>
+                    </div>
+
+                    <div class="mb-2" id="import_not_found_wrap">
+                        <h5 class="text-warning">
+                            <i class="ki-duotone ki-information-5 fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                            غير موجودين بالنظام (<span id="import_not_found_count">0</span>) - لن تتم إضافتهم
+                        </h5>
+                        <div id="import_not_found_list" class="border rounded p-3" style="max-height:150px;overflow-y:auto;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" id="import_preview_btn" class="btn btn-primary">
+                    <i class="ki-duotone ki-eye fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i> معاينة الفرق
+                </button>
+                <button type="button" id="import_confirm_btn" class="btn btn-danger d-none">
+                    <i class="ki-duotone ki-check fs-2"></i> تأكيد المزامنة
                 </button>
             </div>
         </div>
@@ -316,6 +390,133 @@
             }).done(function (data) {
                 toastr[data.status](data.message);
                 oTable.draw(false);
+            });
+        });
+
+        // ================== استيراد ومزامنة من Excel ==================
+        function escapeHtml(str) {
+            return $('<div>').text(str || '').html();
+        }
+
+        function renderPersonList($container, items) {
+            $container.empty();
+            if (!items.length) {
+                $container.append('<div class="text-muted fs-7">لا يوجد</div>');
+                return;
+            }
+            items.forEach(function (item) {
+                $container.append(
+                    '<div class="d-flex justify-content-between border-bottom py-1">' +
+                        '<span>' + escapeHtml(item.name || '(بدون اسم)') + '</span>' +
+                        '<span class="text-muted fs-8" dir="ltr">' + escapeHtml(item.mobile || item.email || '') + '</span>' +
+                    '</div>'
+                );
+            });
+        }
+
+        function resetImportModal() {
+            $('#import_step_1').removeClass('d-none');
+            $('#import_step_2').addClass('d-none');
+            $('#import_preview_btn').removeClass('d-none');
+            $('#import_confirm_btn').addClass('d-none');
+            $('#import_course_id').val('');
+            $('#import_file').val('');
+        }
+
+        $('#import_modal').on('hidden.bs.modal', resetImportModal);
+
+        $('#import_preview_btn').on('click', function () {
+            var courseId = $('#import_course_id').val();
+            var fileInput = document.getElementById('import_file');
+            if (!courseId) {
+                toastr.error('يرجى اختيار الدورة');
+                return;
+            }
+            if (!fileInput.files.length) {
+                toastr.error('يرجى اختيار ملف Excel');
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('course_id', courseId);
+            formData.append('file', fileInput.files[0]);
+
+            var $btn = $(this);
+            $btn.prop('disabled', true);
+
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('course_candidates.import') }}",
+                data: formData,
+                processData: false,
+                contentType: false
+            }).done(function (data) {
+                if (data.status !== 'success') {
+                    toastr.error(data.message);
+                    return;
+                }
+
+                $('#import_summary').text(
+                    'بالملف ' + (data.to_add.length + data.to_remove.length + data.unchanged_count) + ' مطابقة، ' +
+                    data.unchanged_count + ' منهم مرشحون أصلاً بدون تغيير.'
+                );
+                $('#import_add_count').text(data.to_add.length);
+                $('#import_remove_count').text(data.to_remove.length);
+                $('#import_not_found_count').text(data.not_found.length);
+                renderPersonList($('#import_add_list'), data.to_add);
+                renderPersonList($('#import_remove_list'), data.to_remove);
+                renderPersonList($('#import_not_found_list'), data.not_found);
+
+                $('#import_step_1').addClass('d-none');
+                $('#import_step_2').removeClass('d-none');
+
+                if (data.to_add.length === 0 && data.to_remove.length === 0) {
+                    toastr.info('لا يوجد أي فرق - قائمة المرشحين مطابقة للملف أصلاً');
+                    $('#import_confirm_btn').addClass('d-none');
+                    $('#import_preview_btn').addClass('d-none');
+                } else {
+                    $('#import_preview_btn').addClass('d-none');
+                    $('#import_confirm_btn').removeClass('d-none');
+                }
+            }).fail(function () {
+                toastr.error('تعذر الاتصال بالسيرفر');
+            }).always(function () {
+                $btn.prop('disabled', false);
+            });
+        });
+
+        $('#import_confirm_btn').on('click', function () {
+            var courseId = $('#import_course_id').val();
+            var fileInput = document.getElementById('import_file');
+            if (!fileInput.files.length) {
+                toastr.error('يرجى إعادة اختيار الملف');
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('course_id', courseId);
+            formData.append('file', fileInput.files[0]);
+            formData.append('confirm', '1');
+
+            var $btn = $(this);
+            $btn.prop('disabled', true);
+
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('course_candidates.import') }}",
+                data: formData,
+                processData: false,
+                contentType: false
+            }).done(function (data) {
+                toastr[data.status](data.message);
+                if (data.status === 'success') {
+                    $('#import_modal').modal('hide');
+                    oTable.draw(false);
+                }
+            }).fail(function () {
+                toastr.error('تعذر الاتصال بالسيرفر');
+            }).always(function () {
+                $btn.prop('disabled', false);
             });
         });
     });

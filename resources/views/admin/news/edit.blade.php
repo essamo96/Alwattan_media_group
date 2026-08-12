@@ -119,7 +119,7 @@
 @endsection
 
 @push('scripts')
-<script src="vendor/laravel-filemanager/js/lfm.js"></script>
+<script src="{{ asset('vendor/laravel-filemanager/js/lfm.js') }}"></script>
 <script src="{{ asset_v('assets/metronic/plugins/custom/ckeditor/ckeditor-classic.bundle.js') }}"></script>
 <script type="text/javascript">
 function convertToSlug(str)
@@ -145,7 +145,7 @@ ClassicEditor.create(document.querySelector('#descs'), {
         uploadUrl: "{{ route('news.upload', ['_token' => csrf_token()]) }}"
     }
 }).catch(error => console.error(error));
-var domain = "admin/file_manager";
+var domain = "{{ asset('/admin').'/file_manager' }}";
 $('#lfm').filemanager('image', {prefix: domain});
 </script>
 @endpush

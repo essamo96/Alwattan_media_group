@@ -248,6 +248,24 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web
     Route::post('partners/delete', ['as' => 'partners.delete', 'middleware' => ['permission:admin.partners.delete'], 'uses' => 'PartnersController@postDelete']);
     Route::post('partners/status', ['as' => 'partners.status', 'middleware' => ['permission:admin.partners.status'], 'uses' => 'PartnersController@postStatus']);
     //Advertisements Route
+    Route::get('gallery', ['as' => 'gallery.view', 'middleware' => ['permission:admin.gallery.view|admin.gallery.add|admin.gallery.edit|admin.gallery.delete|admin.gallery.status'], 'uses' => 'GalleryController@getIndex']);
+    Route::get('gallery/list', ['as' => 'gallery.list', 'middleware' => ['permission:admin.gallery.view|admin.gallery.add|admin.gallery.edit|admin.gallery.delete|admin.gallery.status'], 'uses' => 'GalleryController@getList']);
+    Route::get('gallery/add', ['as' => 'gallery.add', 'middleware' => ['permission:admin.gallery.add'], 'uses' => 'GalleryController@getAdd']);
+    Route::post('gallery/add', ['as' => 'gallery.add', 'middleware' => ['permission:admin.gallery.add'], 'uses' => 'GalleryController@postAdd']);
+    Route::get('gallery/edit/{id}', ['as' => 'gallery.edit', 'middleware' => ['permission:admin.gallery.edit'], 'uses' => 'GalleryController@getEdit']);
+    Route::post('gallery/edit/{id}', ['as' => 'gallery.edit', 'middleware' => ['permission:admin.gallery.edit'], 'uses' => 'GalleryController@postEdit']);
+    Route::post('gallery/delete', ['as' => 'gallery.delete', 'middleware' => ['permission:admin.gallery.delete'], 'uses' => 'GalleryController@postDelete']);
+    Route::post('gallery/status', ['as' => 'gallery.status', 'middleware' => ['permission:admin.gallery.status'], 'uses' => 'GalleryController@postStatus']);
+
+    Route::get('achievements', ['as' => 'achievements.view', 'middleware' => ['permission:admin.achievements.view|admin.achievements.add|admin.achievements.edit|admin.achievements.delete|admin.achievements.status'], 'uses' => 'AchievementsController@getIndex']);
+    Route::get('achievements/list', ['as' => 'achievements.list', 'middleware' => ['permission:admin.achievements.view|admin.achievements.add|admin.achievements.edit|admin.achievements.delete|admin.achievements.status'], 'uses' => 'AchievementsController@getList']);
+    Route::get('achievements/add', ['as' => 'achievements.add', 'middleware' => ['permission:admin.achievements.add'], 'uses' => 'AchievementsController@getAdd']);
+    Route::post('achievements/add', ['as' => 'achievements.add', 'middleware' => ['permission:admin.achievements.add'], 'uses' => 'AchievementsController@postAdd']);
+    Route::get('achievements/edit/{id}', ['as' => 'achievements.edit', 'middleware' => ['permission:admin.achievements.edit'], 'uses' => 'AchievementsController@getEdit']);
+    Route::post('achievements/edit/{id}', ['as' => 'achievements.edit', 'middleware' => ['permission:admin.achievements.edit'], 'uses' => 'AchievementsController@postEdit']);
+    Route::post('achievements/delete', ['as' => 'achievements.delete', 'middleware' => ['permission:admin.achievements.delete'], 'uses' => 'AchievementsController@postDelete']);
+    Route::post('achievements/status', ['as' => 'achievements.status', 'middleware' => ['permission:admin.achievements.status'], 'uses' => 'AchievementsController@postStatus']);
+
     Route::get('advertisements', ['as' => 'advertisements.view', 'middleware' => ['permission:admin.advertisements.view|admin.advertisements.add|admin.advertisements.edit|admin.advertisements.delete|admin.advertisements.status'], 'uses' => 'AdvertisementsController@getIndex']);
     Route::get('advertisements/list', ['as' => 'advertisements.list', 'middleware' => ['permission:admin.advertisements.view|admin.advertisements.add|admin.advertisements.edit|admin.advertisements.delete|admin.advertisements.status'], 'uses' => 'AdvertisementsController@getList']);
     Route::get('advertisements/add', ['as' => 'advertisements.add', 'middleware' => ['permission:admin.advertisements.add'], 'uses' => 'AdvertisementsController@getAdd']);
@@ -286,6 +304,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web
     Route::get('course_candidates/list', ['as' => 'course_candidates.index_list', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getIndexList']);
     Route::get('course_candidates/export', ['as' => 'course_candidates.export', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getExport']);
     Route::post('course_candidates/remove', ['as' => 'course_candidates.remove_global', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@postRemoveGlobal']);
+    Route::post('course_candidates/import', ['as' => 'course_candidates.import', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@postImport']);
     //SMS Route
     Route::post('sms/send', ['as' => 'sms.send', 'middleware' => ['permission:admin.sms.send'], 'uses' => 'SmsController@postSend']);
     Route::get('courses/{id}/candidates', ['as' => 'course_candidates.manage', 'middleware' => ['permission:admin.course_candidates.manage'], 'uses' => 'CourseCandidatesController@getManage']);
