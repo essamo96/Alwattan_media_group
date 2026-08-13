@@ -18,7 +18,13 @@
                                 <h1 class="mb-4">{{ $post_news->title }}</h1>
 
                                 <div class="post-thumb rounded">
-                                    <img src="{{ url($post_news->image) }}" class="rounded-lg img-fluid " alt="blog">
+                                    @if(!empty($post_news->image) && file_exists(public_path($post_news->image)))
+                                    <img src="{{ url($post_news->image) }}" class="rounded-lg img-fluid " alt="{{ $post_news->title }}">
+                                    @else
+                                    {{-- الصورة المرفقة بالخبر غير موجودة (لم تُرفع أصلاً، أو فُقدت على السيرفر) —
+                                         نعرض صورة بديلة بدل رابط صورة مكسور بدون أي مؤشر بصري. --}}
+                                    <img src="{{ asset('assets/front/images/misc/1.jpg') }}" class="rounded-lg img-fluid " alt="{{ $post_news->title }}">
+                                    @endif
                                 </div>
                                 <div class="post-content">
                                     <ul class="lab-ul post-date my-3">

@@ -9,6 +9,7 @@ use App\Models\Testimonials;
 use App\Models\News;
 use App\Models\Pages;
 use App\Models\Advertisements;
+use App\Models\Achievement;
 //use App\Models\Categories;
 // use App\Models\Videos;
 // use App\Models\Photos;
@@ -45,6 +46,8 @@ class HomepageController extends Controller {
         // admin CRUD immediately (a stale "forever" cache previously made newly
         // added partners invisible on the public site until manually cleared).
         parent::$data['partners'] = (new Partners())->getAllPartners();
+        // نفس منطق partners: بدون كاش دائم حتى تظهر تعديلات لوحة التحكم فوراً على الواجهة.
+        parent::$data['achievements'] = (new Achievement())->getAllActiveAchievements();
         $page = new Pages();
         parent::$data['about'] = $page->getPage(1);
 

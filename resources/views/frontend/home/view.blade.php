@@ -130,6 +130,115 @@
 </section>
 <!-- section close -->
 @endif
+
+@if(sizeof($achievements) > 0)
+<!-- section begin -->
+<section id="section-achievements" aria-label="section-achievements" data-bgimage="url({{ asset('assets/front/images/bg/2.png') }}) top left no-repeat">
+    <style>
+        #section-achievements .achievement-card {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 14px rgba(20, 26, 62, .07);
+            transition: transform .3s ease, box-shadow .3s ease;
+            height: 100%;
+        }
+        #section-achievements .achievement-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 30px rgba(20, 26, 62, .14);
+        }
+        #section-achievements .achievement-img-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 62%;
+            overflow: hidden;
+        }
+        #section-achievements .achievement-img-wrap img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .4s ease;
+        }
+        #section-achievements .achievement-card:hover .achievement-img-wrap img {
+            transform: scale(1.06);
+        }
+        #section-achievements .achievement-body {
+            padding: 22px 20px 24px;
+        }
+        #section-achievements .achievement-body h5 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        #section-achievements .achievement-desc {
+            color: #6b7182;
+            font-size: 14.5px;
+            line-height: 1.7;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+        #section-achievements .achievement-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        #section-achievements .achievement-tag {
+            display: inline-block;
+            font-size: 11.5px;
+            font-weight: 600;
+            padding: 3px 11px;
+            border-radius: 20px;
+            background: rgba(33, 52, 120, .08);
+            color: var(--bs-primary, #213478);
+        }
+    </style>
+    <div class="wm wm-border light wow fadeInDown">@lang('site.achievements')</div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center wow fadeInUp">
+                <h2>@lang('site.our_achievements')</h2>
+                <div class="separator"><span><i class="fa fa-square"></i></span></div>
+                <p class="services-intro">@lang('site.achievements_intro')</p>
+                <div class="spacer-single"></div>
+            </div>
+            <div class="col-md-12">
+                <div class="row">
+                    @foreach($achievements as $item)
+                    @php
+                        $achImage = $item->{'image_' . $locale} ?: $item->image_ar;
+                        $achTags = $item->tagsArray();
+                    @endphp
+                    <div class="col-md-4 col-sm-6 mb-4 wow fadeInUp" data-wow-delay="{{ ($loop->index % 3) * .1 }}s">
+                        <div class="achievement-card">
+                            <div class="achievement-img-wrap">
+                                <img src="{{ asset('uploads/achievements/' . $achImage) }}" alt="{{ $item->title }}" loading="lazy">
+                            </div>
+                            <div class="achievement-body">
+                                <h5>{{ $item->title }}</h5>
+                                <p class="achievement-desc">{{ $item->short_description }}</p>
+                                @if(!empty($achTags))
+                                <div class="achievement-tags">
+                                    @foreach($achTags as $tag)
+                                    <span class="achievement-tag">{{ $tag }}</span>
+                                    @endforeach
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- section close -->
+@endif
+
 <!-- section begin -->
 <section id="section-partners" data-bgimage="url({{ asset('assets/front/images/bg/5.png') }})) top right no-repeat">
     <div class="wm wm-border light wow fadeInDown ">@lang('site.partners')</div>
