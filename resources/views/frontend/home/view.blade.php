@@ -4,7 +4,7 @@
 <!-- parallax section -->
 {{-- النصوص متموضعة مطلقاً فوق الصور/الموجات (hero-slider.css) حتى لا تدخل
      تدفق التخطيط ولا تتعارض مع الخطوط المتحركة. --}}
-<section id="section-hero" class="full-height jarallax text-light">
+<section id="section-hero" class="full-height jarallax text-light hero-crossfade">
     {{-- canvas واحد مشترك للموجات المتحركة على كامل السلايدر --}}
     <canvas class="waves" data-speed="5" data-wave-width="150%" data-animation="SineInOut"></canvas>
     @foreach($slides as $item)
