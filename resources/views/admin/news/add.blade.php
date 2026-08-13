@@ -68,14 +68,9 @@
             </div>
             <div id="image" class="row mb-5">
                 <label class="col-md-3 col-form-label">صورة</label>
-                <div class="col-md-5">
-                    <input id="thumbnail" value="{{ old('image') }}" class="form-control" type="text" name="image" readonly>
-                    <img id="holder" src="" style="margin-top:15px;max-height:100px;">
-                </div>
-                <div class="col-md-1">
-                    <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-primary">
-                        <i class="fa fa-picture-o"></i> حدد صورة
-                    </a>
+                <div class="col-md-6">
+                    <input id="image_input" class="form-control" type="file" name="image" accept="image/*">
+                    <img id="holder" src="" class="d-none" style="margin-top:15px;max-height:150px;border-radius:6px;">
                 </div>
             </div>
             <div class="row mb-5">
@@ -119,7 +114,6 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('vendor/laravel-filemanager/js/lfm.js') }}"></script>
 <script src="{{ asset_v('assets/metronic/plugins/custom/ckeditor/ckeditor-classic.bundle.js') }}"></script>
 <script type="text/javascript">
 function convertToSlug(str)
@@ -145,7 +139,20 @@ ClassicEditor.create(document.querySelector('#descs'), {
         uploadUrl: "{{ route('news.upload', ['_token' => csrf_token()]) }}"
     }
 }).catch(error => console.error(error));
-var domain = "{{ asset('/admin').'/file_manager' }}";
-$('#lfm').filemanager('image', {prefix: domain});
+
+document.getElementById('image_input').addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    var holder = document.getElementById('holder');
+    if (!file) {
+        holder.classList.add('d-none');
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+        holder.src = ev.target.result;
+        holder.classList.remove('d-none');
+    };
+    reader.readAsDataURL(file);
+});
 </script>
 @endpush

@@ -13,6 +13,7 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Cache;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Illuminate\Support\Facades\Artisan;
+use App\Support\MediaUpload;
 
 class NewsController extends AdminController {
 
@@ -96,7 +97,7 @@ class NewsController extends AdminController {
         $sub = $request->get('sub');
         $descs = $request->get('descs');
         $language = $request->get('language');
-        $image = $request->get('image');
+        $image = $request->file('image');
         $tags = $request->get('tags');
         $pub_date = $request->get('pub_date');
         $publish = (int) $request->get('publish');
@@ -117,13 +118,18 @@ class NewsController extends AdminController {
                     'sub' => 'required',
                     'descs' => 'required',
                     'language' => 'required',
-                    'image' => 'required',
+                    'image' => 'required|image',
         ]);
 //////////////////////////////////////////////////////////
         if ($validator->fails()) {
             $request->session()->flash('danger', $validator->messages());
             return redirect(route('news.add'))->withInput();
         } else {
+            $destinationPath = MediaUpload::ensureDir('uploads/news');
+            $image_name = 'news_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
+            $image->move($destinationPath, $image_name);
+            $image = 'uploads/news/' . $image_name;
+
             $news = new News();
             $add = $news->addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, Auth::guard('admin')->user()->id);
             if ($add) {
@@ -181,7 +187,7 @@ class NewsController extends AdminController {
             $sub = $request->get('sub');
             $descs = $request->get('descs');
             $language = $request->get('language');
-            $image = $request->get('image');
+            $image = $request->file('image');
             $tags = $request->get('tags');
             $pub_date = $request->get('pub_date');
             $publish = (int) $request->get('publish');
@@ -194,6 +200,7 @@ class NewsController extends AdminController {
                         'sub' => $sub,
                         'language' => $language,
                         'descs' => $descs,
+                        'image' => $image,
                             ], [
                         'category_id' => 'required',
                         'title' => 'required',
@@ -201,6 +208,7 @@ class NewsController extends AdminController {
                         'sub' => 'required',
                         'language' => 'required',
                         'descs' => 'required',
+                        'image' => 'nullable|image',
             ]);
 //////////////////////////////////////////////////////////
             if ($validator->fails()) {
@@ -209,6 +217,15 @@ class NewsController extends AdminController {
             } else {
                 $old_category_id = $info->category_id;
 ////////////////////////////////////////////
+                if ($request->hasFile('image') && $image->isValid()) {
+                    $destinationPath = MediaUpload::ensureDir('uploads/news');
+                    $image_name = 'news_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
+                    $image->move($destinationPath, $image_name);
+                    $image = 'uploads/news/' . $image_name;
+                } else {
+                    $image = $info->image;
+                }
+
                 $update = $news->updateNews($info, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar);
                 if ($update) {
                     if ($info->publish == 1) {
