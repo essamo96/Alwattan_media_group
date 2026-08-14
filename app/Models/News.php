@@ -94,6 +94,9 @@ class News extends Model {
 
     //////////////////////////////////////////////
     public function deleteNews($obj) {
+        // لا يوجد قيد FK على مستوى القاعدة يربط news_media.news_id بـ news.id (انظر
+        // ملاحظة migration جدول news_media)، فنحذف صفوف المعرض يدوياً هون.
+        NewsMedia::where('news_id', $obj->id)->delete();
         return $obj->delete();
     }
 
