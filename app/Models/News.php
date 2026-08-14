@@ -27,8 +27,14 @@ class News extends Model {
         return $this->hasMany('App\Models\Comments', 'news_id', 'id');
     }
 
+    //////////////////////////////////////////////
+    // معرض الصور/الفيديوهات الإضافية التابعة لنفس الخبر (الريبيتر)
+    public function media() {
+        return $this->hasMany(NewsMedia::class, 'news_id')->orderBy('sort_order');
+    }
+
     /////
-    public function addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, $user_id) {
+    public function addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, $user_id, $type = 'image', $video = null) {
         if ($publish == 1) {
             $pub_date = date('Y-m-d H:i:s');
         }
@@ -37,6 +43,8 @@ class News extends Model {
         $this->sub = $sub;
         $this->descs = $descs;
         $this->image = $image;
+        $this->type = $type;
+        $this->video = $video;
         $this->category_id = $category_id;
         $this->tags = $tags;
         $this->pub_date = $pub_date;
@@ -50,7 +58,7 @@ class News extends Model {
     }
 
     //////////////////////////////////////////////
-    public function updateNews($obj, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar) {
+    public function updateNews($obj, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar, $type = 'image', $video = null) {
         $old_resort = $obj->resort;
         if ($obj->publish == 0 && $publish == 1) {
             $pub_date = date('Y-m-d H:i:s');
@@ -60,6 +68,8 @@ class News extends Model {
         $obj->sub = $sub;
         $obj->descs = $descs;
         $obj->image = $image;
+        $obj->type = $type;
+        $obj->video = $video;
         $obj->category_id = $category_id;
         $obj->tags = $tags;
         $obj->pub_date = $pub_date;

@@ -155,7 +155,7 @@
                     <div class="row mb-5">
                         <label class="col-md-3 col-form-label">التفاصيل</label>
                         <div class="col-md-6">
-                            <textarea name="{{ $item->prefix }}_details" id="{{ $item->prefix }}_details" class="form-control" rows="3">{{ $info->translate($item->prefix) ? $info->translate($item->prefix)->details : '' }}</textarea>
+                            <textarea name="{{ $item->prefix }}_details" id="{{ $item->prefix }}_details" class="form-control ckeditor" data-lang="{{ $item->prefix }}" rows="3">{{ $info->translate($item->prefix) ? $info->translate($item->prefix)->details : '' }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -185,14 +185,9 @@
 
 @push('scripts')
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js"></script>
-<script src="vendor/laravel-filemanager/js/lfm.js"></script>
-<script src="{{ asset_v('assets/metronic/plugins/custom/ckeditor/ckeditor-classic.bundle.js') }}"></script>
 <script type="text/javascript">
 var domain = "{{ asset('/admin').'/file_manager' }}";
 $('#lfm').filemanager('image', {prefix: domain});
-@foreach($languages as $item)
-ClassicEditor.create(document.querySelector('#{{ $item->prefix }}_details'), { language: '{{ $item->prefix }}' }).catch(error => console.error(error));
-@endforeach
 mapboxgl.accessToken = '{{ config('services.mapbox.token') }}';
 var map = new mapboxgl.Map({
     container: 'map',

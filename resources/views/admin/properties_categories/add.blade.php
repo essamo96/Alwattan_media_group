@@ -63,7 +63,7 @@
                     <div class="row mb-5">
                         <label class="col-md-3 col-form-label">الوصف</label>
                         <div class="col-md-6">
-                            <textarea name="{{ $item->prefix }}_descs" id="{{ $item->prefix }}_descs" class="form-control" rows="3">{{ old($item->prefix.'_descs') }}</textarea>
+                            <textarea name="{{ $item->prefix }}_descs" id="{{ $item->prefix }}_descs" class="form-control ckeditor" data-lang="{{ $item->prefix }}" rows="3">{{ old($item->prefix.'_descs') }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -79,11 +79,3 @@
 </div>
 @endsection
 
-@push('scripts')
-<script src="{{ asset_v('assets/metronic/plugins/custom/ckeditor/ckeditor-classic.bundle.js') }}"></script>
-<script type="text/javascript">
-    @foreach($languages as $item)
-    ClassicEditor.create(document.querySelector('#{{ $item->prefix }}_descs'), { language: '{{ $item->prefix }}' }).catch(error => console.error(error));
-    @endforeach
-</script>
-@endpush

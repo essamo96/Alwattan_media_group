@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Categories;
 use App\Models\News;
+use App\Models\NewsMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -97,7 +98,9 @@ class NewsController extends AdminController {
         $sub = $request->get('sub');
         $descs = $request->get('descs');
         $language = $request->get('language');
+        $type = $request->get('type', 'image');
         $image = $request->file('image');
+        $video = $request->get('video');
         $tags = $request->get('tags');
         $pub_date = $request->get('pub_date');
         $publish = (int) $request->get('publish');
@@ -110,7 +113,9 @@ class NewsController extends AdminController {
                     'sub' => $sub,
                     'descs' => $descs,
                     'language' => $language,
+                    'type' => $type,
                     'image' => $image,
+                    'video' => $video,
                         ], [
                     'category_id' => 'required',
                     'title' => 'required',
@@ -118,21 +123,29 @@ class NewsController extends AdminController {
                     'sub' => 'required',
                     'descs' => 'required',
                     'language' => 'required',
-                    'image' => 'required|image',
+                    'type' => 'required|in:image,video',
+                    'image' => 'required_if:type,image|image',
+                    'video' => 'required_if:type,video|string',
         ]);
 //////////////////////////////////////////////////////////
         if ($validator->fails()) {
             $request->session()->flash('danger', $validator->messages());
             return redirect(route('news.add'))->withInput();
         } else {
-            $destinationPath = MediaUpload::ensureDir('uploads/news');
-            $image_name = 'news_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $image_name);
-            $image = 'uploads/news/' . $image_name;
+            if ($type == 'image') {
+                $destinationPath = MediaUpload::ensureDir('uploads/news');
+                $image_name = 'news_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
+                $image->move($destinationPath, $image_name);
+                $image = 'uploads/news/' . $image_name;
+                $video = null;
+            } else {
+                $image = null;
+            }
 
             $news = new News();
-            $add = $news->addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, Auth::guard('admin')->user()->id);
+            $add = $news->addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, Auth::guard('admin')->user()->id, $type, $video);
             if ($add) {
+                $this->saveMediaRepeater($request, $add->id);
                 if ($publish == 1) {
                     $this->clearCache($category_id, $language);
                 }
@@ -142,6 +155,77 @@ class NewsController extends AdminController {
             } else {
                 $request->session()->flash('danger', self::EXECUTION_ERROR);
                 return redirect(route('news.add'))->withInput();
+            }
+        }
+    }
+
+//////////////////////////////////////////////
+    private function saveMediaRepeater(Request $request, $news_id) {
+        $delete_ids = (array) $request->get('media_delete', []);
+        if (!empty($delete_ids)) {
+            NewsMedia::where('news_id', $news_id)->whereIn('id', $delete_ids)->delete();
+        }
+
+        $types = (array) $request->get('media_type', []);
+        $video_urls = (array) $request->get('media_video_url', []);
+        $ids = (array) $request->get('media_id', []);
+        $files = $request->file('media_image', []);
+
+        foreach ($types as $index => $row_type) {
+            $media_id = $ids[$index] ?? null;
+            $sort_order = (int) $index;
+
+            if ($row_type === 'image') {
+                $file = $files[$index] ?? null;
+                if ($file && $file->isValid()) {
+                    $destinationPath = MediaUpload::ensureDir('uploads/news/gallery');
+                    $file_name = 'news_media_' . strtotime(date("Y-m-d H:i:s")) . '_' . $index . '.' . $file->getClientOriginalExtension();
+                    $file->move($destinationPath, $file_name);
+                    $path = 'uploads/news/gallery/' . $file_name;
+                } elseif ($media_id) {
+                    continue;
+                } else {
+                    continue;
+                }
+
+                if ($media_id) {
+                    NewsMedia::where('id', $media_id)->where('news_id', $news_id)->update([
+                        'type' => 'image',
+                        'path' => $path,
+                        'video_url' => null,
+                        'sort_order' => $sort_order,
+                    ]);
+                } else {
+                    NewsMedia::create([
+                        'news_id' => $news_id,
+                        'type' => 'image',
+                        'path' => $path,
+                        'video_url' => null,
+                        'sort_order' => $sort_order,
+                    ]);
+                }
+            } else {
+                $video_url = $video_urls[$index] ?? null;
+                if (empty($video_url)) {
+                    continue;
+                }
+
+                if ($media_id) {
+                    NewsMedia::where('id', $media_id)->where('news_id', $news_id)->update([
+                        'type' => 'video',
+                        'path' => null,
+                        'video_url' => $video_url,
+                        'sort_order' => $sort_order,
+                    ]);
+                } else {
+                    NewsMedia::create([
+                        'news_id' => $news_id,
+                        'type' => 'video',
+                        'path' => null,
+                        'video_url' => $video_url,
+                        'sort_order' => $sort_order,
+                    ]);
+                }
             }
         }
     }
@@ -187,7 +271,9 @@ class NewsController extends AdminController {
             $sub = $request->get('sub');
             $descs = $request->get('descs');
             $language = $request->get('language');
+            $type = $request->get('type', 'image');
             $image = $request->file('image');
+            $video = $request->get('video');
             $tags = $request->get('tags');
             $pub_date = $request->get('pub_date');
             $publish = (int) $request->get('publish');
@@ -200,7 +286,9 @@ class NewsController extends AdminController {
                         'sub' => $sub,
                         'language' => $language,
                         'descs' => $descs,
+                        'type' => $type,
                         'image' => $image,
+                        'video' => $video,
                             ], [
                         'category_id' => 'required',
                         'title' => 'required',
@@ -208,7 +296,9 @@ class NewsController extends AdminController {
                         'sub' => 'required',
                         'language' => 'required',
                         'descs' => 'required',
+                        'type' => 'required|in:image,video',
                         'image' => 'nullable|image',
+                        'video' => 'required_if:type,video|nullable|string',
             ]);
 //////////////////////////////////////////////////////////
             if ($validator->fails()) {
@@ -217,17 +307,23 @@ class NewsController extends AdminController {
             } else {
                 $old_category_id = $info->category_id;
 ////////////////////////////////////////////
-                if ($request->hasFile('image') && $image->isValid()) {
-                    $destinationPath = MediaUpload::ensureDir('uploads/news');
-                    $image_name = 'news_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
-                    $image->move($destinationPath, $image_name);
-                    $image = 'uploads/news/' . $image_name;
+                if ($type == 'image') {
+                    if ($request->hasFile('image') && $image->isValid()) {
+                        $destinationPath = MediaUpload::ensureDir('uploads/news');
+                        $image_name = 'news_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
+                        $image->move($destinationPath, $image_name);
+                        $image = 'uploads/news/' . $image_name;
+                    } else {
+                        $image = $info->image;
+                    }
+                    $video = null;
                 } else {
                     $image = $info->image;
                 }
 
-                $update = $news->updateNews($info, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar);
+                $update = $news->updateNews($info, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar, $type, $video);
                 if ($update) {
+                    $this->saveMediaRepeater($request, $info->id);
                     if ($info->publish == 1) {
                         if ($old_category_id != $category_id) {
                             $this->clearCache($old_category_id, $language);

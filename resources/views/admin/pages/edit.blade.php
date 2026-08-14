@@ -94,7 +94,7 @@
                     <div class="row mb-5">
                         <label class="col-md-3 col-form-label">التفاصيل</label>
                         <div class="col-md-6">
-                            <textarea name="{{ $item->prefix }}_details" id="{{ $item->prefix }}_descs" class="form-control ckeditor" rows="3">{{ $info->translate($item->prefix) ? $info->translate($item->prefix)->details : '' }}</textarea>
+                            <textarea name="{{ $item->prefix }}_details" id="{{ $item->prefix }}_descs" class="form-control ckeditor" data-lang="{{ $item->prefix }}" rows="3">{{ $info->translate($item->prefix) ? $info->translate($item->prefix)->details : '' }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -110,16 +110,3 @@
 </div>
 @endsection
 
-@push('scripts')
-<script src="{{ asset_v('assets/metronic/plugins/custom/ckeditor/ckeditor-classic.bundle.js') }}"></script>
-<script type="text/javascript">
-    ClassicEditor.create(document.querySelector('#ar_descs'), {
-        language: 'ar',
-        ckfinder: { uploadUrl: "{{ route('news.upload', ['_token' => csrf_token()]) }}" }
-    }).catch(error => console.error(error));
-    ClassicEditor.create(document.querySelector('#en_descs'), {
-        language: 'en',
-        ckfinder: { uploadUrl: "{{ route('news.upload', ['_token' => csrf_token()]) }}" }
-    }).catch(error => console.error(error));
-</script>
-@endpush

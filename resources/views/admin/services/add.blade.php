@@ -66,7 +66,7 @@
                     <div class="row mb-5">
                         <label class="col-md-3 col-form-label">التفاصيل</label>
                         <div class="col-md-6">
-                            <textarea name="{{ $item->prefix }}_details" id="{{ $item->prefix }}_details" class="form-control" rows="3">{{ old($item->prefix.'_details') }}</textarea>
+                            <textarea name="{{ $item->prefix }}_details" id="{{ $item->prefix }}_details" class="form-control ckeditor" data-lang="{{ $item->prefix }}" rows="3">{{ old($item->prefix.'_details') }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -83,13 +83,8 @@
 @endsection
 
 @push('scripts')
-<script src="vendor/laravel-filemanager/js/lfm.js"></script>
-<script src="{{ asset_v('assets/metronic/plugins/custom/ckeditor/ckeditor-classic.bundle.js') }}"></script>
 <script>
 var domain = "{{ asset('/admin').'/file_manager' }}";
 $('#lfm').filemanager('image', {prefix: domain});
-@foreach($languages as $item)
-ClassicEditor.create(document.querySelector('#{{ $item->prefix }}_details'), { language: '{{ $item->prefix }}' }).catch(error => console.error(error));
-@endforeach
 </script>
 @endpush

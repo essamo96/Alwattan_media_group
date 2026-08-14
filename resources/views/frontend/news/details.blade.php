@@ -18,7 +18,20 @@
                                 <h1 class="mb-4">{{ $post_news->title }}</h1>
 
                                 <div class="post-thumb rounded">
-                                    @if(!empty($post_news->image) && file_exists(public_path($post_news->image)))
+                                    @if($post_news->type == 'video' && !empty($post_news->video))
+                                    <?php
+                                        $video_url = $post_news->video;
+                                        $embed_url = $video_url;
+                                        if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/', $video_url, $m)) {
+                                            $embed_url = 'https://www.youtube.com/embed/' . $m[1];
+                                        } elseif (preg_match('/vimeo\.com\/(\d+)/', $video_url, $m)) {
+                                            $embed_url = 'https://player.vimeo.com/video/' . $m[1];
+                                        }
+                                    ?>
+                                    <div class="ratio ratio-16x9 rounded-lg">
+                                        <iframe src="{{ $embed_url }}" title="{{ $post_news->title }}" allowfullscreen></iframe>
+                                    </div>
+                                    @elseif(!empty($post_news->image) && file_exists(public_path($post_news->image)))
                                     <img src="{{ url($post_news->image) }}" class="rounded-lg img-fluid " alt="{{ $post_news->title }}">
                                     @else
                                     {{-- الصورة المرفقة بالخبر غير موجودة (لم تُرفع أصلاً، أو فُقدت على السيرفر) —
@@ -26,6 +39,34 @@
                                     <img src="{{ asset('assets/front/images/misc/1.jpg') }}" class="rounded-lg img-fluid " alt="{{ $post_news->title }}">
                                     @endif
                                 </div>
+                                @if($post_news->media && $post_news->media->count() > 0)
+                                <div class="news-gallery-repeater mt-4">
+                                    <div class="row g-3">
+                                        @foreach($post_news->media as $media_item)
+                                        <div class="col-6 col-md-4">
+                                            @if($media_item->type == 'image' && $media_item->path && file_exists(public_path($media_item->path)))
+                                            <a href="{{ url($media_item->path) }}" target="_blank" rel="noopener">
+                                                <img src="{{ url($media_item->path) }}" class="img-fluid rounded" alt="{{ $post_news->title }}">
+                                            </a>
+                                            @elseif($media_item->type == 'video' && $media_item->video_url)
+                                            <?php
+                                                $g_url = $media_item->video_url;
+                                                $g_embed = $g_url;
+                                                if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/', $g_url, $gm)) {
+                                                    $g_embed = 'https://www.youtube.com/embed/' . $gm[1];
+                                                } elseif (preg_match('/vimeo\.com\/(\d+)/', $g_url, $gm)) {
+                                                    $g_embed = 'https://player.vimeo.com/video/' . $gm[1];
+                                                }
+                                            ?>
+                                            <div class="ratio ratio-16x9 rounded">
+                                                <iframe src="{{ $g_embed }}" title="{{ $post_news->title }}" allowfullscreen></iframe>
+                                            </div>
+                                            @endif
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
                                 <div class="post-content">
                                     <ul class="lab-ul post-date my-3">
                                         <li><span><i class="fa fa-calendar me-2"></i> {{ $post_news->pub_date }}</span></li>

@@ -88,32 +88,32 @@
         lang = lang || 'ar';
         var isRtl = (lang === 'ar' || lang === 'fa' || lang === 'he' || lang === 'ur');
 
+        // ملاحظة: توليفة العناصر هون مقيّدة بما هو موجود فعلاً داخل bundle الـCKEditor
+        // المخصص لميترونيك (ckeditor-classic.bundle.js). عناصر غير مبنية بالحزمة
+        // (مثل alignment / underline / fontSize / fontColor) بترمي خطأ عند create()
+        // فيسقط الكود للتهيئة الاحتياطية المصغّرة (انظر createEditor أدناه) وتختفي
+        // كل الأزرار الإضافية بصمت — كانت هاي بالضبط سبب عدم ظهور مزايا المحرر.
         var config = {
             language: lang,
             toolbar: {
                 items: [
                     'heading', '|',
-                    'bold', 'italic', 'underline', 'strikethrough', '|',
-                    'fontSize', 'fontColor', 'fontBackgroundColor', '|',
-                    'alignment', '|',
-                    'bulletedList', 'numberedList', '|',
+                    'bold', 'italic', 'strikethrough', 'highlight', '|',
+                    'bulletedList', 'numberedList', 'todoList', '|',
                     'outdent', 'indent', '|',
-                    'link', 'uploadImage', 'insertTable', 'blockQuote', 'horizontalLine', '|',
+                    'link', 'uploadImage', 'insertTable', 'blockQuote', 'horizontalLine', 'code', 'codeBlock', '|',
                     'undo', 'redo'
                 ],
                 shouldNotGroupWhenFull: true
             },
             image: {
                 toolbar: [
-                    'imageTextAlternative', '|',
-                    'imageStyle:alignLeft', 'imageStyle:alignCenter', 'imageStyle:alignRight'
+                    'imageStyle:inline', 'imageStyle:block', 'imageStyle:side', '|',
+                    'toggleImageCaption', 'imageTextAlternative'
                 ]
             },
             table: {
                 contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
-            },
-            alignment: {
-                options: ['left', 'center', 'right', 'justify']
             }
         };
 

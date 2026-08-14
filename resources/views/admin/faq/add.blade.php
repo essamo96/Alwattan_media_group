@@ -32,7 +32,7 @@
             <div class="row mb-5">
                 <label class="col-md-3 col-form-label">الجواب عربي</label>
                 <div class="col-md-6">
-                    <textarea name="name1_ar" id="name1_ar" class="form-control" placeholder="الجواب عربي">{{ old('name1_ar') }}</textarea>
+                    <textarea name="name1_ar" id="name1_ar" class="form-control ckeditor" data-lang="ar" placeholder="الجواب عربي">{{ old('name1_ar') }}</textarea>
                 </div>
             </div>
             <div class="row mb-5">
@@ -44,7 +44,7 @@
             <div class="row mb-5">
                 <label class="col-md-3 col-form-label">الجواب انجليزي</label>
                 <div class="col-md-6">
-                    <textarea name="name1_en" id="name1_en" class="form-control" placeholder="الجواب انجليزي">{{ old('name1_en') }}</textarea>
+                    <textarea name="name1_en" id="name1_en" class="form-control ckeditor" data-lang="en" placeholder="الجواب انجليزي">{{ old('name1_en') }}</textarea>
                 </div>
             </div>
             <div class="row mb-5">
@@ -65,10 +65,3 @@
 </div>
 @endsection
 
-@push('scripts')
-<script src="{{ asset_v('assets/metronic/plugins/custom/ckeditor/ckeditor-classic.bundle.js') }}"></script>
-<script type="text/javascript">
-    ClassicEditor.create(document.querySelector('#name1_ar'), { language: 'ar' }).catch(error => console.error(error));
-    ClassicEditor.create(document.querySelector('#name1_en'), { language: 'en' }).catch(error => console.error(error));
-</script>
-@endpush
