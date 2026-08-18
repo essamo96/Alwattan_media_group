@@ -21,15 +21,23 @@
                                     @if($post_news->type == 'video' && !empty($post_news->video))
                                     <?php
                                         $video_url = $post_news->video;
+                                        $is_file_video = $post_news->video_source == 'file';
                                         $embed_url = $video_url;
-                                        if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/', $video_url, $m)) {
-                                            $embed_url = 'https://www.youtube.com/embed/' . $m[1];
-                                        } elseif (preg_match('/vimeo\.com\/(\d+)/', $video_url, $m)) {
-                                            $embed_url = 'https://player.vimeo.com/video/' . $m[1];
+                                        if (!$is_file_video) {
+                                            if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/', $video_url, $m)) {
+                                                $embed_url = 'https://www.youtube.com/embed/' . $m[1];
+                                            } elseif (preg_match('/vimeo\.com\/(\d+)/', $video_url, $m)) {
+                                                $embed_url = 'https://player.vimeo.com/video/' . $m[1];
+                                            }
                                         }
                                     ?>
-                                    <div class="ratio ratio-16x9 rounded-lg">
+                                    <div class="ratio ratio-16x9 rounded-lg position-relative">
+                                        @if($is_file_video)
+                                        <video src="{{ url($video_url) }}" controls class="w-100 h-100"></video>
+                                        @else
                                         <iframe src="{{ $embed_url }}" title="{{ $post_news->title }}" allowfullscreen></iframe>
+                                        @endif
+                                        @include('frontend.news.parts.watermark-overlay')
                                     </div>
                                     @elseif(!empty($post_news->image) && file_exists(public_path($post_news->image)))
                                     <img src="{{ url($post_news->image) }}" class="rounded-lg img-fluid " alt="{{ $post_news->title }}">
@@ -51,15 +59,23 @@
                                             @elseif($media_item->type == 'video' && $media_item->video_url)
                                             <?php
                                                 $g_url = $media_item->video_url;
+                                                $g_is_file_video = $media_item->video_source == 'file';
                                                 $g_embed = $g_url;
-                                                if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/', $g_url, $gm)) {
-                                                    $g_embed = 'https://www.youtube.com/embed/' . $gm[1];
-                                                } elseif (preg_match('/vimeo\.com\/(\d+)/', $g_url, $gm)) {
-                                                    $g_embed = 'https://player.vimeo.com/video/' . $gm[1];
+                                                if (!$g_is_file_video) {
+                                                    if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/', $g_url, $gm)) {
+                                                        $g_embed = 'https://www.youtube.com/embed/' . $gm[1];
+                                                    } elseif (preg_match('/vimeo\.com\/(\d+)/', $g_url, $gm)) {
+                                                        $g_embed = 'https://player.vimeo.com/video/' . $gm[1];
+                                                    }
                                                 }
                                             ?>
-                                            <div class="ratio ratio-16x9 rounded">
+                                            <div class="ratio ratio-16x9 rounded position-relative">
+                                                @if($g_is_file_video)
+                                                <video src="{{ url($g_url) }}" controls class="w-100 h-100"></video>
+                                                @else
                                                 <iframe src="{{ $g_embed }}" title="{{ $post_news->title }}" allowfullscreen></iframe>
+                                                @endif
+                                                @include('frontend.news.parts.watermark-overlay')
                                             </div>
                                             @endif
                                         </div>

@@ -8,7 +8,7 @@ class NewsMedia extends Model {
 
     protected $table = 'news_media';
     protected $fillable = [
-        'news_id', 'type', 'path', 'video_url', 'sort_order',
+        'news_id', 'type', 'path', 'video_url', 'video_source', 'sort_order',
     ];
 
     //////////////////////////////////////////////

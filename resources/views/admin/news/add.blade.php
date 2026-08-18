@@ -87,9 +87,23 @@
                 </div>
             </div>
             <div id="video" class="row mb-5 media-type-field media-type-field-video d-none">
-                <label class="col-md-3 col-form-label">رابط الفيديو</label>
+                <label class="col-md-3 col-form-label">الفيديو</label>
                 <div class="col-md-6">
-                    <input type="text" value="{{ old('video') }}" name="video" id="video_input" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
+                    <div class="form-check form-check-custom form-check-solid me-5 d-inline-block">
+                        <input class="form-check-input video-source-radio" type="radio" name="video_source" id="video_source_url" value="url" {{ old('video_source', 'url') == 'url' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="video_source_url">رابط خارجي</label>
+                    </div>
+                    <div class="form-check form-check-custom form-check-solid d-inline-block">
+                        <input class="form-check-input video-source-radio" type="radio" name="video_source" id="video_source_file" value="file" {{ old('video_source') == 'file' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="video_source_file">رفع ملف فيديو</label>
+                    </div>
+                    <div class="mt-3 video-source-field video-source-field-url">
+                        <input type="text" value="{{ old('video') }}" name="video" id="video_input" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
+                    </div>
+                    <div class="mt-3 video-source-field video-source-field-file d-none">
+                        <input type="file" name="video_file" class="form-control" accept="video/*">
+                        <div class="form-text">صيغ مدعومة: mp4, mov, webm, ogg, mkv, avi — بحد أقصى 100 ميجابايت.</div>
+                    </div>
                 </div>
             </div>
             <div class="row mb-5">
@@ -189,6 +203,19 @@ function toggleMediaType() {
 $('input.media-type-radio').on('change', toggleMediaType);
 toggleMediaType();
 
+function toggleVideoSource() {
+    var source = $('input.video-source-radio:checked').val();
+    if (source === 'file') {
+        $('.video-source-field-url').addClass('d-none');
+        $('.video-source-field-file').removeClass('d-none');
+    } else {
+        $('.video-source-field-file').addClass('d-none');
+        $('.video-source-field-url').removeClass('d-none');
+    }
+}
+$('input.video-source-radio').on('change', toggleVideoSource);
+toggleVideoSource();
+
 var mediaRowIndex = 0;
 function mediaRowTemplate(index) {
     return '' +
@@ -201,7 +228,18 @@ function mediaRowTemplate(index) {
         '  </div>' +
         '  <div class="col-md-7">' +
         '    <input type="file" name="media_image[' + index + ']" accept="image/*" class="form-control media-row-image">' +
-        '    <input type="text" name="media_video_url[' + index + ']" class="form-control media-row-video d-none" placeholder="https://www.youtube.com/watch?v=...">' +
+        '    <div class="media-row-video-wrap d-none">' +
+        '      <div class="form-check form-check-custom form-check-solid me-4 d-inline-block">' +
+        '        <input class="form-check-input media-row-video-source" type="radio" name="media_video_source[' + index + ']" value="url" checked>' +
+        '        <label class="form-check-label">رابط خارجي</label>' +
+        '      </div>' +
+        '      <div class="form-check form-check-custom form-check-solid d-inline-block">' +
+        '        <input class="form-check-input media-row-video-source" type="radio" name="media_video_source[' + index + ']" value="file">' +
+        '        <label class="form-check-label">رفع ملف</label>' +
+        '      </div>' +
+        '      <input type="text" name="media_video_url[' + index + ']" class="form-control mt-2 media-row-video-url" placeholder="https://www.youtube.com/watch?v=...">' +
+        '      <input type="file" name="media_video_file[' + index + ']" accept="video/*" class="form-control mt-2 media-row-video-file d-none">' +
+        '    </div>' +
         '  </div>' +
         '  <div class="col-md-2">' +
         '    <button type="button" class="btn btn-sm btn-icon btn-light-danger media-row-remove"><i class="fa fa-trash"></i></button>' +
@@ -217,10 +255,20 @@ $(document).on('change', '.media-row-type', function () {
     var $row = $(this).closest('.media-repeater-row');
     if ($(this).val() === 'video') {
         $row.find('.media-row-image').addClass('d-none');
-        $row.find('.media-row-video').removeClass('d-none');
+        $row.find('.media-row-video-wrap').removeClass('d-none');
     } else {
-        $row.find('.media-row-video').addClass('d-none');
+        $row.find('.media-row-video-wrap').addClass('d-none');
         $row.find('.media-row-image').removeClass('d-none');
+    }
+});
+$(document).on('change', '.media-row-video-source', function () {
+    var $row = $(this).closest('.media-repeater-row');
+    if ($(this).val() === 'file') {
+        $row.find('.media-row-video-url').addClass('d-none');
+        $row.find('.media-row-video-file').removeClass('d-none');
+    } else {
+        $row.find('.media-row-video-file').addClass('d-none');
+        $row.find('.media-row-video-url').removeClass('d-none');
     }
 });
 $(document).on('click', '.media-row-remove', function () {

@@ -11,7 +11,7 @@ class News extends Model {
 
     protected $table = 'news';
     protected $fillable = [
-        'title', 'description', 'details', 'type', 'thumb', 'image', 'video', 'category_id', 'tags', 'special', 'sidebar', 'language', 'user_id',
+        'title', 'description', 'details', 'type', 'thumb', 'image', 'video', 'video_source', 'category_id', 'tags', 'special', 'sidebar', 'language', 'user_id',
     ];
     protected $hidden = [
         '',

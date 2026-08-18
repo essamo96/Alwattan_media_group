@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Cache;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Illuminate\Support\Facades\Artisan;
 use App\Support\MediaUpload;
+use App\Support\Watermark;
 
 class NewsController extends AdminController {
 
@@ -100,7 +101,9 @@ class NewsController extends AdminController {
         $language = $request->get('language');
         $type = $request->get('type', 'image');
         $image = $request->file('image');
-        $video = $request->get('video');
+        $video_source = $request->get('video_source', 'url');
+        $video = $video_source == 'file' ? null : $request->get('video');
+        $video_file = $request->file('video_file');
         $tags = $request->get('tags');
         $pub_date = $request->get('pub_date');
         $publish = (int) $request->get('publish');
@@ -115,7 +118,8 @@ class NewsController extends AdminController {
                     'language' => $language,
                     'type' => $type,
                     'image' => $image,
-                    'video' => $video,
+                    'video' => $video_source == 'url' ? $video : 'x',
+                    'video_file' => $video_file,
                         ], [
                     'category_id' => 'required',
                     'title' => 'required',
@@ -126,6 +130,7 @@ class NewsController extends AdminController {
                     'type' => 'required|in:image,video',
                     'image' => 'required_if:type,image|image',
                     'video' => 'required_if:type,video|string',
+                    'video_file' => 'required_if:video_source,file|nullable|mimes:mp4,mov,webm,ogg,mkv,avi|max:102400',
         ]);
 //////////////////////////////////////////////////////////
         if ($validator->fails()) {
@@ -136,15 +141,28 @@ class NewsController extends AdminController {
                 $destinationPath = MediaUpload::ensureDir('uploads/news');
                 $image_name = 'news_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
                 $image->move($destinationPath, $image_name);
+                Watermark::applyToImage($destinationPath . DIRECTORY_SEPARATOR . $image_name);
                 $image = 'uploads/news/' . $image_name;
                 $video = null;
+                $video_source = 'url';
             } else {
                 $image = null;
+                if ($video_source == 'file' && $video_file && $video_file->isValid()) {
+                    $destinationPath = MediaUpload::ensureDir('uploads/news/video');
+                    $video_name = 'news_video_' . strtotime(date("Y-m-d H:i:s")) . '.' . $video_file->getClientOriginalExtension();
+                    $video_file->move($destinationPath, $video_name);
+                    $video = 'uploads/news/video/' . $video_name;
+                    $video_source = 'file';
+                } else {
+                    $video_source = 'url';
+                }
             }
 
             $news = new News();
             $add = $news->addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, Auth::guard('admin')->user()->id, $type, $video);
             if ($add) {
+                $add->video_source = $video_source;
+                $add->save();
                 $this->saveMediaRepeater($request, $add->id);
                 if ($publish == 1) {
                     $this->clearCache($category_id, $language);
@@ -167,9 +185,11 @@ class NewsController extends AdminController {
         }
 
         $types = (array) $request->get('media_type', []);
+        $video_sources = (array) $request->get('media_video_source', []);
         $video_urls = (array) $request->get('media_video_url', []);
         $ids = (array) $request->get('media_id', []);
         $files = $request->file('media_image', []);
+        $video_files = $request->file('media_video_file', []);
 
         foreach ($types as $index => $row_type) {
             $media_id = $ids[$index] ?? null;
@@ -181,6 +201,7 @@ class NewsController extends AdminController {
                     $destinationPath = MediaUpload::ensureDir('uploads/news/gallery');
                     $file_name = 'news_media_' . strtotime(date("Y-m-d H:i:s")) . '_' . $index . '.' . $file->getClientOriginalExtension();
                     $file->move($destinationPath, $file_name);
+                    Watermark::applyToImage($destinationPath . DIRECTORY_SEPARATOR . $file_name);
                     $path = 'uploads/news/gallery/' . $file_name;
                 } elseif ($media_id) {
                     continue;
@@ -193,6 +214,7 @@ class NewsController extends AdminController {
                         'type' => 'image',
                         'path' => $path,
                         'video_url' => null,
+                        'video_source' => 'url',
                         'sort_order' => $sort_order,
                     ]);
                 } else {
@@ -201,13 +223,29 @@ class NewsController extends AdminController {
                         'type' => 'image',
                         'path' => $path,
                         'video_url' => null,
+                        'video_source' => 'url',
                         'sort_order' => $sort_order,
                     ]);
                 }
             } else {
-                $video_url = $video_urls[$index] ?? null;
-                if (empty($video_url)) {
-                    continue;
+                $video_source = $video_sources[$index] ?? 'url';
+                $video_file = $video_files[$index] ?? null;
+
+                if ($video_source === 'file' && $video_file && $video_file->isValid()) {
+                    $destinationPath = MediaUpload::ensureDir('uploads/news/gallery');
+                    $video_name = 'news_media_video_' . strtotime(date("Y-m-d H:i:s")) . '_' . $index . '.' . $video_file->getClientOriginalExtension();
+                    $video_file->move($destinationPath, $video_name);
+                    $video_url = 'uploads/news/gallery/' . $video_name;
+                } else {
+                    $video_url = $video_urls[$index] ?? null;
+                    $video_source = 'url';
+                    if (empty($video_url)) {
+                        // ملف موجود مسبقاً ولم يُستبدل: أبقِ الصف كما هو
+                        if ($media_id) {
+                            continue;
+                        }
+                        continue;
+                    }
                 }
 
                 if ($media_id) {
@@ -215,6 +253,7 @@ class NewsController extends AdminController {
                         'type' => 'video',
                         'path' => null,
                         'video_url' => $video_url,
+                        'video_source' => $video_source,
                         'sort_order' => $sort_order,
                     ]);
                 } else {
@@ -223,6 +262,7 @@ class NewsController extends AdminController {
                         'type' => 'video',
                         'path' => null,
                         'video_url' => $video_url,
+                        'video_source' => $video_source,
                         'sort_order' => $sort_order,
                     ]);
                 }
@@ -273,7 +313,9 @@ class NewsController extends AdminController {
             $language = $request->get('language');
             $type = $request->get('type', 'image');
             $image = $request->file('image');
+            $video_source = $request->get('video_source', 'url');
             $video = $request->get('video');
+            $video_file = $request->file('video_file');
             $tags = $request->get('tags');
             $pub_date = $request->get('pub_date');
             $publish = (int) $request->get('publish');
@@ -288,7 +330,8 @@ class NewsController extends AdminController {
                         'descs' => $descs,
                         'type' => $type,
                         'image' => $image,
-                        'video' => $video,
+                        'video' => $video_source == 'url' ? $video : 'x',
+                        'video_file' => $video_file,
                             ], [
                         'category_id' => 'required',
                         'title' => 'required',
@@ -299,6 +342,7 @@ class NewsController extends AdminController {
                         'type' => 'required|in:image,video',
                         'image' => 'nullable|image',
                         'video' => 'required_if:type,video|nullable|string',
+                        'video_file' => 'nullable|mimes:mp4,mov,webm,ogg,mkv,avi|max:102400',
             ]);
 //////////////////////////////////////////////////////////
             if ($validator->fails()) {
@@ -312,17 +356,34 @@ class NewsController extends AdminController {
                         $destinationPath = MediaUpload::ensureDir('uploads/news');
                         $image_name = 'news_' . strtotime(date("Y-m-d H:i:s")) . '.' . $image->getClientOriginalExtension();
                         $image->move($destinationPath, $image_name);
+                        Watermark::applyToImage($destinationPath . DIRECTORY_SEPARATOR . $image_name);
                         $image = 'uploads/news/' . $image_name;
                     } else {
                         $image = $info->image;
                     }
                     $video = null;
+                    $video_source = 'url';
                 } else {
                     $image = $info->image;
+                    if ($video_source == 'file' && $video_file && $video_file->isValid()) {
+                        $destinationPath = MediaUpload::ensureDir('uploads/news/video');
+                        $video_name = 'news_video_' . strtotime(date("Y-m-d H:i:s")) . '.' . $video_file->getClientOriginalExtension();
+                        $video_file->move($destinationPath, $video_name);
+                        $video = 'uploads/news/video/' . $video_name;
+                        $video_source = 'file';
+                    } elseif ($video_source == 'file') {
+                        // ابقاء ملف الفيديو الحالي إن لم يُرفع ملف جديد
+                        $video = $info->video;
+                        $video_source = $info->video_source ?: 'file';
+                    } else {
+                        $video_source = 'url';
+                    }
                 }
 
                 $update = $news->updateNews($info, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar, $type, $video);
                 if ($update) {
+                    $update->video_source = $video_source;
+                    $update->save();
                     $this->saveMediaRepeater($request, $info->id);
                     if ($info->publish == 1) {
                         if ($old_category_id != $category_id) {

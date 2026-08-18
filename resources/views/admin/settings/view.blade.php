@@ -104,6 +104,57 @@
                     </div>
                 </div>
             </div>
+            <hr class="my-8">
+            <h4 class="mb-5">العلامة المائية</h4>
+            <div class="row">
+                <div class="row mb-5">
+                    <label class="col-md-3 col-form-label">تفعيل العلامة المائية</label>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch form-check-custom form-check-solid">
+                            <input class="form-check-input" type="checkbox" value="1" name="watermark_enabled" {{ $info->watermark_enabled == 1 ? 'checked' : '' }}>
+                        </div>
+                        <div class="form-text">تُطبع على الصور تلقائياً، وتُعرض كطبقة فوق الفيديوهات (المرفوعة أو الروابط الخارجية) في الواجهة.</div>
+                    </div>
+                </div>
+                <div class="row mb-5">
+                    <label class="col-md-3 col-form-label">شعار العلامة المائية</label>
+                    <div class="col-md-6">
+                        <input type="file" name="watermark_logo" class="form-control" accept="image/png,image/webp">
+                        <div class="form-text">يفضّل PNG بخلفية شفافة.</div>
+                        @if($info->watermark_logo)
+                        <img src="{{ \App\Support\MediaUpload::previewUrl($info->watermark_logo) }}" style="margin-top:15px;max-height:100px;border:1px dashed #ccc;padding:6px;background:#f5f5f5;">
+                        @endif
+                    </div>
+                </div>
+                <div class="row mb-5">
+                    <label class="col-md-3 col-form-label">مكان العلامة المائية</label>
+                    <div class="col-md-6">
+                        <select name="watermark_position" class="form-select">
+                            @php
+                                $positions = [
+                                    'top-left' => 'أعلى اليسار', 'top' => 'أعلى المنتصف', 'top-right' => 'أعلى اليمين',
+                                    'left' => 'وسط اليسار', 'center' => 'المنتصف', 'right' => 'وسط اليمين',
+                                    'bottom-left' => 'أسفل اليسار', 'bottom' => 'أسفل المنتصف', 'bottom-right' => 'أسفل اليمين',
+                                ];
+                            @endphp
+                            @foreach($positions as $value => $label)
+                            <option value="{{ $value }}" {{ $info->watermark_position == $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-5">
+                    <label class="col-md-3 col-form-label">الشفافية (%)</label>
+                    <div class="col-md-3">
+                        <input type="number" min="10" max="100" value="{{ $info->watermark_opacity ?? 70 }}" name="watermark_opacity" class="form-control">
+                    </div>
+                    <label class="col-md-2 col-form-label">الحجم (%)</label>
+                    <div class="col-md-3">
+                        <input type="number" min="5" max="50" value="{{ $info->watermark_size ?? 15 }}" name="watermark_size" class="form-control">
+                        <div class="form-text">نسبة من عرض الصورة/المشغل.</div>
+                    </div>
+                </div>
+            </div>
             <div class="d-flex justify-content-end mt-5">
                 <button type="submit" class="btn btn-primary">حفظ</button>
             </div>

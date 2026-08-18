@@ -7,6 +7,7 @@ use Datatables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Settings;
+use App\Support\MediaUpload;
 
 //////////////////////////////////
 
@@ -43,7 +44,11 @@ class SettingsController extends AdminController {
     public function postIndex(Request $request) {
         $info = Settings::findOrFail(1);
         if ($info) {
-            $save_data = $request->all();
+            $save_data = $request->except(['watermark_logo', '_token']);
+            $save_data['watermark_enabled'] = $request->has('watermark_enabled') ? 1 : 0;
+            $save_data['watermark_position'] = $request->get('watermark_position', 'bottom-right');
+            $save_data['watermark_opacity'] = (int) $request->get('watermark_opacity', 70);
+            $save_data['watermark_size'] = (int) $request->get('watermark_size', 15);
 
             $title_ar = $request->get('title_ar');
             $title_en = $request->get('title_en');
@@ -63,6 +68,10 @@ class SettingsController extends AdminController {
                 $request->session()->flash('danger', $validator->messages());
                 return redirect(route('settings.view'))->withInput();
             } else {
+                $save_data['watermark_logo'] = MediaUpload::importFromRequest(
+                    $request, 'watermark_logo', 'uploads/settings', 'path', $info->watermark_logo
+                );
+
                 $update = $info->update($save_data);
                 if ($update) {
                     Cache::forget('settings');
