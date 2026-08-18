@@ -109,7 +109,45 @@
             <div class="row mb-5">
                 <label class="col-md-3 col-form-label">معرض إضافي (صور/فيديوهات)</label>
                 <div class="col-md-9">
-                    <div id="media_repeater"></div>
+                    <div id="media_repeater">
+                        @if(old('media_type'))
+                        @foreach(old('media_type', []) as $old_index => $old_type)
+                        <div class="row mb-3 align-items-center media-repeater-row" data-index="{{ $old_index }}">
+                            <div class="col-md-3">
+                                <select name="media_type[{{ $old_index }}]" class="form-select media-row-type">
+                                    <option value="image" {{ $old_type == 'image' ? 'selected' : '' }}>صورة</option>
+                                    <option value="video" {{ $old_type == 'video' ? 'selected' : '' }}>فيديو</option>
+                                </select>
+                            </div>
+                            <div class="col-md-7">
+                                <input type="file" name="media_image[{{ $old_index }}]" accept="image/*" class="form-control media-row-image {{ $old_type == 'video' ? 'd-none' : '' }}">
+                                @if($old_type == 'image')
+                                <div class="form-text text-warning">فشل الحفظ ولم يُحتفظ بالملف — يرجى إعادة اختيار الصورة.</div>
+                                @endif
+                                @php $old_video_source = old('media_video_source.' . $old_index, 'url'); @endphp
+                                <div class="media-row-video-wrap {{ $old_type == 'video' ? '' : 'd-none' }}">
+                                    <div class="form-check form-check-custom form-check-solid me-4 d-inline-block">
+                                        <input class="form-check-input media-row-video-source" type="radio" name="media_video_source[{{ $old_index }}]" value="url" {{ $old_video_source != 'file' ? 'checked' : '' }}>
+                                        <label class="form-check-label">رابط خارجي</label>
+                                    </div>
+                                    <div class="form-check form-check-custom form-check-solid d-inline-block">
+                                        <input class="form-check-input media-row-video-source" type="radio" name="media_video_source[{{ $old_index }}]" value="file" {{ $old_video_source == 'file' ? 'checked' : '' }}>
+                                        <label class="form-check-label">رفع ملف</label>
+                                    </div>
+                                    <input type="text" name="media_video_url[{{ $old_index }}]" value="{{ old('media_video_url.' . $old_index) }}" class="form-control mt-2 media-row-video-url {{ $old_video_source == 'file' ? 'd-none' : '' }}" placeholder="https://www.youtube.com/watch?v=...">
+                                    <input type="file" name="media_video_file[{{ $old_index }}]" accept="video/*" class="form-control mt-2 media-row-video-file {{ $old_video_source == 'file' ? '' : 'd-none' }}">
+                                    @if($old_video_source == 'file')
+                                    <div class="form-text text-warning">فشل الحفظ ولم يُحتفظ بالملف — يرجى إعادة اختيار الفيديو.</div>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-sm btn-icon btn-light-danger media-row-remove"><i class="fa fa-trash"></i></button>
+                            </div>
+                        </div>
+                        @endforeach
+                        @endif
+                    </div>
                     <button type="button" id="media_add_row" class="btn btn-sm btn-light-primary mt-2">
                         <i class="fa fa-plus"></i> إضافة عنصر
                     </button>
@@ -216,7 +254,7 @@ function toggleVideoSource() {
 $('input.video-source-radio').on('change', toggleVideoSource);
 toggleVideoSource();
 
-var mediaRowIndex = 0;
+var mediaRowIndex = {{ old('media_type') ? count(old('media_type')) : 0 }};
 function mediaRowTemplate(index) {
     return '' +
         '<div class="row mb-3 align-items-center media-repeater-row" data-index="' + index + '">' +

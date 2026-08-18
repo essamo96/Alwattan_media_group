@@ -102,7 +102,7 @@ class NewsController extends AdminController {
         $type = $request->get('type', 'image');
         $image = $request->file('image');
         $video_source = $request->get('video_source', 'url');
-        $video = $video_source == 'file' ? null : $request->get('video');
+        $video = $video_source == 'file' ? null : (string) $request->get('video', '');
         $video_file = $request->file('video_file');
         $tags = $request->get('tags');
         $pub_date = $request->get('pub_date');
@@ -119,6 +119,7 @@ class NewsController extends AdminController {
                     'type' => $type,
                     'image' => $image,
                     'video' => $video_source == 'url' ? $video : 'x',
+                    'video_source' => $video_source,
                     'video_file' => $video_file,
                         ], [
                     'category_id' => 'required',
@@ -129,7 +130,7 @@ class NewsController extends AdminController {
                     'language' => 'required',
                     'type' => 'required|in:image,video',
                     'image' => 'required_if:type,image|image',
-                    'video' => 'required_if:type,video|string',
+                    'video' => 'required_if:type,video|nullable|string',
                     'video_file' => 'required_if:video_source,file|nullable|mimes:mp4,mov,webm,ogg,mkv,avi|max:102400',
         ]);
 //////////////////////////////////////////////////////////
@@ -314,7 +315,7 @@ class NewsController extends AdminController {
             $type = $request->get('type', 'image');
             $image = $request->file('image');
             $video_source = $request->get('video_source', 'url');
-            $video = $request->get('video');
+            $video = (string) $request->get('video', '');
             $video_file = $request->file('video_file');
             $tags = $request->get('tags');
             $pub_date = $request->get('pub_date');
@@ -331,6 +332,7 @@ class NewsController extends AdminController {
                         'type' => $type,
                         'image' => $image,
                         'video' => $video_source == 'url' ? $video : 'x',
+                        'video_source' => $video_source,
                         'video_file' => $video_file,
                             ], [
                         'category_id' => 'required',
