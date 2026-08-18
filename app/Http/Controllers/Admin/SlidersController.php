@@ -49,6 +49,13 @@ class SlidersController extends AdminController {
             return (!empty($row->name) ? $row->name : 'N/A');
         });
 
+        $datatable->editColumn('image', function ($row) {
+            if (empty($row->image) || !is_file(public_path('uploads/sliders/' . $row->image))) {
+                return '';
+            }
+            return '<img src="' . asset('uploads/sliders/' . $row->image) . '" style="width:70px;height:45px;object-fit:cover;border-radius:4px;">';
+        });
+
         $datatable->editColumn('status', function ($row) {
             $data['id'] = $row->id;
             $data['status'] = $row->status;
@@ -62,6 +69,7 @@ class SlidersController extends AdminController {
 
             return view('admin.sliders.parts.actions', $data)->render();
         });
+        $datatable->rawColumns(['image']);
         $datatable->escapeColumns(['*']);
         return $datatable->make(true);
     }

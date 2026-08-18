@@ -35,6 +35,7 @@
             <thead>
                 <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
                     <th>#</th>
+                    <th>الصورة</th>
                     <th>الاسم</th>
                     <th>الحالة</th>
                     <th class="text-end">الاوامر</th>
@@ -95,6 +96,7 @@
             "columnDefs": [{"targets": "_all", "defaultContent": ""}],
             "columns": [
                 {"data": "", "title": "#", "orderable": false, "searchable": false},
+                {"data": "image", "title": "الصورة", "orderable": false, "searchable": false},
                 {"data": "name", "title": "الاسم", "orderable": true, "searchable": false},
                 {"data": "status", "title": "الحالة", "orderable": true, "searchable": false},
                 {"data": "actions", "title": "الاوامر", "orderable": false, "searchable": false}
