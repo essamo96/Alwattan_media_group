@@ -20,7 +20,7 @@ return [
     'about-us' => 'من نحن',
     'our-services' => 'خدماتنا',
     'contact' => 'اتصل بنا',
-    'blog' => 'اهم الانجازات',
+    'blog' => 'الأخبار',
     //------------------alhadath website -------------------//
     'back_welcome' => 'أهلا وسهلاً',
     'services' => 'خدماتنا',

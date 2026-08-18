@@ -21,7 +21,7 @@ return [
     'our-services' => 'Our Services',
     'contact' => 'Contact',
     'partners' => 'Our Partners',
-    'blog' => 'Blogs',
+    'blog' => 'News',
     'back_welcome' => ' welcome',
     'services' => ' Services',
     'creative_solutions' => 'Services',
