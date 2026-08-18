@@ -184,6 +184,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => ['web
     Route::post('news/edit/{id}', ['as' => 'news.edit', 'middleware' => ['permission:admin.news.edit'], 'uses' => 'NewsController@postEdit']);
     Route::post('news/delete', ['as' => 'news.delete', 'middleware' => ['permission:admin.news.delete'], 'uses' => 'NewsController@postDelete']);
     Route::post('news/publish', ['as' => 'news.publish', 'middleware' => ['permission:admin.news.publish'], 'uses' => 'NewsController@postPublish']);
+    Route::post('news/watermark', ['as' => 'news.watermark', 'middleware' => ['permission:admin.news.edit'], 'uses' => 'NewsController@postToggleWatermark']);
     Route::get('news/cleaAllCache', ['as' => 'news.cleaAllCache', 'middleware' => ['permission:admin.news.publish'], 'uses' => 'NewsController@cleaAllCache']);
     Route::get('news/twitter', ['as' => 'news.twitter', 'middleware' => ['permission:admin.news.publish'], 'uses' => 'NewsController@getTwitter']);
     Route::post('upload_image', ['as' => 'news.upload', 'uses' => 'NewsController@getImage']);

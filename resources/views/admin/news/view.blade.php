@@ -174,6 +174,21 @@
                 oTable.draw();
             });
         });
+
+        $(document).on('click', ".watermark-toggle", function (e) {
+            e.preventDefault();
+            var id = $(this).data('href');
+            $.ajax({
+                type: "POST",
+                url: "{{ route('news.watermark') }}",
+                data: {'id': id}
+            }).done(function (data) {
+                toastr[data.status](data.message);
+                if (data.status == 'success') {
+                    oTable.draw(false);
+                }
+            });
+        });
     });
 </script>
 @endpush

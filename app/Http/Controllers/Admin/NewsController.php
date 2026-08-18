@@ -77,6 +77,7 @@ class NewsController extends AdminController {
         $datatable->addColumn('actions', function ($row) {
             $data['id'] = $row->id;
             $data['btn_class'] = parent::$data['btn_class'];
+            $data['watermark_applied'] = $row->watermark_applied;
 
             return view('admin.news.parts.actions', $data)->render();
         });
@@ -163,6 +164,7 @@ class NewsController extends AdminController {
             $add = $news->addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, Auth::guard('admin')->user()->id, $type, $video);
             if ($add) {
                 $add->video_source = $video_source;
+                $add->watermark_applied = $this->watermarkEnabled();
                 $add->save();
                 $this->saveMediaRepeater($request, $add->id);
                 if ($publish == 1) {
@@ -352,6 +354,7 @@ class NewsController extends AdminController {
                 return redirect(route('news.edit', ['id' => $encrypted_id]))->withInput();
             } else {
                 $old_category_id = $info->category_id;
+                $new_image_uploaded = false;
 ////////////////////////////////////////////
                 if ($type == 'image') {
                     if ($request->hasFile('image') && $image->isValid()) {
@@ -360,6 +363,7 @@ class NewsController extends AdminController {
                         $image->move($destinationPath, $image_name);
                         Watermark::applyToImage($destinationPath . DIRECTORY_SEPARATOR . $image_name);
                         $image = 'uploads/news/' . $image_name;
+                        $new_image_uploaded = true;
                     } else {
                         $image = $info->image;
                     }
@@ -385,6 +389,9 @@ class NewsController extends AdminController {
                 $update = $news->updateNews($info, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar, $type, $video);
                 if ($update) {
                     $update->video_source = $video_source;
+                    if ($new_image_uploaded) {
+                        $update->watermark_applied = $this->watermarkEnabled();
+                    }
                     $update->save();
                     $this->saveMediaRepeater($request, $info->id);
                     if ($info->publish == 1) {
@@ -470,6 +477,37 @@ class NewsController extends AdminController {
         } else {
             return response()->json(['status' => 'error', 'message' => self::NOT_FOUND]);
         }
+    }
+
+////////////////////////////////////////////////
+    // يشيل/يرجّع العلامة المائية عن صور الخبر (الرئيسية + المعرض) بأي وقت بعد النشر،
+    // بدون الحاجة لإعادة رفع الصور من جديد (انظر Watermark::applyToNews/removeFromNews).
+    public function postToggleWatermark(Request $request) {
+        $id = $request->get('id');
+        try {
+            $id = Crypt::decrypt($id);
+        } catch (DecryptException $e) {
+            return response()->json(['status' => 'error', 'message' => 'Error Decode']);
+        }
+
+        $news = new News();
+        $info = $news->getNew($id);
+        if (!$info) {
+            return response()->json(['status' => 'error', 'message' => self::NOT_FOUND]);
+        }
+
+        if ($info->watermark_applied) {
+            Watermark::removeFromNews($info);
+            return response()->json(['status' => 'success', 'message' => 'تم إزالة العلامة المائية', 'type' => 'no']);
+        } else {
+            Watermark::applyToNews($info);
+            return response()->json(['status' => 'success', 'message' => 'تم تطبيق العلامة المائية', 'type' => 'yes']);
+        }
+    }
+
+    private function watermarkEnabled(): bool {
+        $settings = Watermark::settings();
+        return (bool) ($settings && $settings->watermark_enabled && !empty($settings->watermark_logo));
     }
 
 /////////////////////////////////////////

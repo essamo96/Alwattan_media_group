@@ -11,6 +11,17 @@
             </a>
         </div>
         @endcan
+        @can('admin.news.edit')
+        <div class="menu-item px-3">
+            <a href="#" data-href="{{ Crypt::encrypt($id) }}" class="menu-link px-3 watermark-toggle">
+                @if($watermark_applied ?? false)
+                <i class="ki-duotone ki-eye-slash fs-5 me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i> إزالة العلامة المائية
+                @else
+                <i class="ki-duotone ki-eye fs-5 me-1"><span class="path1"></span><span class="path2"></span></i> تطبيق العلامة المائية
+                @endif
+            </a>
+        </div>
+        @endcan
         @can('admin.news.delete')
         <div class="menu-item px-3">
             <a href="#" data-href="{{ Crypt::encrypt($id) }}" data-bs-toggle="modal" data-bs-target="#confirm" class="menu-link px-3">
