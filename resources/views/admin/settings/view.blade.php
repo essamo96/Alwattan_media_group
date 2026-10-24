@@ -106,6 +106,9 @@
             </div>
             <hr class="my-8">
             <h4 class="mb-5">مشاهدات الأخبار</h4>
+            @if(!\Illuminate\Support\Facades\Schema::hasColumn('settings', 'default_views'))
+            <div class="alert alert-warning mb-5">خيار المشاهدات الافتراضية غير مفعّل بعد على هذا السيرفر: نفّذ <code>php artisan migrate --force</code> ثم أعد فتح الصفحة. بقية الإعدادات تُحفظ بشكل طبيعي.</div>
+            @else
             <div class="row">
                 <div class="row mb-5">
                     <label class="col-md-3 col-form-label">المشاهدات الافتراضية</label>
@@ -124,6 +127,7 @@
                     </div>
                 </div>
             </div>
+            @endif
             <hr class="my-8">
             <h4 class="mb-5">العلامة المائية</h4>
             <div class="row">

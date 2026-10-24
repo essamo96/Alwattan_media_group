@@ -7,6 +7,7 @@ use Datatables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Models\News;
 use App\Models\Settings;
 use App\Support\MediaUpload;
@@ -46,8 +47,15 @@ class SettingsController extends AdminController {
     public function postIndex(Request $request) {
         $info = Settings::findOrFail(1);
         if ($info) {
+            // النشر عبر FTP لا يشغّل migrate، فعمود default_views قد لا يكون موجوداً بعد على السيرفر؛
+            // نتجاهل الحقل حينها بدل أن يفشل حفظ كل الإعدادات بخطأ SQL.
+            $has_default_views = Schema::hasColumn('settings', 'default_views');
             $save_data = $request->except(['watermark_logo', 'apply_default_views', '_token']);
-            $save_data['default_views'] = (int) $request->get('default_views', News::DEFAULT_VIEWS);
+            if ($has_default_views) {
+                $save_data['default_views'] = (int) $request->get('default_views', News::DEFAULT_VIEWS);
+            } else {
+                unset($save_data['default_views']);
+            }
             $save_data['watermark_enabled'] = $request->has('watermark_enabled') ? 1 : 0;
             $save_data['watermark_position'] = $request->get('watermark_position', 'bottom-right');
             $save_data['watermark_opacity'] = (int) $request->get('watermark_opacity', 70);
@@ -67,7 +75,7 @@ class SettingsController extends AdminController {
                         'title_ar' => 'required',
                         'title_en' => 'required',
                         'contact_email' => 'nullable|email',
-                        'default_views' => 'required|integer|min:0',
+                        'default_views' => $has_default_views ? 'required|integer|min:0' : 'nullable',
             ]);
             //////////////////////////////////////////////////////////
             if ($validator->fails()) {
@@ -81,7 +89,7 @@ class SettingsController extends AdminController {
                 $update = $info->update($save_data);
                 if ($update) {
                     // خيار صريح: ضبط مشاهدات كل الأخبار الحالية على الرقم الافتراضي الجديد.
-                    if ($request->has('apply_default_views')) {
+                    if ($has_default_views && $request->has('apply_default_views')) {
                         DB::table('news')->update(['views' => $save_data['default_views']]);
                         News::forgetListingCache();
                     }
