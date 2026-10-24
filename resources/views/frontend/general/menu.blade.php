@@ -46,8 +46,18 @@
                                 }
                                 return $menu_url;
                             };
+                            // اسم العنصر من قاعدة البيانات؛ عنصر قسم الأخبار كان اسمه الافتراضي «مقالات/Blog»، فنعرضه
+                            // «الأخبار/News» حتى على سيرفر لم تُحدَّث قاعدته (النشر لا يشغّل migrate). أي اسم آخر يضعه
+                            // الأدمن من لوحة القوائم يُعرض كما هو.
+                            $build_title = function ($menu) {
+                                $title = (trans('site.lang') == 'en' && !empty($menu->name_en)) ? $menu->name_en : $menu->name_ar;
+                                if ($menu->url === '#section-schedule' && in_array(trim($title), ['مقالات', 'المقالات', 'Blog', 'Articles'], true)) {
+                                    return trans('site.blog');
+                                }
+                                return $title;
+                            };
                             $menu_url = $build_url($site_menu);
-                            $menu_title = (trans('site.lang') == 'en' && !empty($site_menu->name_en)) ? $site_menu->name_en : $site_menu->name_ar;
+                            $menu_title = $build_title($site_menu);
                             ?>
                             <li class="mainmenu-item {{ $has_children ? 'has-children' : '' }}">
                                 <a href="{{ $menu_url }}" target="{{ $site_menu->target ?: '_self' }}">
@@ -63,7 +73,7 @@
                                     @foreach($site_menu->children as $child_menu)
                                         <?php
                                         $child_url = $build_url($child_menu);
-                                        $child_title = (trans('site.lang') == 'en' && !empty($child_menu->name_en)) ? $child_menu->name_en : $child_menu->name_ar;
+                                        $child_title = $build_title($child_menu);
                                         ?>
                                         <li>
                                             <a href="{{ $child_url }}" target="{{ $child_menu->target ?: '_self' }}">
