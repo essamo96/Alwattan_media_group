@@ -12,6 +12,20 @@ class Helper {
         return $img;
     }
 
+    // تاريخ نشر الخبر: [نص قصير للعرض ، نص كامل (اليوم + التاريخ + الوقت) للـ tooltip].
+    // أي قيمة غير قابلة للتحليل تُعرض كما هي بدل أن تكسر الصفحة.
+    public static function news_date_parts($date) {
+        try {
+            $locale = app()->getLocale();
+            $dt = \Carbon\Carbon::parse($date)->locale($locale);
+            $format = $locale == 'ar' ? 'l، j F Y • h:i A' : 'l, j F Y • h:i A';
+
+            return ['short' => $dt->format('Y-m-d'), 'full' => $dt->translatedFormat($format), 'with_time' => $dt->format('Y-m-d H:i:s')];
+        } catch (\Throwable $e) {
+            return ['short' => (string) $date, 'full' => (string) $date, 'with_time' => (string) $date];
+        }
+    }
+
     // 77000 => 77K ، 1250000 => 1.3M ، 950 => 950
     public static function format_views($views) {
         $views = max(0, (int) $views);

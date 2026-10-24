@@ -85,7 +85,7 @@
                                 @endif
                                 <div class="post-content">
                                     <ul class="lab-ul post-date news-meta my-3">
-                                        <li><span><i class="fa fa-calendar me-2"></i> {{ $post_news->pub_date }}</span></li>
+                                        <li>@include('frontend.news.parts.date', ['date' => $post_news->pub_date, 'with_time' => true])</li>
                                         <li>@include('frontend.news.parts.views', ['views' => $post_news->views])</li>
                                     </ul>
                                     {!! $post_news->descs !!}
@@ -153,9 +153,10 @@
                                                             data-slug="{{ $item->slug }}" class="stretched-link">
                                                             <h6 class="card-title">{{ $item->title }}</h6>
                                                         </a>
-                                                        <p class="card-text"><small
-                                                                class="text-muted">{{ $item->pub_date }}</small></p>
-                                                        <p class="card-text"><small class="text-muted">@include('frontend.news.parts.views', ['views' => $item->views])</small></p>
+                                                        <div class="news-meta-row">
+                                                            @include('frontend.news.parts.date', ['date' => $item->pub_date])
+                                                            @include('frontend.news.parts.views', ['views' => $item->views, 'tip_align' => 'end'])
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

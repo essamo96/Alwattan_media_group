@@ -8,7 +8,7 @@
             </div>
             <div class="post-content">
                 <ul class="lab-ul post-date news-meta my-3">
-                    <li><span><i class="fa fa-calendar me-2"></i> {{$post_news->pub_date}}</span></li>
+                    <li>@include('frontend.news.parts.date', ['date' => $post_news->pub_date, 'with_time' => true])</li>
                     <li>@include('frontend.news.parts.views', ['views' => $post_news->views])</li>
                 </ul>
                 {!! $post_news->descs !!}

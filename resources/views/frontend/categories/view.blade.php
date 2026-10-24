@@ -38,7 +38,10 @@
                                                     <div class="card-body">
                                                         <h5 class="card-title">{{$item->title}}</h5>
                                                         <p class="card-text">{!! $item->sub !!}.</p>
-                                                        <p class="card-text"><small class="text-muted">@include('frontend.news.parts.views', ['views' => $item->views])</small></p>
+                                                        <div class="news-meta-row">
+                                                            @include('frontend.news.parts.date', ['date' => $item->pub_date])
+                                                            @include('frontend.news.parts.views', ['views' => $item->views, 'tip_align' => 'end'])
+                                                        </div>
                                                         <a href="{{ url('post/'.$item->slug) }}" class="text-primary stretched-link">@lang('site.read_more')</a>
                                                     </div>
                                                 </div>

@@ -8629,11 +8629,97 @@ html[dir="rtl"] .rounded-start {
     align-items: center;
     gap: 6px 22px;
 }
-.news-views{
-    white-space: nowrap;
+/* شريط التاريخ + المشاهدات على بطاقات الأخبار */
+.news-meta-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #8a8f9c;
 }
-.news-views .fa{
+/* عنصر معلومة بفقاعة (tooltip): تاريخ أو مشاهدات.
+   position + z-index أعلى من الرابط الممتد (stretched-link ::after) كي يلتقط الماوس الوقوف عليه. */
+.news-tip{
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    cursor: help;
+    outline: none;
+    transition: color .2s ease;
+}
+.news-tip .fa{
     color: #9aa0ac;
+    transition: color .2s ease, transform .2s ease;
+}
+.news-tip:hover,
+.news-tip:focus-visible{
+    color: var(--secondary-color, #0077ff);
+}
+.news-tip:hover .fa,
+.news-tip:focus-visible .fa{
+    color: var(--secondary-color, #0077ff);
+    transform: scale(1.18);
+}
+/* التاريخ والوقت أرقام: نعزلها يسار→يمين حتى لا ينعكس ترتيبها داخل صفحة RTL */
+.news-date .news-tip__text{
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+.news-tip__box{
+    position: absolute;
+    bottom: calc(100% + 10px);
+    inset-inline-start: 0;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: #1b2336;
+    border: 1px solid rgba(255, 255, 255, .12);
+    box-shadow: 0 10px 28px rgba(15, 20, 40, .28);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity .18s ease, transform .18s ease, visibility .18s;
+    pointer-events: none;
+    z-index: 30;
+}
+.news-tip__box strong{
+    font-size: 17px;
+    font-weight: 700;
+    color: #7cc4ff;
+    margin-inline-end: 3px;
+}
+/* سهم الفقاعة */
+.news-tip__box::after{
+    content: "";
+    position: absolute;
+    top: 100%;
+    inset-inline-start: 14px;
+    border: 6px solid transparent;
+    border-top-color: #1b2336;
+}
+/* محاذاة الفقاعة لنهاية العنصر (للعنصر الأخير بالصف) كي لا تخرج خارج البطاقة */
+.news-tip--end .news-tip__box{
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+}
+.news-tip--end .news-tip__box::after{
+    inset-inline-start: auto;
+    inset-inline-end: 14px;
+}
+.news-tip:hover .news-tip__box,
+.news-tip:focus-visible .news-tip__box{
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 .partners-logos img{
     max-width: 200px !important;
