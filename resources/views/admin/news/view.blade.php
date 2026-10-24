@@ -52,6 +52,7 @@
                     <th> الخبر </th>
                     <th> القسم </th>
                     <th> اللغة </th>
+                    <th> المشاهدات </th>
                     @can('admin.news.publish')
                     <th> النشر </th>
                     @endcan
@@ -117,6 +118,7 @@
                 {"data": "title", "title": "الخبر", "orderable": true, "searchable": false},
                 {"data": "category_name", "title": "القسم", "orderable": true, "searchable": false},
                 {"data": "language", "title": "اللغة", "orderable": true, "searchable": false},
+                {"data": "views", "title": "المشاهدات", "orderable": false, "searchable": false},
                 @can('admin.news.publish')
                 {"data": "publish", "title": "النشر", "orderable": true, "searchable": false},
                 @endcan

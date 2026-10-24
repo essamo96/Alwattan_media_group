@@ -8622,6 +8622,19 @@ html[dir="rtl"] .rounded-start {
     padding: 0;
     margin: 0;
 }
+/* التاريخ + المشاهدات بصف واحد داخل تفاصيل الخبر */
+.lab-ul.news-meta{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 22px;
+}
+.news-views{
+    white-space: nowrap;
+}
+.news-views .fa{
+    color: #9aa0ac;
+}
 .partners-logos img{
     max-width: 200px !important;
     max-height: 100px !important;

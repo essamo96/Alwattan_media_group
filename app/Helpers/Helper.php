@@ -12,6 +12,23 @@ class Helper {
         return $img;
     }
 
+    // 77000 => 77K ، 1250000 => 1.3M ، 950 => 950
+    public static function format_views($views) {
+        $views = max(0, (int) $views);
+        if ($views < 1000) {
+            return (string) $views;
+        }
+
+        $suffix = 'K';
+        $value = round($views / 1000, 1);
+        if ($views >= 1000000 || $value >= 1000) {
+            $suffix = 'M';
+            $value = round($views / 1000000, 1);
+        }
+
+        return rtrim(rtrim(number_format($value, 1, '.', ''), '0'), '.') . $suffix;
+    }
+
     public static function humanTiming($time) {
 
         $time = time() - $time; // to get the time since that moment

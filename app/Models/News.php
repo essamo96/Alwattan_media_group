@@ -2,20 +2,55 @@
 
 namespace App\Models;
 
+use App\Helpers\Helper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class News extends Model {
 
     use SoftDeletes;
 
+    // عدد المشاهدات الافتراضي (77K) إن لم يُحدَّد من الإعدادات.
+    const DEFAULT_VIEWS = 77000;
+
     protected $table = 'news';
     protected $fillable = [
-        'title', 'description', 'details', 'type', 'thumb', 'image', 'video', 'video_source', 'watermark_applied', 'category_id', 'tags', 'special', 'sidebar', 'language', 'user_id',
+        'title', 'description', 'details', 'type', 'thumb', 'image', 'video', 'video_source', 'watermark_applied', 'category_id', 'tags', 'special', 'sidebar', 'language', 'user_id', 'views',
     ];
     protected $hidden = [
         '',
     ];
+
+    //////////////////////////////////////////////
+    // العدد المختصر للعرض في الواجهة (مثال: 77K).
+    public function getViewsLabelAttribute() {
+        return Helper::format_views($this->views);
+    }
+
+    //////////////////////////////////////////////
+    // المشاهدات الافتراضية للأخبار: من الإعدادات (لوحة التحكم) مع الرجوع لـ 77K.
+    public static function defaultViews() {
+        if (!Schema::hasColumn('settings', 'default_views')) {
+            return self::DEFAULT_VIEWS;
+        }
+        $value = Settings::where('id', 1)->value('default_views');
+
+        return $value === null ? self::DEFAULT_VIEWS : (int) $value;
+    }
+
+    //////////////////////////////////////////////
+    // قوائم الواجهة (الرئيسية + صفحات الأقسام) مخزّنة بالكاش للأبد، فأي تغيير جماعي بالمشاهدات
+    // يحتاج مسحها حتى يظهر الرقم الجديد.
+    public static function forgetListingCache() {
+        foreach (['ar', 'en'] as $locale) {
+            Cache::forget('lastnews_' . $locale);
+        }
+        foreach (Categories::pluck('id') as $category_id) {
+            Cache::forget('category_news_' . $category_id);
+        }
+    }
 
     //////////////////////////////////////////////
     public function category() {
@@ -34,10 +69,11 @@ class News extends Model {
     }
 
     /////
-    public function addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, $user_id, $type = 'image', $video = null) {
+    public function addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, $user_id, $type = 'image', $video = null, $views = null) {
         if ($publish == 1) {
             $pub_date = date('Y-m-d H:i:s');
         }
+        $this->views = $views === null ? self::defaultViews() : (int) $views;
         $this->title = $title;
         $this->slug = $slug;
         $this->sub = $sub;
@@ -58,10 +94,13 @@ class News extends Model {
     }
 
     //////////////////////////////////////////////
-    public function updateNews($obj, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar, $type = 'image', $video = null) {
+    public function updateNews($obj, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar, $type = 'image', $video = null, $views = null) {
         $old_resort = $obj->resort;
         if ($obj->publish == 0 && $publish == 1) {
             $pub_date = date('Y-m-d H:i:s');
+        }
+        if ($views !== null) {
+            $obj->views = (int) $views;
         }
         $obj->title = $title;
         $obj->slug = $slug;

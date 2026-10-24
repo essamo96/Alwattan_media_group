@@ -105,6 +105,26 @@
                 </div>
             </div>
             <hr class="my-8">
+            <h4 class="mb-5">مشاهدات الأخبار</h4>
+            <div class="row">
+                <div class="row mb-5">
+                    <label class="col-md-3 col-form-label">المشاهدات الافتراضية</label>
+                    <div class="col-md-6">
+                        <input type="number" min="0" step="1" value="{{ old('default_views', $info->default_views ?? \App\Models\News::DEFAULT_VIEWS) }}" name="default_views" id="default_views" class="form-control" placeholder="77000">
+                        <div class="form-text">تُعطى للأخبار الجديدة عند ترك حقل المشاهدات فارغاً. تظهر مختصرة في الموقع (77000 = 77K). ولكل خبر رقمه الخاص من شاشة تعديل الخبر.</div>
+                    </div>
+                </div>
+                <div class="row mb-5">
+                    <label class="col-md-3 col-form-label">تطبيق على كل الأخبار</label>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch form-check-custom form-check-solid">
+                            <input class="form-check-input" type="checkbox" value="1" name="apply_default_views">
+                        </div>
+                        <div class="form-text text-danger">عند التفعيل سيُستبدل عدد مشاهدات جميع الأخبار الحالية بالرقم أعلاه عند الحفظ (بما فيها الأرقام المعدّلة يدوياً).</div>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-8">
             <h4 class="mb-5">العلامة المائية</h4>
             <div class="row">
                 <div class="row mb-5">

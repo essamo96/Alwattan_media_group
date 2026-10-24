@@ -168,6 +168,13 @@
                     <input type="text" name="pub_date" id="pub_date" value="{{ $info->pub_date }}" class="form-control rtl" placeholder="تاريخ النشر">
                 </div>
             </div>
+            <div class="row mb-5">
+                <label class="col-md-3 col-form-label">عدد المشاهدات</label>
+                <div class="col-md-6">
+                    <input type="number" min="0" step="1" name="views" id="views" value="{{ old('views', $info->views) }}" class="form-control" placeholder="عدد المشاهدات">
+                    <div class="form-text">الرقم الذي يظهر للزوار (يُعرض مختصراً مثل {{ \App\Helpers\Helper::format_views($info->views) }}).</div>
+                </div>
+            </div>
             @can('admin.news.publish')
             <div class="row mb-5">
                 <label class="col-md-3 col-form-label">نشر</label>

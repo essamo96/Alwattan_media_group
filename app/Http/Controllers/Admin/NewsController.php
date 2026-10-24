@@ -67,6 +67,10 @@ class NewsController extends AdminController {
             return $row->language == 'ar' ? 'عربي' : 'English';
         });
 
+        $datatable->editColumn('views', function ($row) {
+            return number_format((int) $row->views);
+        });
+
         $datatable->editColumn('publish', function ($row) {
             $data['id'] = $row->id;
             $data['publish'] = $row->publish;
@@ -109,6 +113,8 @@ class NewsController extends AdminController {
         $pub_date = $request->get('pub_date');
         $publish = (int) $request->get('publish');
         $sidebar = (int) $request->get('main');
+        // فارغ = يؤخذ الرقم الافتراضي من الإعدادات (77K)
+        $views = $request->filled('views') ? $request->get('views') : null;
 
         $validator = Validator::make([
                     'category_id' => $category_id,
@@ -122,6 +128,7 @@ class NewsController extends AdminController {
                     'video' => $video_source == 'url' ? $video : 'x',
                     'video_source' => $video_source,
                     'video_file' => $video_file,
+                    'views' => $views,
                         ], [
                     'category_id' => 'required',
                     'title' => 'required',
@@ -133,6 +140,7 @@ class NewsController extends AdminController {
                     'image' => 'required_if:type,image|image',
                     'video' => 'required_if:type,video|nullable|string',
                     'video_file' => 'required_if:video_source,file|nullable|mimes:mp4,mov,webm,ogg,mkv,avi|max:102400',
+                    'views' => 'nullable|integer|min:0',
         ]);
 //////////////////////////////////////////////////////////
         if ($validator->fails()) {
@@ -161,7 +169,7 @@ class NewsController extends AdminController {
             }
 
             $news = new News();
-            $add = $news->addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, Auth::guard('admin')->user()->id, $type, $video);
+            $add = $news->addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, Auth::guard('admin')->user()->id, $type, $video, $views);
             if ($add) {
                 $add->video_source = $video_source;
                 $add->watermark_applied = $this->watermarkEnabled();
@@ -323,6 +331,8 @@ class NewsController extends AdminController {
             $pub_date = $request->get('pub_date');
             $publish = (int) $request->get('publish');
             $sidebar = (int) $request->get('main');
+            // فارغ = يبقى الرقم الحالي كما هو
+            $views = $request->filled('views') ? $request->get('views') : null;
 
             $validator = Validator::make([
                         'category_id' => $category_id,
@@ -336,6 +346,7 @@ class NewsController extends AdminController {
                         'video' => $video_source == 'url' ? $video : 'x',
                         'video_source' => $video_source,
                         'video_file' => $video_file,
+                        'views' => $views,
                             ], [
                         'category_id' => 'required',
                         'title' => 'required',
@@ -347,6 +358,7 @@ class NewsController extends AdminController {
                         'image' => 'nullable|image',
                         'video' => 'required_if:type,video|nullable|string',
                         'video_file' => 'nullable|mimes:mp4,mov,webm,ogg,mkv,avi|max:102400',
+                        'views' => 'nullable|integer|min:0',
             ]);
 //////////////////////////////////////////////////////////
             if ($validator->fails()) {
@@ -386,7 +398,7 @@ class NewsController extends AdminController {
                     }
                 }
 
-                $update = $news->updateNews($info, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar, $type, $video);
+                $update = $news->updateNews($info, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar, $type, $video, $views);
                 if ($update) {
                     $update->video_source = $video_source;
                     if ($new_image_uploaded) {

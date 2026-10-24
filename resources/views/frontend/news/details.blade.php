@@ -84,8 +84,9 @@
                                 </div>
                                 @endif
                                 <div class="post-content">
-                                    <ul class="lab-ul post-date my-3">
+                                    <ul class="lab-ul post-date news-meta my-3">
                                         <li><span><i class="fa fa-calendar me-2"></i> {{ $post_news->pub_date }}</span></li>
+                                        <li>@include('frontend.news.parts.views', ['views' => $post_news->views])</li>
                                     </ul>
                                     {!! $post_news->descs !!}
                                     <div class="tags-area">
@@ -154,6 +155,7 @@
                                                         </a>
                                                         <p class="card-text"><small
                                                                 class="text-muted">{{ $item->pub_date }}</small></p>
+                                                        <p class="card-text"><small class="text-muted">@include('frontend.news.parts.views', ['views' => $item->views])</small></p>
                                                     </div>
                                                 </div>
                                             </div>

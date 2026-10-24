@@ -165,6 +165,13 @@
                     <input type="text" name="pub_date" id="pub_date" value="{{ old('pub_date') ? old('pub_date') : date('Y-m-d H:i:s') }}" class="form-control rtl" placeholder="تاريخ النشر">
                 </div>
             </div>
+            <div class="row mb-5">
+                <label class="col-md-3 col-form-label">عدد المشاهدات</label>
+                <div class="col-md-6">
+                    <input type="number" min="0" step="1" name="views" id="views" value="{{ old('views') }}" class="form-control" placeholder="{{ number_format(\App\Models\News::defaultViews()) }}">
+                    <div class="form-text">اتركه فارغاً لاستخدام الرقم الافتراضي من الإعدادات ({{ \App\Helpers\Helper::format_views(\App\Models\News::defaultViews()) }}).</div>
+                </div>
+            </div>
             @can('admin.news.publish')
             <div class="row mb-5">
                 <label class="col-md-3 col-form-label">نشر</label>

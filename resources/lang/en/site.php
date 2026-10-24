@@ -30,6 +30,7 @@ return [
     'news' => 'Our Achievements',
     'latest_new_blogs' => 'Latest News & Blogs',
     'read_more' => 'Read More',
+    'views' => 'views',
     'achievements' => 'Achievements',
     'our_achievements' => 'Our Key Achievements',
     'achievements_intro' => 'Milestones and accomplishments Alwattan Media Group has reached throughout its professional journey.',

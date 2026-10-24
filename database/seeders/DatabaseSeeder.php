@@ -24,5 +24,6 @@ class DatabaseSeeder extends Seeder
         $this->call(SyncPermissionsSeeder::class);
         $this->call(HomeSlidesSeeder::class);
         $this->call(SocialsSeeder::class);
+        $this->call(NewsViewsSeeder::class);
     }
 }

@@ -7,8 +7,9 @@
                 <img src="{{ url($post_news->image)}}" class="rounded-lg" alt="blog">
             </div>
             <div class="post-content">
-                <ul class="lab-ul post-date my-3">
+                <ul class="lab-ul post-date news-meta my-3">
                     <li><span><i class="fa fa-calendar me-2"></i> {{$post_news->pub_date}}</span></li>
+                    <li>@include('frontend.news.parts.views', ['views' => $post_news->views])</li>
                 </ul>
                 {!! $post_news->descs !!}
                 <div class="tags-area">
