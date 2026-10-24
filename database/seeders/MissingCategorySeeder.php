@@ -33,7 +33,7 @@ class MissingCategorySeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
-            foreach (['ar' => 'مقالات', 'en' => 'Articles'] as $locale => $name) {
+            foreach (['ar' => 'الأخبار', 'en' => 'News'] as $locale => $name) {
                 DB::table('categories_translations')->insert([
                     'categories_id' => $id,
                     'locale' => $locale,

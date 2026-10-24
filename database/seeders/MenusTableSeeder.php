@@ -42,8 +42,8 @@ class MenusTableSeeder extends Seeder {
                 'sort' => 3,
             ],
             [
-                'name_ar' => 'مقالات',
-                'name_en' => 'Blog',
+                'name_ar' => 'الأخبار',
+                'name_en' => 'News',
                 'url' => '#section-schedule',
                 'icon' => 'fa fa-pencil-square-o',
                 'image' => null,

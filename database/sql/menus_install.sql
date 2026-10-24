@@ -39,7 +39,7 @@ SELECT * FROM (
   SELECT 'الرئيسية' AS a, 'Home' AS b, '#section-hero' AS c, 'fa fa-home' AS d, NULL AS e, '_self' AS f, 0 AS g, 1 AS h, 1 AS i, NOW() AS j, NOW() AS k
   UNION ALL SELECT 'من نحن', 'About Us', '#section-about', 'fa fa-info-circle', NULL, '_self', 0, 2, 1, NOW(), NOW()
   UNION ALL SELECT 'خدماتنا', 'Our Services', '#section-services', 'fa fa-cogs', NULL, '_self', 0, 3, 1, NOW(), NOW()
-  UNION ALL SELECT 'مقالات', 'Blog', '#section-schedule', 'fa fa-pencil-square-o', NULL, '_self', 0, 4, 1, NOW(), NOW()
+  UNION ALL SELECT 'الأخبار', 'News', '#section-schedule', 'fa fa-pencil-square-o', NULL, '_self', 0, 4, 1, NOW(), NOW()
   UNION ALL SELECT 'شركاؤنا', 'Partners', '#section-partners', 'fa fa-handshake-o', NULL, '_self', 0, 5, 1, NOW(), NOW()
   UNION ALL SELECT 'اتصل بنا', 'Contact Us', '#section-contact', 'fa fa-envelope', NULL, '_self', 0, 6, 1, NOW(), NOW()
   UNION ALL SELECT 'جريدة الوطن', 'Al Wattan Newspaper', 'https://alwattan.ps', 'fa fa-newspaper-o', 'wattan-newspaper.png', '_blank', 0, 7, 1, NOW(), NOW()
