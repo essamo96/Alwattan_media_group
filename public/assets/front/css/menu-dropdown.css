@@ -1,0 +1,270 @@
+/* ==========================================================================
+   القوائم المنسدلة في الناف بار («المنصات الإعلامية» و«المزيد» ...)
+   - شكل حديث متناسق مع ألوان الموقع بدل القائمة الرمادية ذات العرض الثابت.
+   - سهم يدل على وجود قائمة فرعية، وحركة ظهور ناعمة.
+   - الجوال: قوائم فرعية قابلة للطي (accordion) بدل أن تكون مخفية.
+   - داخل «المزيد»: القائمة الفرعية تنفتح للأسفل بدل أن تخرج خارج الشاشة.
+   السلوك (نقر/لمس/كيبورد/Esc) في menu-dropdown.js؛ بدونه تبقى القائمة تفتح بالتمرير.
+   ========================================================================== */
+
+/* ---------- سهم العنصر الأب (كل الأحجام) ---------- */
+header #mainmenu li.has-children > a > span::after {
+    content: "\f107";
+    font-family: "FontAwesome";
+    display: inline-block;
+    margin-inline-start: 7px;
+    font-size: 13px;
+    line-height: 1;
+    letter-spacing: 0;
+    vertical-align: middle;
+    transition: transform .25s ease;
+}
+header #mainmenu li.has-children.is-open > a > span::after {
+    transform: rotate(180deg);
+}
+
+/* ==========================================================================
+   سطح المكتب
+   ========================================================================== */
+@media (min-width: 993px) {
+
+    /* اللوحة */
+    html[dir] header #mainmenu li > ul {
+        width: auto;
+        min-width: 250px;
+        max-width: 340px;
+        height: auto;
+        margin: 0;
+        padding: 8px;
+        background: #1b2336;
+        border: 1px solid rgba(255, 255, 255, .1);
+        border-radius: 14px;
+        box-shadow: 0 22px 46px rgba(8, 12, 30, .45);
+        overflow: visible;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(10px) scale(.98);
+        transform-origin: top center;
+        /* الإغلاق مؤجَّل قليلاً حتى لا تختفي اللوحة إذا انحرف الماوس لحظة عن الفجوة */
+        transition: opacity .2s ease, transform .2s ease, visibility 0s linear .2s;
+    }
+
+    /* سهم صغير أعلى اللوحة */
+    html[dir] header #mainmenu li > ul::before {
+        content: "";
+        position: absolute;
+        top: -7px;
+        inset-inline-start: 28px;
+        width: 12px;
+        height: 12px;
+        background: #1b2336;
+        /* حدود فعلية (لا منطقية) كي يبقى السهم متماثلاً ويشير للأعلى في RTL وLTR */
+        border-top: 1px solid rgba(255, 255, 255, .1);
+        border-left: 1px solid rgba(255, 255, 255, .1);
+        transform: rotate(45deg);
+    }
+
+    /* تقليب جهة اللوحة إذا كانت ستخرج من الشاشة (يحددها menu-dropdown.js) */
+    html[dir="rtl"] header #mainmenu li.flip > ul {
+        right: auto;
+        left: 0;
+    }
+    html[dir="ltr"] header #mainmenu li.flip > ul {
+        left: auto;
+        right: 0;
+    }
+
+    /* فتح اللوحة: تمرير الماوس (للأجهزة التي تدعمه) أو الحالة is-open من JS */
+    html[dir] header #mainmenu li.has-children.is-open > ul {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: none;
+        transition-delay: 0s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+        html[dir] header #mainmenu li.has-children:not(.is-closed):hover > ul {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: none;
+            transition-delay: 0s;
+        }
+        html[dir] header #mainmenu li.has-children:not(.is-closed):hover > a > span::after {
+            transform: rotate(180deg);
+        }
+    }
+
+    /* العنصر الأب عند فتح قائمته */
+    header #mainmenu > li.has-children.is-open > a,
+    header #mainmenu > li.has-children:hover > a {
+        color: #7cc4ff;
+    }
+
+    /* عناصر اللوحة */
+    html[dir] header #mainmenu li li {
+        display: block;
+        float: none;
+        width: 100%;
+        border: 0;
+        font-size: 14px;
+        letter-spacing: 0;
+        text-transform: none;
+    }
+    html[dir] header #mainmenu li li a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 11px 14px !important;
+        border: 0;
+        border-radius: 10px;
+        background: transparent;
+        color: #dfe6f5;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.6;
+        letter-spacing: 0;
+        text-align: start;
+        text-transform: none;
+        white-space: normal;
+        transition: background .18s ease, color .18s ease, padding .18s ease;
+    }
+    html[dir] header #mainmenu ul li:hover > a,
+    html[dir] header #mainmenu li li a:hover,
+    html[dir] header #mainmenu li li a:focus-visible {
+        background: rgba(255, 255, 255, .09);
+        color: #fff;
+        outline: none;
+    }
+    html[dir] header #mainmenu li li a:hover,
+    html[dir] header #mainmenu li li a:focus-visible {
+        padding-inline-start: 18px !important;
+    }
+
+    /* أيقونة «رابط خارجي» لعناصر تُفتح بتبويب جديد */
+    html[dir] header #mainmenu li li a[target="_blank"]::after {
+        content: "\f08e" !important;
+        font-family: "FontAwesome";
+        float: none;
+        margin: 0 0 0 auto;
+        margin-inline-start: auto;
+        font-size: 12px;
+        color: #7cc4ff;
+        opacity: .65;
+    }
+
+    /* سهم عنصر أب داخل لوحة (مثل «المنصات الإعلامية» داخل «المزيد») يذهب لطرف السطر */
+    html[dir] header #mainmenu li li.has-children > a > span {
+        margin-inline-start: auto;
+    }
+
+    /* ------ داخل «المزيد»: القائمة الفرعية accordion للأسفل بدل خروجها خارج الشاشة ------ */
+    html[dir] header #menu-more-list li > ul {
+        position: static;
+        width: auto;
+        min-width: 0;
+        max-width: none;
+        margin: 2px 0 6px;
+        padding: 4px;
+        background: rgba(255, 255, 255, .05);
+        border: 0;
+        border-radius: 10px;
+        box-shadow: none;
+        display: none;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: none;
+        transition: none;
+    }
+    html[dir] header #menu-more-list li > ul::before {
+        display: none;
+    }
+    html[dir] header #menu-more-list li.has-children.is-open > ul {
+        display: block;
+    }
+    html[dir] header #menu-more-list li.has-children:hover > ul {
+        display: none;
+    }
+    html[dir] header #menu-more-list li.has-children.is-open:hover > ul {
+        display: block;
+    }
+    html[dir] header #menu-more-list li li a {
+        padding: 9px 12px !important;
+        font-size: 13px;
+    }
+}
+
+/* ==========================================================================
+   الجوال / التابلت: درج القائمة — قوائم فرعية قابلة للطي
+   ========================================================================== */
+@media (max-width: 992px) {
+    header #mainmenu li.has-children > a {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+    header #mainmenu li.has-children > a > span {
+        margin-inline-start: auto;
+        padding-inline-end: 4px;
+    }
+
+    /* مخفية افتراضياً وتظهر عند الفتح */
+    html[dir] header #mainmenu li > ul {
+        display: none;
+        position: static;
+        height: auto;
+        margin: 0;
+        padding: 2px 0 8px;
+        opacity: 1;
+        visibility: visible;
+        overflow: visible;
+        background: rgba(0, 0, 0, .16);
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+        transform: none;
+    }
+    html[dir] header #mainmenu li.has-children.is-open > ul {
+        display: block;
+        animation: menuDropdownIn .22s ease;
+    }
+    html[dir] header #mainmenu li > ul::before {
+        display: none;
+    }
+
+    html[dir] header #mainmenu li li a {
+        font-size: 14px;
+        letter-spacing: 0;
+        text-transform: none;
+        color: #dfe6f5;
+    }
+    html[dir] header #mainmenu li li a:hover {
+        color: #fff;
+    }
+    html[dir] header #mainmenu li li a[target="_blank"]::after {
+        display: inline-block !important;
+        content: "\f08e" !important;
+        font-family: "FontAwesome";
+        float: none;
+        margin: 0 8px;
+        font-size: 12px;
+        color: #7cc4ff;
+        opacity: .7;
+    }
+}
+
+@keyframes menuDropdownIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[dir] header #mainmenu li > ul,
+    header #mainmenu li.has-children > a > span::after {
+        transition: none;
+        animation: none !important;
+    }
+}

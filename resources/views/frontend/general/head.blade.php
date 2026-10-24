@@ -42,6 +42,7 @@
 <!-- سلايدر القسم الرئيسي + إصلاح الناف بار -->
 <link href="{{ asset_v('assets/front/css/hero-slider.css') }}" rel="stylesheet" type="text/css">
 <link href="{{ asset_v('assets/front/css/navbar-fix.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ asset_v('assets/front/css/menu-dropdown.css') }}" rel="stylesheet" type="text/css">
 
 <!-- custom font -->
 <link rel="stylesheet" href="{{ asset_v('assets/front/css/font-style.css') }}" type="text/css">

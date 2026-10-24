@@ -24,3 +24,4 @@
 <script src="{{ asset_v('assets/front/js/validation.js') }}"></script>
 <script src="{{ asset_v('assets/front/js/countdown-custom.js') }}"></script>
 <script src="{{ asset_v('assets/front/js/nav-priority.js') }}"></script>
+<script src="{{ asset_v('assets/front/js/menu-dropdown.js') }}"></script>
