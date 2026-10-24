@@ -6,6 +6,7 @@ use App\Helpers\Helper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class News extends Model {
@@ -27,6 +28,33 @@ class News extends Model {
     // العدد المختصر للعرض في الواجهة (مثال: 77K).
     public function getViewsLabelAttribute() {
         return Helper::format_views($this->views);
+    }
+
+    //////////////////////////////////////////////
+    // زيارة واحدة = +1. زيادة ذرّية على مستوى القاعدة (لا تضيع عند الزيارات المتزامنة) وبدون لمس updated_at.
+    public function incrementViews() {
+        DB::table($this->table)->where('id', $this->id)->increment('views');
+        $this->setAttribute('views', (int) $this->views + 1);
+        $this->syncOriginalAttribute('views');
+
+        return $this;
+    }
+
+    //////////////////////////////////////////////
+    // قائمة الرئيسية مخزّنة بالكاش للأبد، فنقرأ منها الأخبار ونحدّث المشاهدات فقط من القاعدة
+    // (استعلام واحد صغير) حتى يظهر العدد الحالي دون إلغاء الكاش عند كل زيارة.
+    public static function applyFreshViews($items) {
+        if (count($items) == 0) {
+            return $items;
+        }
+        $fresh = DB::table('news')->whereIn('id', collect($items)->pluck('id'))->pluck('views', 'id');
+        foreach ($items as $item) {
+            if (isset($fresh[$item->id])) {
+                $item->setAttribute('views', (int) $fresh[$item->id]);
+            }
+        }
+
+        return $items;
     }
 
     //////////////////////////////////////////////

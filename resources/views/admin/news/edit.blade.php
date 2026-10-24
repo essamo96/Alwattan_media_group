@@ -172,7 +172,8 @@
                 <label class="col-md-3 col-form-label">عدد المشاهدات</label>
                 <div class="col-md-6">
                     <input type="number" min="0" step="1" name="views" id="views" value="{{ old('views', $info->views) }}" class="form-control" placeholder="عدد المشاهدات">
-                    <div class="form-text">الرقم الذي يظهر للزوار (يُعرض مختصراً مثل {{ \App\Helpers\Helper::format_views($info->views) }}).</div>
+                    <input type="hidden" name="views_loaded" value="{{ $info->views }}">
+                    <div class="form-text">العدد الحالي (يزداد +1 مع كل زيارة للخبر). غيّر الرقم لضبطه يدوياً — يُعرض للزوار مختصراً مثل {{ \App\Helpers\Helper::format_views($info->views) }} والرقم الكامل عند تمرير الماوس.</div>
                 </div>
             </div>
             @can('admin.news.publish')

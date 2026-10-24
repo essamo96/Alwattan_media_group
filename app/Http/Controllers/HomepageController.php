@@ -38,6 +38,7 @@ class HomepageController extends Controller {
                     $news = new News();
                     return $news->getLastNews(4, $locale);
                 });
+        News::applyFreshViews(parent::$data['news']);
         parent::$data['testimonials'] = Cache::rememberForever('testimonials', function () {
                     $items = new Testimonials();
                     return $items->getAllTestimonials();

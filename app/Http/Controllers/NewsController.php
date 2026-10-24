@@ -20,12 +20,16 @@ class NewsController extends Controller {
     }
 
     ///////////////////////////////////////
-    public function getNews($slug) {
+    public function getNews(Request $request, $slug) {
         $locale = LaravelLocalization::getCurrentLocale();
         $news = new News();
         $info = $news->getNewBySlug($slug);
         if (!$info) {
             return response()->view('errors.404', parent::$data, 500);
+        }
+        // كل زيارة لخبر منشور تزيد المشاهدات +1 (الأخبار غير المنشورة/معاينة الأدمن وطلبات HEAD لا تُحتسب).
+        if ($info->publish == 1 && !$request->isMethod('HEAD')) {
+            $info->incrementViews();
         }
         parent::$data['post_news'] = $info;
         parent::$data['last_news'] = $news->getLastNews(4, $locale);

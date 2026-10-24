@@ -331,8 +331,12 @@ class NewsController extends AdminController {
             $pub_date = $request->get('pub_date');
             $publish = (int) $request->get('publish');
             $sidebar = (int) $request->get('main');
-            // فارغ = يبقى الرقم الحالي كما هو
+            // فارغ = يبقى الرقم الحالي. وإن لم يغيّره الأدمن عن القيمة وقت فتح الصفحة نتجاهله،
+            // حتى لا يُرجع الحفظ العدّاد للخلف ويمحو زيارات حصلت أثناء التعديل.
             $views = $request->filled('views') ? $request->get('views') : null;
+            if ($views !== null && (string) $views === (string) $request->get('views_loaded')) {
+                $views = null;
+            }
 
             $validator = Validator::make([
                         'category_id' => $category_id,
