@@ -165,7 +165,13 @@
             <div class="row mb-5">
                 <label class="col-md-3 col-form-label">تاريخ النشر</label>
                 <div class="col-md-6">
-                    <input type="text" name="pub_date" id="pub_date" value="{{ $info->pub_date }}" class="form-control rtl" placeholder="تاريخ النشر">
+                    <div class="input-group" id="pub_date_wrap">
+                        <input type="text" name="pub_date" id="pub_date" value="{{ old('pub_date', $info->pub_date) }}" class="form-control" dir="ltr" data-input autocomplete="off" placeholder="اختر تاريخ ووقت النشر">
+                        <button type="button" class="btn btn-light-primary" data-toggle title="فتح التقويم">
+                            <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                        </button>
+                    </div>
+                    <div class="form-text">التاريخ والوقت اللذان يظهران للزوار على الموقع كتاريخ نشر الخبر.</div>
                 </div>
             </div>
             <div class="row mb-5">
@@ -330,4 +336,5 @@ $(document).on('click', '.media-row-remove', function () {
 });
 $('#media_add_row').on('click', addMediaRow);
 </script>
+@include('admin.news.parts.pub-date-picker')
 @endpush

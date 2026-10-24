@@ -97,10 +97,24 @@ class News extends Model {
     }
 
     /////
-    public function addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, $user_id, $type = 'image', $video = null, $views = null) {
-        if ($publish == 1) {
-            $pub_date = date('Y-m-d H:i:s');
+    // تاريخ النشر الذي يختاره الأدمن من التقويم يُحفظ كما هو (ويظهر على الموقع)، وكان سابقاً يُستبدل
+    // بوقت الحفظ عند تفعيل "نشر" فيبدو كأنه تاريخ الإنشاء. الفارغ/غير الصالح يرجع للوقت الحالي
+    // (أو للتاريخ المحفوظ سابقاً عند التعديل).
+    public static function normalizePubDate($value, $fallback = null) {
+        if (!empty($value)) {
+            try {
+                return \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s');
+            } catch (\Throwable $e) {
+                // نسقط للقيمة البديلة
+            }
         }
+
+        return $fallback ?: date('Y-m-d H:i:s');
+    }
+
+    /////
+    public function addNews($title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $sidebar, $language, $user_id, $type = 'image', $video = null, $views = null) {
+        $pub_date = self::normalizePubDate($pub_date);
         $this->views = $views === null ? self::defaultViews() : (int) $views;
         $this->title = $title;
         $this->slug = $slug;
@@ -124,9 +138,7 @@ class News extends Model {
     //////////////////////////////////////////////
     public function updateNews($obj, $title, $slug, $sub, $descs, $image, $category_id, $tags, $pub_date, $publish, $language, $sidebar, $type = 'image', $video = null, $views = null) {
         $old_resort = $obj->resort;
-        if ($obj->publish == 0 && $publish == 1) {
-            $pub_date = date('Y-m-d H:i:s');
-        }
+        $pub_date = self::normalizePubDate($pub_date, $obj->pub_date);
         if ($views !== null) {
             $obj->views = (int) $views;
         }
@@ -150,12 +162,12 @@ class News extends Model {
     }
 
     //////////////////////////////////////////////
+    // تبديل النشر السريع من الجدول يغيّر الحالة فقط ولا يلمس تاريخ النشر المحدّد من التقويم.
     public function updatePublish($id, $publish) {
         return $this
                         ->where('id', '=', $id)
                         ->update([
                             'publish' => $publish,
-                            'pub_date' => date('Y-m-d H:i:s'),
         ]);
     }
 

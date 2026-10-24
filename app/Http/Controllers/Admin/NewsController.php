@@ -129,6 +129,7 @@ class NewsController extends AdminController {
                     'video_source' => $video_source,
                     'video_file' => $video_file,
                     'views' => $views,
+                    'pub_date' => $pub_date,
                         ], [
                     'category_id' => 'required',
                     'title' => 'required',
@@ -141,6 +142,7 @@ class NewsController extends AdminController {
                     'video' => 'required_if:type,video|nullable|string',
                     'video_file' => 'required_if:video_source,file|nullable|mimes:mp4,mov,webm,ogg,mkv,avi|max:102400',
                     'views' => 'nullable|integer|min:0',
+                    'pub_date' => 'nullable|date',
         ]);
 //////////////////////////////////////////////////////////
         if ($validator->fails()) {
@@ -351,6 +353,7 @@ class NewsController extends AdminController {
                         'video_source' => $video_source,
                         'video_file' => $video_file,
                         'views' => $views,
+                        'pub_date' => $pub_date,
                             ], [
                         'category_id' => 'required',
                         'title' => 'required',
@@ -363,6 +366,7 @@ class NewsController extends AdminController {
                         'video' => 'required_if:type,video|nullable|string',
                         'video_file' => 'nullable|mimes:mp4,mov,webm,ogg,mkv,avi|max:102400',
                         'views' => 'nullable|integer|min:0',
+                        'pub_date' => 'nullable|date',
             ]);
 //////////////////////////////////////////////////////////
             if ($validator->fails()) {
